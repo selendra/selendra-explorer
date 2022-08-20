@@ -1,7 +1,7 @@
-import { Table } from "antd";
-import { Link } from "react-router-dom";
-import { formatNumber, shortenAddress, timeDuration } from "../utils";
-import LaodingLogo from "../assets/loading.png";
+import { Table } from 'antd';
+import { Link } from 'react-router-dom';
+import { formatNumber, shortenAddress, timeDuration } from '../utils';
+import LaodingLogo from '../assets/loading.png';
 
 export default function BlocksTable({ short, loading, data, onChange }) {
   return (
@@ -45,7 +45,7 @@ export default function BlocksTable({ short, loading, data, onChange }) {
         dataIndex="finalized"
         render={(finalized) => (
           <div>
-            { finalized ?
+            {finalized ? (
               <div>
                 <img
                   src="/assets/icons/check.svg"
@@ -53,20 +53,20 @@ export default function BlocksTable({ short, loading, data, onChange }) {
                   width={18}
                   height={18}
                 />
-                <span style={{ marginLeft: "4px" }}>Finalized</span>
+                <span style={{ marginLeft: '4px' }}>Finalized</span>
               </div>
-              :
+            ) : (
               <div>
-                <img className="loading-img-block" alt='' src={LaodingLogo} />
+                <img className="loading-img-block" alt="" src={LaodingLogo} />
               </div>
-            }
+            )}
           </div>
         )}
       />
       {!short && (
         <Table.Column
           title="Time"
-          responsive={["md"]}
+          responsive={['md']}
           dataIndex="timestamp"
           render={(timestamp) => <p>{timeDuration(timestamp)}</p>}
         />

@@ -1,86 +1,105 @@
-import { Col, Row } from "antd";
-import { useEffect, useState } from "react";
-import Search from "../components/Search";
-import Overview from "../components/Overview";
-import BlocksTable from "../components/BlocksTable";
-import TransferTable from "../components/TransferTable";
-import AccountsTable from "../components/AccountsTable";
-import { useAPIState } from "../context/APIContext";
-import Loading from "../components/Loading";
-import bannerImg from "../assets/loading.png";
+import { Col, Row } from 'antd';
+import { useEffect, useState } from 'react';
+import Search from '../components/Search';
+import Overview from '../components/Overview';
+import BlocksTable from '../components/BlocksTable';
+import TransferTable from '../components/TransferTable';
+import AccountsTable from '../components/AccountsTable';
+// import { useAPIState } from '../context/APIContext';
+import Loading from '../components/Loading';
+// import bannerImg from '../assets/loading.png';
+import { QUERY_ACCOUNT, QURERY_BLOCKS } from '../graphql/query';
+import { useQuery } from '@apollo/client';
 
 export default function Home() {
-  const { api } = useAPIState();
-  const [loading, setLoading] = useState(true);
-  const [blockNumber, setBlockNumber] = useState(0);
-  const [blockNumberFinalized, setBlockNumberFinalized] = useState(0);
-  const [validators, setValidators] = useState(0);
+  // const { api } = useAPIState();
+  // const [loading, setLoading] = useState(true);
+  // const [blockNumber, setBlockNumber] = useState(0);
+  // const [blockNumberFinalized, setBlockNumberFinalized] = useState(0);
+  // const [validators, setValidators] = useState(0);
   const [overview, setOverview] = useState();
+  // const [loading, setLoading] = useState(false);
+  const { data: data1, loading } = useQuery(QUERY_ACCOUNT);
+  const { data: block, loading: loadingblock } = useQuery(QURERY_BLOCKS);
 
-  const bestNumber = api.derive.chain.bestNumber;
-  const bestNumberFinalized = api.derive.chain.bestNumberFinalized;
-  const validatorsData = api.query.session.validators;
-  useEffect(() => {
-    let unsubscribeAll = null;
+  // const bestNumber = api.derive.chain.bestNumber;
+  // const bestNumberFinalized = api.derive.chain.bestNumberFinalized;
+  // const validatorsData = api.query.session.validators;
+  // useEffect(() => {
+  //   let unsubscribeAll = null;
 
-    bestNumber((number) => {
-      setBlockNumber(number.toNumber().toLocaleString("en-US"));
-    });
-    bestNumberFinalized((number) => {
-      setBlockNumberFinalized(number.toNumber().toLocaleString("en-US"));
-    });
-    validatorsData((data) => {
-      setValidators(data.toHuman());
-    })
-      .then((unsub) => {
-        unsubscribeAll = unsub;
-      })
-      .catch(console.error);
+  //   bestNumber((number) => {
+  //     setBlockNumber(number.toNumber().toLocaleString('en-US'));
+  //   });
+  //   bestNumberFinalized((number) => {
+  //     setBlockNumberFinalized(number.toNumber().toLocaleString('en-US'));
+  //   });
+  //   validatorsData((data) => {
+  //     setValidators(data.toHuman());
+  //   })
+  //     .then((unsub) => {
+  //       unsubscribeAll = unsub;
+  //     })
+  //     .catch(console.error);
 
-    return () => unsubscribeAll && unsubscribeAll();
-  }, [bestNumber, bestNumberFinalized, validatorsData]);
+  //   return () => unsubscribeAll && unsubscribeAll();
+  // }, [bestNumber, bestNumberFinalized, validatorsData]);
 
-  useEffect(() => {
-    Promise.all([
-      fetch(`${process.env.REACT_APP_API}/block/all/1`),
-      fetch(`${process.env.REACT_APP_API}/transfer/all/1`),
-      fetch(`${process.env.REACT_APP_API}/totals`),
-      fetch(`${process.env.REACT_APP_API}/staking/status`),
-      fetch(`${process.env.REACT_APP_API}/totals/lock_balances`),
-      fetch(`${process.env.REACT_APP_API}/staking/status`),
-      fetch(`${process.env.REACT_APP_API}/account/all/1`),
-    ])
-      .then(async ([a, b, c, d, e, f, g]) => {
-        const block = await a.json();
-        const transfer = await b.json();
-        const total = await c.json();
-        const staking = await d.json();
-        const totalLock = await e.json();
-        const waitingCount = await f.json();
-        const account = await g.json();
+  // useEffect(() => {
+  //   Promise.all([
+  //     fetch(`${process.env.REACT_APP_API}/block/all/1`),
+  //     fetch(`${process.env.REACT_APP_API}/transfer/all/1`),
+  //     fetch(`${process.env.REACT_APP_API}/totals`),
+  //     fetch(`${process.env.REACT_APP_API}/staking/status`),
+  //     fetch(`${process.env.REACT_APP_API}/totals/lock_balances`),
+  //     fetch(`${process.env.REACT_APP_API}/staking/status`),
+  //     fetch(`${process.env.REACT_APP_API}/account/all/1`),
+  //   ])
+  //     .then(async ([a, b, c, d, e, f, g]) => {
+  //       const block = await a.json();
+  //       const transfer = await b.json();
+  //       const total = await c.json();
+  //       const staking = await d.json();
+  //       const totalLock = await e.json();
+  //       const waitingCount = await f.json();
+  //       const account = await g.json();
 
-        setLoading(false);
-        setOverview({
-          waitingCount,
-          block,
-          transfer,
-          total,
-          staking,
-          totalLock,
-          account
-        });
-      })
-      .catch((err) => {
-        setLoading(false);
-      });
-  }, [blockNumber]);
+  //       setLoading(false);
+  //       setOverview({
+  //         waitingCount,
+  //         block,
+  //         transfer,
+  //         total,
+  //         staking,
+  //         totalLock,
+  //         account,
+  //       });
+  //     })
+  //     .catch((err) => {
+  //       setLoading(false);
+  //     });
+  // }, [blockNumber]);
 
-  if (loading)
+  if (loading || loadingblock)
     return (
       <div className="container">
         <Loading />
       </div>
     );
+
+  const {
+    // blocks,
+    blocksFinalized,
+    extrinsicSigned,
+    accounts,
+    transfers,
+    issuance,
+    validators,
+    lockBalance,
+    waitingCount,
+  } = [100];
+
+  const total_blocks = block;
 
   return (
     <div>
@@ -91,15 +110,15 @@ export default function Home() {
           <Search />
           <div className="spacing" />
           <Overview
-            total_blocks={blockNumber}
-            total_blocksFinalized={blockNumberFinalized}
-            total_extrinsicSigned={overview?.total.SignedExtrinsic}
-            total_accounts={overview?.total.Accounts}
-            total_transfers={overview?.total.Transfers}
-            total_issuance={overview?.block.blocks[0].totalIssuance}
-            total_validators={validators.length}
-            total_lockBalance={overview?.totalLock.totalLockBalances}
-            waitingCount={overview?.waitingCount.waitingValidatorCount}
+            total_blocks={total_blocks}
+            total_blocksFinalized={blocksFinalized}
+            total_extrinsicSigned={extrinsicSigned}
+            total_accounts={accounts}
+            total_transfers={transfers}
+            total_issuance={issuance}
+            total_validators={validators}
+            total_lockBalance={lockBalance}
+            waitingCount={waitingCount}
           />
         </div>
       </div>

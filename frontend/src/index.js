@@ -4,7 +4,9 @@ import './styles/index.css';
 import App from './App';
 import 'antd/dist/antd.variable.min.css';
 import { ConfigProvider } from 'antd';
-import { APIContextProvider } from './context/APIContext';
+import { ApolloProvider } from '@apollo/client';
+import client from './lib/apollo-config';
+// import { APIContextProvider } from './context/APIContext';
 import Footer from './components/Footer';
 
 ConfigProvider.config({
@@ -14,13 +16,15 @@ ConfigProvider.config({
 });
 
 ReactDOM.render(
-  <APIContextProvider>
+  // <APIContextProvider>
+  <ApolloProvider client={client}>
     <ConfigProvider>
-      <div className='app'>
+      <div className="app">
         <App />
       </div>
       <Footer />
     </ConfigProvider>
-  </APIContextProvider>,
+  </ApolloProvider>,
+  // </APIContextProvider>
   document.getElementById('root')
 );

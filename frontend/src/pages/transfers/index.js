@@ -1,7 +1,7 @@
-import { useState } from "react";
-import TransferTable from "../../components/TransferTable";
-import useFetch from "../../hooks/useFetch";
-import LaodingLogo from "../../assets/loading.png";
+import { useState } from 'react';
+import TransferTable from '../../components/TransferTable';
+import useFetch from '../../hooks/useFetch';
+import LaodingLogo from '../../assets/loading.png';
 export default function Transfers() {
   const [page, setPage] = useState(1);
   const { loading, data = [] } = useFetch(
@@ -18,7 +18,7 @@ export default function Transfers() {
             loading={{
               indicator: (
                 <div>
-                  <img className="loading-img-block" src={LaodingLogo} />
+                  <img className="loading-img-block" alt="" src={LaodingLogo} />
                 </div>
               ),
               spinning: !data,
