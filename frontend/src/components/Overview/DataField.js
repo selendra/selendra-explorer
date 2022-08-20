@@ -1,5 +1,5 @@
-import { Col, Row, Tooltip } from "antd";
-import { Link } from "react-router-dom";
+import { Col, Row, Tooltip } from 'antd';
+import { Link } from 'react-router-dom';
 
 export default function DataField({ icon, title, data, isPercent, isRoute }) {
   return (
@@ -10,19 +10,19 @@ export default function DataField({ icon, title, data, isPercent, isRoute }) {
         </Col>
         <Col xs={24} sm={20} md={12} lg={12} xl={12}>
           <p className="home-all-data-title">{title}</p>
-          { isRoute ?
+          {isRoute ? (
             <Link to={isRoute} className="home-all-data-route">
-              <Tooltip placement="top" title='Click to see all data!'>
+              <Tooltip placement="top" title="Click to see all data!">
                 <p className="home-all-data-data">
-                  {data} {isPercent && "%"}
+                  {data} {isPercent && '%'}
                 </p>
               </Tooltip>
             </Link>
-            :
+          ) : (
             <p className="home-all-data-data">
-              {data} {isPercent && "%"}
+              {data} {isPercent && '%'}
             </p>
-          }
+          )}
         </Col>
       </Row>
     </Col>

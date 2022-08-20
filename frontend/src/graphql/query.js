@@ -22,10 +22,10 @@ const QUERY_ACCOUNT = gql`
 
 const QURERY_BLOCKS = gql`
   query {
-    block {
-      id
-      finalized
-      extrinsic_root
+    block_aggregate {
+      aggregate {
+        count
+      }
     }
   }
 `;

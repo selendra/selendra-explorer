@@ -19,8 +19,7 @@ export default function Home() {
   // const [validators, setValidators] = useState(0);
   const [overview, setOverview] = useState();
   // const [loading, setLoading] = useState(false);
-  const { data: data1, loading } = useQuery(QUERY_ACCOUNT);
-  const { data: block, loading: loadingblock } = useQuery(QURERY_BLOCKS);
+  const { data: blocks, loading: loadingblock } = useQuery(QURERY_BLOCKS);
 
   // const bestNumber = api.derive.chain.bestNumber;
   // const bestNumberFinalized = api.derive.chain.bestNumberFinalized;
@@ -80,15 +79,15 @@ export default function Home() {
   //     });
   // }, [blockNumber]);
 
-  if (loading || loadingblock)
+  if (loadingblock)
     return (
       <div className="container">
         <Loading />
       </div>
     );
 
+  const data2 = 100;
   const {
-    // blocks,
     blocksFinalized,
     extrinsicSigned,
     accounts,
@@ -97,9 +96,9 @@ export default function Home() {
     validators,
     lockBalance,
     waitingCount,
-  } = [100];
+  } = data2;
 
-  const total_blocks = block;
+  const total_blocks = blocks.block_aggregate.aggregate.count;
 
   return (
     <div>
