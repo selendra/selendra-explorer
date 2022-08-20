@@ -8,10 +8,12 @@ import AccountsTable from '../components/AccountsTable';
 // import { useAPIState } from '../context/APIContext';
 import Loading from '../components/Loading';
 // import bannerImg from '../assets/loading.png';
-import { QUERY_ACCOUNT, QURERY_BLOCKS } from '../graphql/query';
+import { QUERY_ACCOUNT, QUERY_BLOCKS } from '../graphql/query';
 import { useQuery } from '@apollo/client';
+import { useGraphQL } from '../context/useApp';
 
 export default function Home() {
+  const { query } = useGraphQL();
   // const { api } = useAPIState();
   // const [loading, setLoading] = useState(true);
   // const [blockNumber, setBlockNumber] = useState(0);
@@ -19,9 +21,18 @@ export default function Home() {
   // const [validators, setValidators] = useState(0);
   const [overview, setOverview] = useState();
   // const [loading, setLoading] = useState(false);
-  const { data: data1, loading } = useQuery(QUERY_ACCOUNT);
-  const { data: block, loading: loadingblock } = useQuery(QURERY_BLOCKS);
-
+  // const { data: data1, loading } = useQuery(QUERY_ACCOUNT);
+  // const { data: block, loading: loadingblock } = useQuery(QURERY_BLOCKS);
+  const accounts = query(
+    useQuery(QUERY_ACCOUNT, {
+      variables: { limit: 10, offset: 1 },
+    }),
+  );
+  const blocks = query(
+    useQuery(QUERY_BLOCKS, {
+      variables: { limit: 10, offset: 1 },
+    }),
+  );
   // const bestNumber = api.derive.chain.bestNumber;
   // const bestNumberFinalized = api.derive.chain.bestNumberFinalized;
   // const validatorsData = api.query.session.validators;
@@ -80,18 +91,18 @@ export default function Home() {
   //     });
   // }, [blockNumber]);
 
-  if (loading || loadingblock)
-    return (
-      <div className="container">
-        <Loading />
-      </div>
-    );
+  // if (loading || loadingblock)
+  //   return (
+  //     <div className="container">
+  //       <Loading />
+  //     </div>
+  //   );
 
   const {
     // blocks,
     blocksFinalized,
     extrinsicSigned,
-    accounts,
+    // accounts,
     transfers,
     issuance,
     validators,
@@ -99,26 +110,36 @@ export default function Home() {
     waitingCount,
   } = [100];
 
-  const total_blocks = block;
+  // const total_blocks = block;
 
   return (
     <div>
       <div className="home-container">
+        {!accounts.account
+          ? accounts
+          : accounts.account.map((i, index) => {
+              return <div key={index}>{i.address}</div>;
+            })}
+        {!blocks.block
+          ? blocks
+          : blocks.block.map((i, index) => {
+              return <div key={index}>{i.hash}</div>;
+            })}
         <div className="home-info">
           <h1>Selendra Blocks Explorer</h1>
           <div className="spacing" />
           <Search />
           <div className="spacing" />
           <Overview
-            total_blocks={total_blocks}
-            total_blocksFinalized={blocksFinalized}
-            total_extrinsicSigned={extrinsicSigned}
-            total_accounts={accounts}
-            total_transfers={transfers}
-            total_issuance={issuance}
-            total_validators={validators}
-            total_lockBalance={lockBalance}
-            waitingCount={waitingCount}
+          // total_blocks={total_blocks}
+          // total_blocksFinalized={blocksFinalized}
+          // total_extrinsicSigned={extrinsicSigned}
+          // total_accounts={accounts}
+          // total_transfers={transfers}
+          // total_issuance={issuance}
+          // total_validators={validators}
+          // total_lockBalance={lockBalance}
+          // waitingCount={waitingCount}
           />
         </div>
       </div>

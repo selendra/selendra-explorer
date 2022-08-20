@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
 const QUERY_ACCOUNT = gql`
-  query {
-    account {
+  query ($limit: Int, $offset: Int) {
+    account(limit: $limit, offset: $offset) {
       address
       voting_balance
       vested_balance
@@ -20,14 +20,15 @@ const QUERY_ACCOUNT = gql`
   }
 `;
 
-const QURERY_BLOCKS = gql`
-  query {
-    block {
+const QUERY_BLOCKS = gql`
+  query ($limit: Int, $offset: Int) {
+    block(limit: $limit, offset: $offset) {
       id
       finalized
+      hash
       extrinsic_root
     }
   }
 `;
 
-export { QUERY_ACCOUNT, QURERY_BLOCKS };
+export { QUERY_ACCOUNT, QUERY_BLOCKS };
