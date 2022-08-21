@@ -6,20 +6,37 @@ import BlocksTable from '../components/BlocksTable';
 import TransferTable from '../components/TransferTable';
 import AccountsTable from '../components/AccountsTable';
 // import { useAPIState } from '../context/APIContext';
-import Loading from '../components/Loading';
 // import bannerImg from '../assets/loading.png';
-import { QUERY_ACCOUNT, QURERY_BLOCKS } from '../graphql/query';
+import {
+  TOTAL_BLOCKS,
+  TOTAL_EXTRINSIC,
+  TOTAL_ACCOUNT,
+  TOTAL_TRANSFER,
+  TOTAL_VALIDATOR,
+  LATEST_BLOCK,
+} from '../graphql/query';
 import { useQuery } from '@apollo/client';
+import { useGraphQL } from '../context/useApp';
 
 export default function Home() {
+  const { query } = useGraphQL();
+  const [overview, setOverview] = useState();
+
   // const { api } = useAPIState();
   // const [loading, setLoading] = useState(true);
   // const [blockNumber, setBlockNumber] = useState(0);
   // const [blockNumberFinalized, setBlockNumberFinalized] = useState(0);
   // const [validators, setValidators] = useState(0);
-  const [overview, setOverview] = useState();
   // const [loading, setLoading] = useState(false);
-  const { data: blocks, loading: loadingblock } = useQuery(QURERY_BLOCKS);
+
+  const block = query(useQuery(TOTAL_BLOCKS));
+  const extrins = query(useQuery(TOTAL_EXTRINSIC));
+  const accounts = query(useQuery(TOTAL_ACCOUNT));
+  const transfers = query(useQuery(TOTAL_TRANSFER));
+  const validators = query(useQuery(TOTAL_VALIDATOR));
+  const latest_block = query(useQuery(TOTAL_VALIDATOR), {
+    variables: { limit: 5, offset: 1 },
+  });
 
   // const bestNumber = api.derive.chain.bestNumber;
   // const bestNumberFinalized = api.derive.chain.bestNumberFinalized;
@@ -79,26 +96,18 @@ export default function Home() {
   //     });
   // }, [blockNumber]);
 
-  if (loadingblock)
-    return (
-      <div className="container">
-        <Loading />
-      </div>
-    );
+  // if (loading || loadingblock)
+  //   return (
+  //     <div className="container">
+  //       <Loading />
+  //     </div>
+  //   );
 
-  const data2 = 100;
-  const {
-    blocksFinalized,
-    extrinsicSigned,
-    accounts,
-    transfers,
-    issuance,
-    validators,
-    lockBalance,
-    waitingCount,
-  } = data2;
+  const total_issuance = 100;
+  const total_lockBalance = 100;
+  const waitingCount = 200;
 
-  const total_blocks = blocks.block_aggregate.aggregate.count;
+  console.log('latest', latest_block.block);
 
   return (
     <div>
@@ -109,14 +118,44 @@ export default function Home() {
           <Search />
           <div className="spacing" />
           <Overview
-            total_blocks={total_blocks}
-            total_blocksFinalized={blocksFinalized}
-            total_extrinsicSigned={extrinsicSigned}
-            total_accounts={accounts}
-            total_transfers={transfers}
-            total_issuance={issuance}
-            total_validators={validators}
-            total_lockBalance={lockBalance}
+            total_blocks={
+              block.block_aggregate && block.block_aggregate.aggregate.count
+            }
+            total_blocksFinalized={
+              (block.block_aggregate && block.block_aggregate.aggregate.count) -
+              4
+            }
+            total_extrinsicSigned={
+              extrins.extrinsic_aggregate &&
+              extrins.extrinsic_aggregate.aggregate.count
+            }
+            total_accounts={
+              accounts.account_aggregate &&
+              accounts.account_aggregate.aggregate.count
+            }
+            total_transfers={
+              transfers.transfer_aggregate &&
+              transfers.transfer_aggregate.aggregate.count
+            }
+            // total_issuance={
+            //   issuance.issuance_aggregate &&
+            //   issuance.issuance_aggregate.aggregate.count
+            // }
+            total_validators={
+              validators.staking_aggregate &&
+              validators.staking_aggregate.aggregate.count
+            }
+            // total_lockBalance={
+            //   lockBalance.lockBalance_aggregate &&
+            //   lockBalance.lockBalance_aggregate.aggregate.count
+            // }
+            // waitingCount={
+            //   waitingCount.waitingCount_aggregate &&
+            //   waitingCount.waitingCount_aggregate.aggregate.count
+            // }
+            total_issuance={total_issuance}
+            // total_validators={total_validators}
+            total_lockBalance={total_lockBalance}
             waitingCount={waitingCount}
           />
         </div>
@@ -126,7 +165,7 @@ export default function Home() {
         <Row gutter={[16, { xs: 8, sm: 16, md: 24, lg: 32 }]}>
           <Col xs={24} md={24} lg={12} xl={12}>
             <p className="home-subTitle">Latest Blocks</p>
-            <BlocksTable short data={overview?.block} />
+            <BlocksTable short data={latest_block} />
           </Col>
           <Col xs={24} md={24} lg={12} xl={12}>
             <p className="home-subTitle">Account Updates</p>
