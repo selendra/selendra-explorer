@@ -1,12 +1,11 @@
 import { Table } from 'antd';
 import { Link } from 'react-router-dom';
 import { formatNumber, shortenAddress, timeDuration } from '../utils';
-import LaodingLogo from '../assets/loading.png';
 
 export default function BlocksTable({ short, loading, data, onChange }) {
   return (
     <Table
-      dataSource={data?.blocks}
+      dataSource={data}
       loading={loading}
       rowKey={(record) => record.blockNumber}
       className="table-styling"
@@ -26,19 +25,19 @@ export default function BlocksTable({ short, loading, data, onChange }) {
     >
       <Table.Column
         title="Block"
-        dataIndex="blockNumber"
-        render={(blockNumber) => (
-          <Link to={`/blocks/${blockNumber}`}>
+        dataIndex="id"
+        render={(id) => (
+          <Link to={`/blocks/${id}`}>
             <div className="blocks-height">
-              <p># {formatNumber(blockNumber)}</p>
+              <p># {formatNumber(id)}</p>
             </div>
           </Link>
         )}
       />
       <Table.Column
         title="Hash"
-        dataIndex="blockHash"
-        render={(blockHash) => <p>{shortenAddress(blockHash)}</p>}
+        dataIndex="hash"
+        render={(hash) => <p>{shortenAddress(hash)}</p>}
       />
       <Table.Column
         title="Status"
@@ -57,7 +56,11 @@ export default function BlocksTable({ short, loading, data, onChange }) {
               </div>
             ) : (
               <div>
-                <img className="loading-img-block" alt="" src={LaodingLogo} />
+                <img
+                  className="loading-img-block"
+                  alt="loading"
+                  src="/assets/loading.png"
+                />
               </div>
             )}
           </div>

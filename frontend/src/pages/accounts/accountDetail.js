@@ -13,7 +13,8 @@ import {
   QUERY_ACCOUNT_BY_ADDRESS,
   QUERY_COUNT_COLUMNS_ACCOUNT,
   QUERY_EXTRINSIC,
-  QUERY_STACKING,
+  QUERY_STAKING,
+  QUERY_TRANSFERS,
 } from '../../graphql/query';
 
 export default function AccountDetail() {
@@ -41,12 +42,17 @@ export default function AccountDetail() {
       variables: {
         limit: 10,
         offset: 1,
+        where: {
+          signer: {
+            _eq: id,
+          },
+        },
       },
     })
   );
 
   const staking = query(
-    useQuery(QUERY_STACKING, {
+    useQuery(QUERY_STAKING, {
       variables: {
         limit: 10,
         offset: 1,
@@ -55,9 +61,35 @@ export default function AccountDetail() {
             timestamp: 'desc',
           },
         ],
+        where: {
+          signer: {
+            _eq: id,
+          },
+        },
       },
     })
   );
+
+  const transfers = query(
+    useQuery(QUERY_TRANSFERS, {
+      variables: {
+        limit: 10,
+        offset: 1,
+        orderBy: [
+          {
+            timestamp: 'desc',
+          },
+        ],
+        where: {
+          from_address: {
+            _eq: id,
+          },
+        },
+      },
+    }),
+  );
+
+  console.log(transfers);
 
   // const [page, setPage] = useState(1);
 
@@ -176,7 +208,11 @@ export default function AccountDetail() {
           )}
         </Tabs.TabPane>
         <Tabs.TabPane tab="Transfers" key="transfers">
-          {/* <TransferTable data={trxData} loading={loading} /> */}
+          {transfers.transfer ? (
+            <TransferTable data={transfers.transfer} />
+          ) : (
+            transfers
+          )}
         </Tabs.TabPane>
         <Tabs.TabPane tab="Staking" key="staking">
           {staking.staking ? (

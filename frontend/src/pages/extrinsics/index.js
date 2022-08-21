@@ -4,6 +4,9 @@ import ExtrinsicsTable from '../../components/ExtrinsicsTable';
 import useFetch from '../../hooks/useFetch';
 import LaodingLogo from '../../assets/loading.png';
 
+import { useGraphQL } from '../../context/useApp';
+import { useQuery } from '@apollo/client';
+
 const module = [
   'all',
   'timestamp',
@@ -37,9 +40,7 @@ export default function Extrinsics() {
           <div className="filter-bg">
             <Row align="middle" gutter={[32, 32]}>
               <Col>
-                <span style={{ paddingRight: '4px', color: 'white' }}>
-                  Sign
-                </span>
+                <span style={{ paddingRight: '4px' }}>Sign</span>
                 <Select
                   style={{ width: '180px' }}
                   defaultValue="All"
@@ -50,9 +51,7 @@ export default function Extrinsics() {
                 </Select>
               </Col>
               <Col>
-                <span style={{ paddingRight: '4px', color: 'white' }}>
-                  Module
-                </span>
+                <span style={{ paddingRight: '4px' }}>Module</span>
                 <Select
                   style={{ width: '180px' }}
                   defaultValue="all"

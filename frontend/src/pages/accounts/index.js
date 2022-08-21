@@ -3,15 +3,15 @@ import AccountsTable from '../../components/AccountsTable';
 import useFetch from '../../hooks/useFetch';
 import LaodingLogo from '../../assets/loading.png';
 import { useGraphQL } from '../../context/useApp';
-import { QUERY_ACCOUNT } from '../../graphql/query';
+import { QUERY_ACCOUNTS } from '../../graphql/query';
 import { useQuery } from '@apollo/client';
 import { Pagination } from 'antd';
 
 export default function Accounts() {
   const { query } = useGraphQL();
   const accounts = query(
-    useQuery(QUERY_ACCOUNT, {
-      variables: { limit: 10, offset: 1 },
+    useQuery(QUERY_ACCOUNTS, {
+      variables: { limit: 10, offset: 1, orderBy: { timestamp: null } },
     })
   );
 
@@ -23,9 +23,9 @@ export default function Accounts() {
   };
 
   const [page, setPage] = useState(1);
-  const { loading, data = [] } = useFetch(
-    `${process.env.REACT_APP_API}/account/all/${page}`
-  );
+  // const { loading, data = [] } = useFetch(
+  //   `${process.env.REACT_APP_API}/account/all/${page}`,
+  // );
 
   return (
     <div>

@@ -14,6 +14,10 @@ export function FormatBalance(amount) {
   return formatBalance(amount, { withSi: false, forceUnit: '-' }, 12);
 }
 
+export function formatAccountBalanceSEL(amount) {
+  return parseInt(amount).toLocaleString('en-US');
+}
+
 export function timeDuration(time, roughly = false) {
   if (!time) {
     return 'Unknown time';
