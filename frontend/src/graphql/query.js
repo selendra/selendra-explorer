@@ -68,7 +68,8 @@ const TOTAL_ACCOUNT = gql`
         count
       }
     }
-    `;
+  }
+`;
 
 const QUERY_COUNT_COLUMNS_ACCOUNT = gql`
   query account_aggregate($columns: [account_select_column!]) {

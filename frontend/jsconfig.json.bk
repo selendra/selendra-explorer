@@ -1,7 +1,0 @@
-{
-  "baseUrl": "src",
-  "paths": {
-    "context/*": ["src/context/*"]
-  },
-  "include": ["src"]
-}

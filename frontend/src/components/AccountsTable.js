@@ -6,6 +6,7 @@ export default function AccountsTable({ short, accounts, onChange }) {
   return (
     <Table
       pagination={false}
+      bordered={false}
       dataSource={accounts}
       rowKey={(record) => record.address}
       className={`${short && 'table-styling'}`}

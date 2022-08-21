@@ -25,7 +25,7 @@ export default function AccountDetail() {
       variables: {
         address: id,
       },
-    }),
+    })
   );
 
   const { account_aggregate } = query(
@@ -33,7 +33,7 @@ export default function AccountDetail() {
       variables: {
         columns: 'vested_balance',
       },
-    }),
+    })
   );
 
   const extrinsic = query(
@@ -42,7 +42,7 @@ export default function AccountDetail() {
         limit: 10,
         offset: 1,
       },
-    }),
+    })
   );
 
   const staking = query(
@@ -56,7 +56,7 @@ export default function AccountDetail() {
           },
         ],
       },
-    }),
+    })
   );
 
   // const [page, setPage] = useState(1);
@@ -83,7 +83,7 @@ export default function AccountDetail() {
   return (
     <div className="container">
       <div className="spacing" />
-      <p className="block-title">Address #{id}</p>
+      <p className="block-title">Account Details</p>
       {account.account_by_pk ? (
         <Card className="block-detail-card" style={{ borderRadius: '8px' }}>
           <table className="table">
@@ -154,7 +154,7 @@ export default function AccountDetail() {
                     {formatNumber(
                       account_aggregate
                         ? account_aggregate.aggregate.count
-                        : null,
+                        : null
                     )}{' '}
                     SEL
                   </td>

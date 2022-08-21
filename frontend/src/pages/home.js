@@ -34,9 +34,9 @@ export default function Home() {
   const accounts = query(useQuery(TOTAL_ACCOUNT));
   const transfers = query(useQuery(TOTAL_TRANSFER));
   const validators = query(useQuery(TOTAL_VALIDATOR));
-  const latest_block = query(useQuery(TOTAL_VALIDATOR), {
-    variables: { limit: 5, offset: 1 },
-  });
+  // const latest_block = query(useQuery(TOTAL_VALIDATOR), {
+  //   variables: { limit: 5, offset: 1 },
+  // });
 
   // const bestNumber = api.derive.chain.bestNumber;
   // const bestNumberFinalized = api.derive.chain.bestNumberFinalized;
@@ -107,8 +107,6 @@ export default function Home() {
   const total_lockBalance = 100;
   const waitingCount = 200;
 
-  console.log('latest', latest_block.block);
-
   return (
     <div>
       <div className="home-container">
@@ -165,7 +163,7 @@ export default function Home() {
         <Row gutter={[16, { xs: 8, sm: 16, md: 24, lg: 32 }]}>
           <Col xs={24} md={24} lg={12} xl={12}>
             <p className="home-subTitle">Latest Blocks</p>
-            <BlocksTable short data={latest_block} />
+            <BlocksTable short data={overview?.block} />
           </Col>
           <Col xs={24} md={24} lg={12} xl={12}>
             <p className="home-subTitle">Account Updates</p>

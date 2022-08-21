@@ -12,7 +12,7 @@ export default function Accounts() {
   const accounts = query(
     useQuery(QUERY_ACCOUNT, {
       variables: { limit: 10, offset: 1 },
-    }),
+    })
   );
 
   const [current, setCurrent] = useState(3);
@@ -24,7 +24,7 @@ export default function Accounts() {
 
   const [page, setPage] = useState(1);
   const { loading, data = [] } = useFetch(
-    `${process.env.REACT_APP_API}/account/all/${page}`,
+    `${process.env.REACT_APP_API}/account/all/${page}`
   );
 
   return (
@@ -51,6 +51,7 @@ export default function Accounts() {
           )}
         </div>
       </div>
+      <div className="container-table-account" />
     </div>
   );
 }

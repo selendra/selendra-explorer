@@ -33,15 +33,15 @@ export default function HeaderComponent() {
       key: 'home',
     },
     {
-      label: <Link to="/account">Account</Link>,
-      key: 'account',
+      label: <Link to="/accounts">Accounts</Link>,
+      key: 'accounts',
     },
     {
       label: <Link to="/transfers">Transfers</Link>,
       key: 'transfer',
     },
     {
-      label: <Link to="/">Staking</Link>,
+      label: <Link to="/staking">Staking</Link>,
       key: 'staking',
     },
     {
