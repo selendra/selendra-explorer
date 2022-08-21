@@ -5,6 +5,7 @@ import LaodingLogo from '../../assets/loading.png';
 import { useGraphQL } from '../../context/useApp';
 import { QUERY_ACCOUNT } from '../../graphql/query';
 import { useQuery } from '@apollo/client';
+import { Pagination } from 'antd';
 
 export default function Accounts() {
   const { query } = useGraphQL();
@@ -14,7 +15,12 @@ export default function Accounts() {
     }),
   );
 
-  console.log(accounts);
+  const [current, setCurrent] = useState(3);
+
+  const onChange = (page) => {
+    console.log(page);
+    setCurrent(page);
+  };
 
   const [page, setPage] = useState(1);
   const { loading, data = [] } = useFetch(
@@ -26,19 +32,23 @@ export default function Accounts() {
       <div className="blocks-bg">
         <div className="container">
           <p className="blocks-title">Accounts</p>
-          <AccountsTable
-            // loading={loading}
-            loading={{
-              indicator: (
-                <div>
-                  <img className="loading-img-block" src={LaodingLogo} />
-                </div>
-              ),
-              spinning: !data,
-            }}
-            data={data}
-            onChange={setPage}
-          />
+          {accounts.account ? (
+            <div className="table-account">
+              <AccountsTable accounts={accounts.account} onChange={setPage} />
+              <Pagination
+                showSizeChanger={false}
+                // onShowSizeChange={onShowSizeChange}
+                // defaultCurrent={1}
+                // total={500}
+                // disabled
+                current={current}
+                onChange={onChange}
+                total={500}
+              />
+            </div>
+          ) : (
+            accounts
+          )}
         </div>
       </div>
     </div>

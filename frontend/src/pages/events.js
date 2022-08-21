@@ -1,16 +1,16 @@
-import { Card, Col, Row, Select } from "antd";
-import React, { useState } from "react";
-import EventsTable from "../components/EventsTable";
-import useFetch from "../hooks/useFetch";
-import LaodingLogo from "../assets/loading.png";
+import { Card, Col, Row, Select } from 'antd';
+import React, { useState } from 'react';
+import EventsTable from '../components/EventsTable';
+import useFetch from '../hooks/useFetch';
+import LaodingLogo from '../assets/loading.png';
 
-const module = ["all", "system"];
+const module = ['all', 'system'];
 
 export default function Events() {
-  const [selectedModule, setSelectedModule] = useState("all");
+  const [selectedModule, setSelectedModule] = useState('all');
   const [page, setPage] = useState(1);
   const { loading, data = [] } = useFetch(
-    `${process.env.REACT_APP_API}/event/${selectedModule}/${page}`
+    `${process.env.REACT_APP_API}/event/${selectedModule}/${page}`,
   );
 
   function handleChangeModule(value) {
@@ -26,9 +26,9 @@ export default function Events() {
         <div className="filter-bg">
           <Row align="middle" gutter={[32, 32]}>
             <Col>
-              <span style={{ paddingRight: "4px" }}>Module:</span>
+              <span style={{ paddingRight: '4px' }}>Module:</span>
               <Select
-                style={{ width: "180px" }}
+                style={{ width: '180px' }}
                 defaultValue="all"
                 placeholder="Module"
                 onChange={handleChangeModule}

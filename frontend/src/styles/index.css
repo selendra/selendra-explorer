@@ -59,6 +59,12 @@ code {
   font-weight: 600;
 }
 /*** Block Table */
+.table-account {
+  padding: 16px 24px;
+  background-color: #fff !important;
+  border-radius: 16px !important;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
 .table-styling .ant-table {
   padding: 16px 24px;
   border-radius: 16px !important;

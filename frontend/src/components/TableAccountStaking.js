@@ -1,53 +1,52 @@
 import { Table } from 'antd';
-import React from 'react'
+import React from 'react';
 import { formatNumber, timeDuration } from '../utils';
 
-export default function TableAccountStaking({loading, data, short, onChange }) {
+export default function TableAccountStaking({
+  loading,
+  data,
+  short,
+  onChange,
+}) {
   return (
-    <Table 
-      dataSource={data?.staking_list}
+    <Table
+      dataSource={data}
       // loading={loading}
-      className='table-styling'
-      sortDirections='descend'
-      pagination={short ? false : {
-        pageSize: 10,
-        total: data?.total_page,
-        onChange:(page) => {
-          onChange(page);
-        } 
-      }}
+      className="table-styling"
+      sortDirections="descend"
+      pagination={
+        short
+          ? false
+          : {
+              pageSize: 10,
+              total: data?.total_page,
+              onChange: (page) => {
+                onChange(page);
+              },
+            }
+      }
     >
-      <Table.Column 
+      <Table.Column
         title="Block"
-        dataIndex="blockNumber"
-        render={blockNumber => (
-          <div className='blocks-height'>
-            <p># {formatNumber(blockNumber)}</p>
-          </div>  
+        dataIndex="event_id"
+        render={(event_id) => (
+          <div className="blocks-height">
+            <p># {formatNumber(event_id)}</p>
+          </div>
         )}
       />
-      <Table.Column 
+      <Table.Column
         title="Time"
         dataIndex="timestamp"
-        render={timestamp => (
-          <p>{timeDuration(timestamp)}</p>
-        )}
+        render={(timestamp) => <p>{timeDuration(timestamp)}</p>}
       />
-      <Table.Column 
+      <Table.Column
         title="Amount"
         dataIndex="amount"
-        render={amount => (
-          <p>{formatNumber(amount)} SEL</p>
-        )}
+        render={(amount) => <p>{formatNumber(amount)} SEL</p>}
       />
-      <Table.Column 
-        title="Era"
-        dataIndex="era"
-      />
-      <Table.Column 
-        title="Action"
-        dataIndex="action"
-      />
+      <Table.Column title="Era" dataIndex="era" />
+      <Table.Column title="Action" dataIndex="action" />
     </Table>
-  )
+  );
 }
