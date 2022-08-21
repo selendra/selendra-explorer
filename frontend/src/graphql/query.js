@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
-const QUERY_ACCOUNT = gql`
-  query ($limit: Int, $offset: Int) {
-    account(limit: $limit, offset: $offset) {
+const QUERY_ACCOUNTS = gql`
+  query ($limit: Int, $offset: Int, $orderBy: [account_order_by!]) {
+    account(limit: $limit, offset: $offset, order_by: $orderBy) {
       address
       voting_balance
       vested_balance
@@ -51,12 +51,17 @@ const QUERY_ACCOUNT_BY_ADDRESS = gql`
 `;
 
 const QUERY_BLOCKS = gql`
-  query ($limit: Int, $offset: Int) {
-    block(limit: $limit, offset: $offset) {
-      id
+  query ($offset: Int, $limit: Int, $orderBy: [block_order_by!]) {
+    block(offset: $offset, limit: $limit, order_by: $orderBy) {
+      author
+      crawler_timestamp
+      extrinsic_root
       finalized
       hash
-      extrinsic_root
+      id
+      parent_hash
+      state_root
+      timestamp
     }
   }
 `;
@@ -68,7 +73,8 @@ const TOTAL_ACCOUNT = gql`
         count
       }
     }
-    `;
+  }
+`;
 
 const QUERY_COUNT_COLUMNS_ACCOUNT = gql`
   query account_aggregate($columns: [account_select_column!]) {
@@ -119,8 +125,8 @@ const LATEST_BLOCK = gql`
   }
 `;
 const QUERY_EXTRINSIC = gql`
-  query ($limit: Int, $offset: Int) {
-    extrinsic(limit: $limit, offset: $offset) {
+  query ($limit: Int, $offset: Int, $where: extrinsic_bool_exp) {
+    extrinsic(limit: $limit, offset: $offset, where: $where) {
       args
       block_id
       docs
@@ -140,9 +146,14 @@ const QUERY_EXTRINSIC = gql`
   }
 `;
 
-const QUERY_STACKING = gql`
-  query ($limit: Int, $offset: Int, $orderBy: [staking_order_by!]) {
-    staking(limit: $limit, offset: $offset, order_by: $orderBy) {
+const QUERY_STAKING = gql`
+  query (
+    $limit: Int
+    $offset: Int
+    $orderBy: [staking_order_by!]
+    $where: staking_bool_exp
+  ) {
+    staking(limit: $limit, offset: $offset, order_by: $orderBy, where: $where) {
       amount
       event_id
       id
@@ -153,8 +164,80 @@ const QUERY_STACKING = gql`
   }
 `;
 
+const QUERY_TRANSFERS = gql`
+  query (
+    $limit: Int
+    $offset: Int
+    $orderBy: [transfer_order_by]
+    $where: transfer_bool_exp
+  ) {
+    transfer(
+      limit: $limit
+      offset: $offset
+      order_by: $orderBy
+      where: $where
+    ) {
+      amount
+      block_id
+      denom
+      error_message
+      extrinsic_id
+      fee_amount
+      from_address
+      from_evm_address
+      id
+      nft_id
+      success
+      timestamp
+      to_address
+      to_evm_address
+      token_address
+      type
+    }
+  }
+`;
+
+const QUERY_TRANSFER_BY_PK = gql`
+  query ($transferByPkId: bigint!) {
+    transfer_by_pk(id: $transferByPkId) {
+      amount
+      block_id
+      denom
+      error_message
+      extrinsic_id
+      fee_amount
+      from_address
+      from_evm_address
+      id
+      nft_id
+      success
+      timestamp
+      to_address
+      to_evm_address
+      token_address
+      type
+    }
+  }
+`;
+
+const QUERY_BLOCK_BY_PK = gql`
+  query ($blockByPkId: bigint!) {
+    block_by_pk(id: $blockByPkId) {
+      author
+      crawler_timestamp
+      extrinsic_root
+      finalized
+      hash
+      id
+      parent_hash
+      state_root
+      timestamp
+    }
+  }
+`;
+
 export {
-  QUERY_ACCOUNT,
+  QUERY_ACCOUNTS,
   QUERY_BLOCKS,
   TOTAL_BLOCKS,
   TOTAL_ACCOUNT,
@@ -165,5 +248,8 @@ export {
   QUERY_ACCOUNT_BY_ADDRESS,
   QUERY_COUNT_COLUMNS_ACCOUNT,
   QUERY_EXTRINSIC,
-  QUERY_STACKING,
+  QUERY_STAKING,
+  QUERY_TRANSFERS,
+  QUERY_TRANSFER_BY_PK,
+  QUERY_BLOCK_BY_PK,
 };

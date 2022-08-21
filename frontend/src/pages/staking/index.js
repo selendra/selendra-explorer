@@ -7,8 +7,19 @@ import { useAPIState } from '../../context/APIContext';
 import { BigNumber } from 'bignumber.js';
 import Loading from '../../components/Loading';
 import Chart from '../../components/chart';
+import { useGraphQL } from '../../context/useApp';
+import { useQuery } from '@apollo/client';
+import { QUERY_STAKING } from '../../graphql/query';
 
 export default function Staking() {
+  const { query } = useGraphQL();
+
+  const staking = query(
+    useQuery(QUERY_STAKING, {
+      variables: { limit: 10, offset: 0 },
+    }),
+  );
+  console.log(staking);
   // const { api } = useAPIState();
   // const [loading, setLoading] = useState(false);
   // const [data, setData] = useState();
@@ -148,7 +159,7 @@ export default function Staking() {
       </div>
       <div className="container">
         <div className="spacing" />
-        {/* <TableStaking data={data?.validators} /> */}
+        {staking ? <TableStaking data={staking.staking} /> : staking}
       </div>
     </div>
   );

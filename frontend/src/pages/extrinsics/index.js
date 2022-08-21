@@ -1,26 +1,29 @@
-import { Card, Col, Row, Select } from "antd";
-import { useState } from "react";
-import ExtrinsicsTable from "../../components/ExtrinsicsTable";
-import useFetch from "../../hooks/useFetch";
-import LaodingLogo from "../../assets/loading.png";
+import { Card, Col, Row, Select } from 'antd';
+import { useState } from 'react';
+import ExtrinsicsTable from '../../components/ExtrinsicsTable';
+import useFetch from '../../hooks/useFetch';
+import LaodingLogo from '../../assets/loading.png';
+
+import { useGraphQL } from '../../context/useApp';
+import { useQuery } from '@apollo/client';
 
 const module = [
-  "all",
-  "timestamp",
-  "paraInherent",
-  "utility",
-  "balances",
-  "staking",
+  'all',
+  'timestamp',
+  'paraInherent',
+  'utility',
+  'balances',
+  'staking',
 ];
 
 export default function Extrinsics() {
   const [isSigned, setIsSigned] = useState(false);
-  const [selectedModule, setSelectedModule] = useState("all");
+  const [selectedModule, setSelectedModule] = useState('all');
   const [page, setPage] = useState(1);
   const { loading, data = [] } = useFetch(
     isSigned
       ? `${process.env.REACT_APP_API}/extrinsic/signed/${page}`
-      : `${process.env.REACT_APP_API}/extrinsic/${selectedModule}/${page}`
+      : `${process.env.REACT_APP_API}/extrinsic/${selectedModule}/${page}`,
   );
 
   function handleChangeModule(value) {
@@ -37,9 +40,9 @@ export default function Extrinsics() {
           <div className="filter-bg">
             <Row align="middle" gutter={[32, 32]}>
               <Col>
-                <span style={{ paddingRight: "4px" }}>Sign</span>
+                <span style={{ paddingRight: '4px' }}>Sign</span>
                 <Select
-                  style={{ width: "180px" }}
+                  style={{ width: '180px' }}
                   defaultValue="All"
                   onChange={setIsSigned}
                 >
@@ -48,9 +51,9 @@ export default function Extrinsics() {
                 </Select>
               </Col>
               <Col>
-                <span style={{ paddingRight: "4px" }}>Module</span>
+                <span style={{ paddingRight: '4px' }}>Module</span>
                 <Select
-                  style={{ width: "180px" }}
+                  style={{ width: '180px' }}
                   defaultValue="all"
                   placeholder="Module"
                   onChange={handleChangeModule}
@@ -70,7 +73,7 @@ export default function Extrinsics() {
             loading={{
               indicator: (
                 <div>
-                  <img className="loading-img-block" alt='' src={LaodingLogo} />
+                  <img className="loading-img-block" alt="" src={LaodingLogo} />
                 </div>
               ),
               spinning: loading,

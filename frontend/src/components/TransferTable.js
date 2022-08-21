@@ -1,12 +1,12 @@
-import { Avatar, Row, Table } from "antd";
-import { Link } from "react-router-dom";
-import { formatNumber, shortenAddress, timeDuration } from "../utils";
+import { Avatar, Row, Table } from 'antd';
+import { Link } from 'react-router-dom';
+import { formatNumber, shortenAddress, timeDuration } from '../utils';
 
 export default function TransferTable({ short, loading, data, onChange }) {
   return (
     <Table
-      dataSource={data?.transfers}
-      rowKey={(record) => record.blockNumber}
+      dataSource={data}
+      rowKey={(record) => record.id}
       loading={loading}
       className="table-styling"
       tableLayout="fixed"
@@ -24,11 +24,11 @@ export default function TransferTable({ short, loading, data, onChange }) {
     >
       <Table.Column
         title="Hash"
-        dataIndex="hash"
-        render={(hash) => (
-          <Link to={`/transfers/${hash}`}>
+        // dataIndex="from_address"
+        render={(_, record) => (
+          <Link to={`/transfers/${record.id}`}>
             <div className="blocks-height">
-              <p>{shortenAddress(hash)}</p>
+              <p>{shortenAddress(record.token_address)}</p>
             </div>
           </Link>
         )}
@@ -36,12 +36,12 @@ export default function TransferTable({ short, loading, data, onChange }) {
       {!short && (
         <Table.Column
           title="Block"
-          responsive={["md"]}
-          dataIndex="blockNumber"
-          render={(blockNumber) => (
-            <Link to={`/blocks/${blockNumber}`}>
+          responsive={['md']}
+          dataIndex="block_id"
+          render={(block_id) => (
+            <Link to={`/blocks/${block_id}`}>
               <div className="blocks-height">
-                <p>#{formatNumber(blockNumber)}</p>
+                <p>#{formatNumber(block_id)}</p>
               </div>
             </Link>
           )}
@@ -50,31 +50,39 @@ export default function TransferTable({ short, loading, data, onChange }) {
       {!short && (
         <Table.Column
           title="Time"
-          responsive={["md"]}
+          responsive={['md']}
           dataIndex="timestamp"
           render={(timestamp) => <p>{timeDuration(timestamp)}</p>}
         />
       )}
       <Table.Column
         title="From"
-        responsive={["md"]}
-        dataIndex="source"
-        render={(source) => 
+        responsive={['md']}
+        dataIndex="from_address"
+        render={(from_address) => (
           <Row>
-            <Avatar style={{marginRight: '4px', backgroundColor: '#87d068'}} size="small" src={`https://avatars.dicebear.com/api/pixel-art/${source}.svg`} />
-            <p>{shortenAddress(source)}</p>
+            <Avatar
+              style={{ marginRight: '4px', backgroundColor: '#87d068' }}
+              size="small"
+              src={`https://avatars.dicebear.com/api/pixel-art/${from_address}.svg`}
+            />
+            <p>{shortenAddress(from_address)}</p>
           </Row>
-        }
+        )}
       />
       <Table.Column
         title="To"
-        dataIndex="destination"
-        render={(destination) => 
+        dataIndex="to_address"
+        render={(to_address) => (
           <Row>
-            <Avatar style={{marginRight: '4px', backgroundColor: '#87d068'}} size="small" src={`https://avatars.dicebear.com/api/pixel-art/${destination}.svg`} />
-            <p>{shortenAddress(destination)}</p>
+            <Avatar
+              style={{ marginRight: '4px', backgroundColor: '#87d068' }}
+              size="small"
+              src={`https://avatars.dicebear.com/api/pixel-art/${to_address}.svg`}
+            />
+            <p>{shortenAddress(to_address)}</p>
           </Row>
-        }
+        )}
       />
       <Table.Column
         title="Amount"
@@ -84,20 +92,22 @@ export default function TransferTable({ short, loading, data, onChange }) {
       <Table.Column
         title="Success"
         dataIndex="success"
-        render={(success) => success ? 
-          <img
-            src="/assets/icons/check.svg"
-            alt="finalized"
-            width={18}
-            height={18}
-          /> 
-          :
-          <img
-            src="/assets/icons/x-circle.svg"
-            alt="finalized"
-            width={18}
-            height={18}
-          /> 
+        render={(success) =>
+          success ? (
+            <img
+              src="/assets/icons/check.svg"
+              alt="finalized"
+              width={18}
+              height={18}
+            />
+          ) : (
+            <img
+              src="/assets/icons/x-circle.svg"
+              alt="finalized"
+              width={18}
+              height={18}
+            />
+          )
         }
       />
     </Table>

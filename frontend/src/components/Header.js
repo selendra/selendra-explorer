@@ -33,7 +33,7 @@ export default function HeaderComponent() {
       key: 'home',
     },
     {
-      label: <Link to="/account">Account</Link>,
+      label: <Link to="/accounts">Accounts</Link>,
       key: 'account',
     },
     {
@@ -41,7 +41,7 @@ export default function HeaderComponent() {
       key: 'transfer',
     },
     {
-      label: <Link to="/">Staking</Link>,
+      label: <Link to="/staking">Staking</Link>,
       key: 'staking',
     },
     {

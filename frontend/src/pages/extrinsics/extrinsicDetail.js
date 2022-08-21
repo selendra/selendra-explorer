@@ -1,12 +1,14 @@
-import { Card, notification, message } from "antd";
-import React from "react";
-import { Link, useParams } from "react-router-dom";
-import Loading from "../../components/Loading";
-import NotFound from "../../components/NotFound";
-import useFetch from "../../hooks/useFetch";
-import { formatNumber, timeDuration } from "../../utils";
-import { CopyOutlined } from "@ant-design/icons";
+import { Card, notification, message } from 'antd';
+import React from 'react';
+import { Link, useParams } from 'react-router-dom';
+import Loading from '../../components/Loading';
+import NotFound from '../../components/NotFound';
+import useFetch from '../../hooks/useFetch';
+import { formatNumber, timeDuration } from '../../utils';
+import { CopyOutlined } from '@ant-design/icons';
 import ReactJson from 'react-json-view';
+import { useGraphQL } from '../../context/useApp';
+import { useQuery } from '@apollo/client';
 
 export default function ExtrinsicDetail() {
   const { id } = useParams();
@@ -22,7 +24,7 @@ export default function ExtrinsicDetail() {
         <Loading />
       </div>
     );
-  console.log("error", error);
+  console.log('error', error);
 
   if (error)
     return (
@@ -37,7 +39,7 @@ export default function ExtrinsicDetail() {
       <p className="block-title">
         Extrinsic #{data?.blockNumber}-{data?.extrinsicIndex}
       </p>
-      <Card className="block-detail-card" style={{ borderRadius: "8px" }}>
+      <Card className="block-detail-card" style={{ borderRadius: '8px' }}>
         <table className="table">
           <tbody>
             <tr>
@@ -60,12 +62,12 @@ export default function ExtrinsicDetail() {
               <td>Hash</td>
               <td>{data?.hash}</td>
               <CopyOutlined
-                style={{ fontSize: "20px", marginTop: "8px" }}
+                style={{ fontSize: '20px', marginTop: '8px' }}
                 onClick={() =>
                   navigator.clipboard.writeText(data?.hash).then(() =>
                     notification.success({
-                      message: "Copied",
-                    })
+                      message: 'Copied',
+                    }),
                   )
                 }
               />
@@ -93,7 +95,7 @@ export default function ExtrinsicDetail() {
                 )}
               </td>
             </tr>
-            
+
             <tr>
               <td>Signed</td>
               <td>
@@ -116,28 +118,36 @@ export default function ExtrinsicDetail() {
             </tr>
             <tr>
               <td>Signer</td>
-              <td>{data?.signer || " "}</td>
+              <td>{data?.signer || ' '}</td>
             </tr>
             <tr>
               <td>Section and Method</td>
               <td>
-                {data?.section}{" "}
+                {data?.section}{' '}
                 <img
                   src="/assets/icons/arrow.svg"
                   alt=""
                   width={14}
                   height={14}
-                />{" "}
+                />{' '}
                 {data?.method}
               </td>
             </tr>
             <tr>
               <td>Documentation</td>
-              <td>{data?.doc && <ReactJson collapsed={true} src={JSON.parse(data?.doc)} />}</td>
+              <td>
+                {data?.doc && (
+                  <ReactJson collapsed={true} src={JSON.parse(data?.doc)} />
+                )}
+              </td>
             </tr>
             <tr>
               <td>Arguments</td>
-              <td>{data?.args && <ReactJson collapsed={true} src={JSON.parse(data?.args)} />}</td>
+              <td>
+                {data?.args && (
+                  <ReactJson collapsed={true} src={JSON.parse(data?.args)} />
+                )}
+              </td>
             </tr>
           </tbody>
         </table>
