@@ -7,39 +7,88 @@ import TableAccountStaking from '../../components/TableAccountStaking';
 import TransferTable from '../../components/TransferTable';
 import useFetch from '../../hooks/useFetch';
 import { formatNumber } from '../../utils';
+import { useGraphQL } from '../../context/useApp';
+import { useQuery } from '@apollo/client';
+import {
+  QUERY_ACCOUNT_BY_ADDRESS,
+  QUERY_COUNT_COLUMNS_ACCOUNT,
+  QUERY_EXTRINSIC,
+  QUERY_STACKING,
+} from '../../graphql/query';
 
 export default function AccountDetail() {
   const { id } = useParams();
-  const [page, setPage] = useState(1);
+  const { query } = useGraphQL();
 
-  const { loading, data = [] } = useFetch(
-    `${process.env.REACT_APP_API}/account/${id}`,
-  );
-  const { data: extrinsicData = [] } = useFetch(
-    `${process.env.REACT_APP_API}/account/extrinsics/${id}/1`,
-  );
-  const { data: trxData = [] } = useFetch(
-    `${process.env.REACT_APP_API}/account/transfer/${id}/1`,
-  );
-  const { data: stakingData = [] } = useFetch(
-    `${process.env.REACT_APP_API}/account/staking/${id}/${page}`,
+  const account = query(
+    useQuery(QUERY_ACCOUNT_BY_ADDRESS, {
+      variables: {
+        address: id,
+      },
+    }),
   );
 
-  if (loading)
-    return (
-      <div className="container">
-        <Loading />
-      </div>
-    );
+  const { account_aggregate } = query(
+    useQuery(QUERY_COUNT_COLUMNS_ACCOUNT, {
+      variables: {
+        columns: 'vested_balance',
+      },
+    }),
+  );
 
+  const extrinsic = query(
+    useQuery(QUERY_EXTRINSIC, {
+      variables: {
+        limit: 10,
+        offset: 1,
+      },
+    }),
+  );
+
+  const staking = query(
+    useQuery(QUERY_STACKING, {
+      variables: {
+        limit: 10,
+        offset: 1,
+        orderBy: [
+          {
+            timestamp: 'desc',
+          },
+        ],
+      },
+    }),
+  );
+
+  // const [page, setPage] = useState(1);
+
+  // const { loading, data = [] } = useFetch(
+  //   `${process.env.REACT_APP_API}/account/${id}`,
+  // );
+  // const { data: extrinsicData = [] } = useFetch(
+  //   `${process.env.REACT_APP_API}/account/extrinsics/${id}/1`,
+  // );
+  // const { data: trxData = [] } = useFetch(
+  //   `${process.env.REACT_APP_API}/account/transfer/${id}/1`,
+  // );
+  // const { data: stakingData = [] } = useFetch(
+  //   `${process.env.REACT_APP_API}/account/staking/${id}/${page}`,
+  // );
+
+  // if (loading)
+  //   return (
+  //     <div className="container">
+  //       <Loading />
+  //     </div>
+  //   );
   return (
     <div className="container">
       <div className="spacing" />
       <p className="block-title">Address #{id}</p>
-      <Card className="block-detail-card" style={{ borderRadius: '8px' }}>
-        <table className="table">
-          <tbody>
-            {data?.identityDetail.identityDisplay && (
+      {account.account_by_pk ? (
+        <Card className="block-detail-card" style={{ borderRadius: '8px' }}>
+          <table className="table">
+            <tbody>
+              {/* {data?.identityDetail.identityDisplay && (
               <tr>
                 <td>Identity Display</td>
                 <td>
@@ -51,68 +100,94 @@ export default function AccountDetail() {
                   {data?.identityDetail.identityDisplay}
                 </td>
               </tr>
-            )}
-            <tr>
-              <td>Address</td>
-              <td>
-                <Avatar
-                  style={{ marginRight: '4px', backgroundColor: '#87d068' }}
-                  size="small"
-                  src={`https://avatars.dicebear.com/api/pixel-art/${data?.accountId}.svg`}
-                />
-                {data?.accountId}
-              </td>
-            </tr>
-            <tr>
-              <td>Total Balance</td>
-              <td>{formatNumber(data?.totalBalance)} SEL</td>
-            </tr>
-            <tr>
-              <td>Available Balance</td>
-              <td>{formatNumber(data?.availableBalance)} SEL</td>
-            </tr>
-            <tr>
-              <td>Locked Balance</td>
-              <td>{formatNumber(data?.lockedBalance)} SEL</td>
-            </tr>
-            <tr>
-              <td>Reserved Balance</td>
-              <td>{formatNumber(data?.reservedBalance)} SEL</td>
-            </tr>
-            <tr>
-              <td>Vest Details</td>
+            )} */}
               <tr>
-                <td>Vest Balance</td>
-                <td>{formatNumber(data?.vestingDetails.vestBalance)} SEL</td>
-              </tr>
-              <tr>
-                <td style={{ paddingRight: '80px' }}>Vested Claimable</td>
+                <td>Address</td>
                 <td>
-                  {formatNumber(data?.vestingDetails.vestedClaimable)} SEL
+                  <Avatar
+                    style={{ marginRight: '4px', backgroundColor: '#87d068' }}
+                    size="small"
+                    src={`https://avatars.dicebear.com/api/pixel-art/${account.account_by_pk.address}.svg`}
+                  />
+                  {account.account_by_pk.address}
                 </td>
               </tr>
               <tr>
-                <td>Vesting Total</td>
-                <td>{formatNumber(data?.vestingDetails.vestingTotal)} SEL</td>
+                <td>Total Balance</td>
+                {/* <td>{formatNumber(account_by_block_id.account[0].)} SEL</td> */}
               </tr>
-            </tr>
-          </tbody>
-        </table>
-      </Card>
+              <tr>
+                <td>Available Balance</td>
+                <td>
+                  {formatNumber(account.account_by_pk.available_balance)} SEL
+                </td>
+              </tr>
+              <tr>
+                <td>Locked Balance</td>
+                <td>
+                  {formatNumber(account.account_by_pk.locked_balance)} SEL
+                </td>
+              </tr>
+              <tr>
+                <td>Reserved Balance</td>
+                <td>
+                  {formatNumber(account.account_by_pk.reserved_balance)} SEL
+                </td>
+              </tr>
+              <tr>
+                <td>Vest Details</td>
+                <tr>
+                  <td>Vest Balance</td>
+                  <td>
+                    {formatNumber(account.account_by_pk.vested_balance)} SEL
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ paddingRight: '80px' }}>Vested Claimable</td>
+                  <td>
+                    {formatNumber(account.account_by_pk.voting_balance)} SEL
+                  </td>
+                </tr>
+                <tr>
+                  <td>Vesting Total</td>
+                  <td>
+                    {formatNumber(
+                      account_aggregate
+                        ? account_aggregate.aggregate.count
+                        : null,
+                    )}{' '}
+                    SEL
+                  </td>
+                </tr>
+              </tr>
+            </tbody>
+          </table>
+        </Card>
+      ) : (
+        account
+      )}
       <div className="spacing" />
       <Tabs size="large">
         <Tabs.TabPane tab="Extrinsics" key="extrinsics">
-          <ExtrinsicsTable data={extrinsicData} loading={loading} />
+          {extrinsic.extrinsic ? (
+            <ExtrinsicsTable data={extrinsic.extrinsic} />
+          ) : (
+            extrinsic
+          )}
         </Tabs.TabPane>
         <Tabs.TabPane tab="Transfers" key="transfers">
-          <TransferTable data={trxData} loading={loading} />
+          {/* <TransferTable data={trxData} loading={loading} /> */}
         </Tabs.TabPane>
         <Tabs.TabPane tab="Staking" key="staking">
-          <TableAccountStaking
-            data={stakingData}
-            loading={loading}
-            onChange={setPage}
-          />
+          {staking.staking ? (
+            <TableAccountStaking
+              data={staking.staking}
+              // loading={loading}
+              // onChange={setPage}
+            />
+          ) : (
+            staking
+          )}
         </Tabs.TabPane>
       </Tabs>
     </div>
