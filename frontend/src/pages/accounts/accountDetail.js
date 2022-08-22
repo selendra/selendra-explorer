@@ -26,7 +26,7 @@ export default function AccountDetail() {
       variables: {
         address: id,
       },
-    })
+    }),
   );
 
   const { account_aggregate } = query(
@@ -34,7 +34,7 @@ export default function AccountDetail() {
       variables: {
         columns: 'vested_balance',
       },
-    })
+    }),
   );
 
   const extrinsic = query(
@@ -48,7 +48,7 @@ export default function AccountDetail() {
           },
         },
       },
-    })
+    }),
   );
 
   const staking = query(
@@ -67,7 +67,7 @@ export default function AccountDetail() {
           },
         },
       },
-    })
+    }),
   );
 
   const transfers = query(
@@ -88,8 +88,6 @@ export default function AccountDetail() {
       },
     }),
   );
-
-  console.log(transfers);
 
   // const [page, setPage] = useState(1);
 
@@ -186,7 +184,7 @@ export default function AccountDetail() {
                     {formatNumber(
                       account_aggregate
                         ? account_aggregate.aggregate.count
-                        : null
+                        : null,
                     )}{' '}
                     SEL
                   </td>

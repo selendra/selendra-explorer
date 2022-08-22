@@ -6,27 +6,37 @@ import { useGraphQL } from '../../context/useApp';
 import { QUERY_ACCOUNTS, TOTAL_ACCOUNT } from '../../graphql/query';
 import { useQuery } from '@apollo/client';
 import { Pagination } from 'antd';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 
 export default function Accounts() {
   const { query } = useGraphQL();
-  const [current, setCurrent] = useState(1);
-  let start = 10 * current;
-  let end = start - 10;
+  let navigate = useNavigate();
+  let location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 10 });
+  const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
+  const [sizePage, setSizePage] = useState(searchParams.get('size'));
+  const { account_aggregate } = query(useQuery(TOTAL_ACCOUNT));
+  let start = sizePage;
+  let end = account_aggregate < currentPage ? account_aggregate : currentPage;
   const accounts = query(
     useQuery(QUERY_ACCOUNTS, {
       variables: {
-        limit: 10,
-        offset: 0,
+        limit: parseInt(start),
+        offset: parseInt(end),
       },
     }),
   );
-  const { account_aggregate } = query(useQuery(TOTAL_ACCOUNT));
 
+  const onShowSizeChange = (current, pageSize) => {
+    setSizePage(pageSize);
+    setCurrentPage(current);
+    setSearchParams({ ...searchParams, p: current, size: sizePage });
+  };
   const onChange = (page) => {
-    setCurrent(page);
+    setCurrentPage(page);
+    setSearchParams({ ...searchParams, p: page, size: sizePage });
   };
 
-  const [page, setPage] = useState(1);
   return (
     <div>
       <div className="blocks-bg">
@@ -34,16 +44,13 @@ export default function Accounts() {
           <p className="blocks-title">Accounts</p>
           {accounts.account ? (
             <div className="table-account">
-              <AccountsTable accounts={accounts.account} />
-              <Pagination
-                showSizeChanger={false}
-                // onShowSizeChange={onShowSizeChange}
-                // defaultCurrent={1}
-                // total={500}
-                // disabled
-                current={current}
+              <AccountsTable
+                accounts={accounts.account}
                 onChange={onChange}
-                total={account_aggregate?.aggregate.count}
+                account_aggregate={account_aggregate}
+                current={currentPage}
+                onShowSizeChange={onShowSizeChange}
+                sizePage={sizePage}
               />
             </div>
           ) : (

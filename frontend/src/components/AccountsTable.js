@@ -7,10 +7,28 @@ import {
   formatAccountBalanceSEL,
 } from '../utils';
 
-export default function AccountsTable({ short, accounts, onChange }) {
+export default function AccountsTable({
+  short,
+  accounts,
+  onChange,
+  account_aggregate,
+  current,
+  onShowSizeChange,
+  sizePage,
+}) {
+  console.log(sizePage);
   return (
     <Table
-      pagination={false}
+      pagination={{
+        pageSize: parseInt(sizePage),
+        showSizeChanger: false,
+        onShowSizeChange,
+        current: parseInt(current),
+        total: account_aggregate?.aggregate.count,
+        onChange: (page) => {
+          onChange(page);
+        },
+      }}
       bordered={false}
       dataSource={accounts}
       rowKey={(record) => record.address}
