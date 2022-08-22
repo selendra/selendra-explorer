@@ -4,13 +4,12 @@ import './styles/index.css';
 import App from './App';
 import { Layout } from 'antd';
 import 'antd/dist/antd.variable.min.css';
-import 'remixicon/fonts/remixicon.css';
 import { ConfigProvider } from 'antd';
 import { ApolloProvider } from '@apollo/client';
 import client from './lib/apollo-config';
 import { AppProvider } from './context/useApp';
 import { ThemeProvider } from 'next-themes';
-// import { APIContextProvider } from './context/APIContext';
+import 'remixicon/fonts/remixicon.css';
 import CustomFooter from './components/Footer';
 
 ConfigProvider.config({
@@ -38,5 +37,5 @@ ReactDOM.render(
       </AppProvider>
     </ThemeProvider>
   </ApolloProvider>,
-  document.getElementById('root')
+  document.getElementById('root'),
 );

@@ -6,6 +6,7 @@ import LaodingLogo from '../../assets/loading.png';
 
 import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
+import { QUERY_EXTRINSIC } from '../../graphql/query';
 
 const module = [
   'all',
@@ -17,14 +18,23 @@ const module = [
 ];
 
 export default function Extrinsics() {
+  const { query } = useGraphQL();
+  const extrinsic = query(
+    useQuery(QUERY_EXTRINSIC, {
+      variables: {
+        limit: 10,
+        offset: 0,
+      },
+    }),
+  );
   const [isSigned, setIsSigned] = useState(false);
   const [selectedModule, setSelectedModule] = useState('all');
   const [page, setPage] = useState(1);
-  const { loading, data = [] } = useFetch(
-    isSigned
-      ? `${process.env.REACT_APP_API}/extrinsic/signed/${page}`
-      : `${process.env.REACT_APP_API}/extrinsic/${selectedModule}/${page}`
-  );
+  // const { loading, data = [] } = useFetch(
+  //   isSigned
+  //     ? `${process.env.REACT_APP_API}/extrinsic/signed/${page}`
+  //     : `${process.env.REACT_APP_API}/extrinsic/${selectedModule}/${page}`,
+  // );
 
   function handleChangeModule(value) {
     setSelectedModule(value);
@@ -68,19 +78,23 @@ export default function Extrinsics() {
             </Row>
           </div>
           <div className="spacing" />
-          <ExtrinsicsTable
-            // loading={loading}
-            loading={{
-              indicator: (
-                <div>
-                  <img className="loading-img-block" alt="" src={LaodingLogo} />
-                </div>
-              ),
-              spinning: loading,
-            }}
-            data={data}
-            onChange={setPage}
-          />
+          {extrinsic.extrinsic ? (
+            <ExtrinsicsTable
+              // loading={loading}
+              // loading={{
+              //   indicator: (
+              //     <div>
+              //       <img className="loading-img-block" alt="" src={LaodingLogo} />
+              //     </div>
+              //   ),
+              //   spinning: loading,
+              // }}
+              data={extrinsic.extrinsic}
+              onChange={setPage}
+            />
+          ) : (
+            extrinsic
+          )}
         </div>
       </div>
     </div>

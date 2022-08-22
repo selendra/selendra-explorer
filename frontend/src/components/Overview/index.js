@@ -8,31 +8,31 @@ export default function Overview(props) {
         <DataField
           icon="/assets/icons/box.svg"
           title="Blocks"
-          data={props.total_blocks}
+          data={props?.total_blocks}
           isRoute="/blocks"
         />
         <DataField
           icon="/assets/icons/box-tick.svg"
           title="Finalized"
-          data={props.total_blocksFinalized}
+          data={props?.total_blocksFinalized}
           isRoute="/blocks"
         />
         <DataField
           icon="/assets/icons/edit.svg"
           title="Extrinsics"
-          data={new Intl.NumberFormat().format(props.total_extrinsicSigned)}
+          data={new Intl.NumberFormat().format(props?.total_extrinsicSigned)}
           isRoute="/extrinsics"
         />
         <DataField
           icon="/assets/icons/user-square.svg"
           title="Accounts"
-          data={new Intl.NumberFormat().format(props.total_accounts)}
+          data={new Intl.NumberFormat().format(props?.total_accounts)}
           isRoute="/accounts"
         />
         <DataField
           icon="/assets/icons/arrow-swap-horizontal.svg"
           title="Transfers"
-          data={new Intl.NumberFormat().format(props.total_transfers)}
+          data={new Intl.NumberFormat().format(props?.total_transfers)}
           isRoute="/transfers"
         />
         <DataField
@@ -40,8 +40,8 @@ export default function Overview(props) {
           title="Validators"
           data={
             <div style={{ display: 'flex' }}>
-              {new Intl.NumberFormat().format(props.total_validators)}{' '}
-              <span>/{props.waitingCount}</span>
+              {new Intl.NumberFormat().format(props?.total_validators)}{' '}
+              <span>/{props?.waitingCount}</span>
             </div>
           }
         />
@@ -51,7 +51,7 @@ export default function Overview(props) {
           title="Balances"
           data={
             <div style={{ display: 'flex' }}>
-              {new Intl.NumberFormat().format(props.total_issuance)}{' '}
+              {new Intl.NumberFormat().format(props?.total_issuance)}{' '}
               <span>&nbsp;&nbsp;SEL</span>
             </div>
           }
@@ -61,7 +61,7 @@ export default function Overview(props) {
           title="Locked"
           data={
             <div style={{ display: 'flex' }}>
-              {new Intl.NumberFormat().format(props.total_lockBalance)}{' '}
+              {new Intl.NumberFormat().format(props?.total_lockBalance)}{' '}
               <span>&nbsp;&nbsp;SEL</span>
             </div>
           }

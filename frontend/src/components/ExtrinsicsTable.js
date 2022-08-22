@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { formatNumber, shortenAddress, timeDuration } from '../utils';
 
 export default function ExtrinsicsTable({ short, loading, data, onChange }) {
+  console.log(data);
   return (
     <Table
       dataSource={data}
@@ -23,11 +24,11 @@ export default function ExtrinsicsTable({ short, loading, data, onChange }) {
     >
       <Table.Column
         title="Hash"
-        dataIndex="hash"
-        render={(hash) => (
-          <Link to={`/extrinsics/${hash}`}>
+        // dataIndex="hash"
+        render={(_, record) => (
+          <Link to={`/extrinsics/${record.id}`}>
             <div className="blocks-height">
-              <p>{shortenAddress(hash)}</p>
+              <p>{shortenAddress(record.hash)}</p>
             </div>
           </Link>
         )}

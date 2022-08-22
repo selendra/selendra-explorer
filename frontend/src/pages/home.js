@@ -26,13 +26,8 @@ export default function Home() {
       variables: {
         limit: 5,
         offset: 0,
-        orderBy: [
-          {
-            timestamp: 'desc',
-          },
-        ],
       },
-    })
+    }),
   );
 
   const accounts = query(
@@ -40,13 +35,8 @@ export default function Home() {
       variables: {
         limit: 5,
         offset: 0,
-        orderBy: [
-          {
-            timestamp: 'desc',
-          },
-        ],
       },
-    })
+    }),
   );
 
   const transfers = query(
@@ -60,7 +50,7 @@ export default function Home() {
           },
         ],
       },
-    })
+    }),
   );
 
   const { block_aggregate } = query(useQuery(TOTAL_BLOCKS));

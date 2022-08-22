@@ -3,14 +3,21 @@ import React, { useState } from 'react';
 import EventsTable from '../components/EventsTable';
 import useFetch from '../hooks/useFetch';
 import LaodingLogo from '../assets/loading.png';
+import { useGraphQL } from '../context/useApp';
+import { useQuery } from '@apollo/client';
+import { QUERY_EVENTS } from '../graphql/query';
 
 const module = ['all', 'system'];
 
 export default function Events() {
   const [selectedModule, setSelectedModule] = useState('all');
   const [page, setPage] = useState(1);
-  const { loading, data = [] } = useFetch(
-    `${process.env.REACT_APP_API}/event/${selectedModule}/${page}`,
+
+  const { query } = useGraphQL();
+  const events = query(
+    useQuery(QUERY_EVENTS, {
+      variables: { limit: 10, offset: 0 },
+    }),
   );
 
   function handleChangeModule(value) {
@@ -43,18 +50,11 @@ export default function Events() {
           </Row>
         </div>
         <div className="spacing" />
-        <EventsTable
-          loading={{
-            indicator: (
-              <div>
-                <img className="loading-img-block" src={LaodingLogo} />
-              </div>
-            ),
-            spinning: !data,
-          }}
-          data={data}
-          onChange={setPage}
-        />
+        {events.event ? (
+          <EventsTable data={events.event} onChange={setPage} />
+        ) : (
+          events
+        )}
       </div>
     </div>
   );

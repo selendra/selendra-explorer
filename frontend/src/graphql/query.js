@@ -125,8 +125,18 @@ const LATEST_BLOCK = gql`
   }
 `;
 const QUERY_EXTRINSIC = gql`
-  query ($limit: Int, $offset: Int, $where: extrinsic_bool_exp) {
-    extrinsic(limit: $limit, offset: $offset, where: $where) {
+  query (
+    $limit: Int
+    $offset: Int
+    $where: extrinsic_bool_exp
+    $orderBy: [extrinsic_order_by!]
+  ) {
+    extrinsic(
+      limit: $limit
+      offset: $offset
+      where: $where
+      order_by: $orderBy
+    ) {
       args
       block_id
       docs
@@ -197,6 +207,27 @@ const QUERY_TRANSFERS = gql`
   }
 `;
 
+const QUERY_EVENTS = gql`
+  query (
+    $offset: Int
+    $limit: Int
+    $orderBy: [event_order_by!]
+    $where: event_bool_exp
+  ) {
+    event(offset: $offset, limit: $limit, order_by: $orderBy, where: $where) {
+      block_id
+      data
+      extrinsic_id
+      id
+      index
+      method
+      phase
+      section
+      timestamp
+    }
+  }
+`;
+
 const QUERY_TRANSFER_BY_PK = gql`
   query ($transferByPkId: bigint!) {
     transfer_by_pk(id: $transferByPkId) {
@@ -236,6 +267,28 @@ const QUERY_BLOCK_BY_PK = gql`
   }
 `;
 
+const QUERY_EXTRINSIC_BY_PK = gql`
+  query ($extrinsicByPkId: bigint!) {
+    extrinsic_by_pk(id: $extrinsicByPkId) {
+      args
+      block_id
+      docs
+      error_message
+      hash
+      id
+      index
+      inherent_data
+      method
+      section
+      signed_data
+      signer
+      status
+      timestamp
+      type
+    }
+  }
+`;
+
 export {
   QUERY_ACCOUNTS,
   QUERY_BLOCKS,
@@ -252,4 +305,6 @@ export {
   QUERY_TRANSFERS,
   QUERY_TRANSFER_BY_PK,
   QUERY_BLOCK_BY_PK,
+  QUERY_EXTRINSIC_BY_PK,
+  QUERY_EVENTS,
 };
