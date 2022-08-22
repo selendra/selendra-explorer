@@ -113,6 +113,7 @@ code {
 .ant-table-tbody > tr.ant-table-placeholder:hover > td {
   background: var(--table-cards) !important;
   color: var(--text-color) !important;
+  font-size: 12px !important;
 }
 .table-styling .ant-table {
   padding: 16px 24px;
@@ -248,7 +249,10 @@ code {
   padding: 2px 5px;
 }
 .failed-background {
-  background: var(--failed-status);
+  background: var(--failed-background) !important;
+  width: 95px !important;
+  border-radius: 6px;
+  padding: 2px 5px;
 }
 /*** blocks */
 .blocks-bg {
@@ -259,14 +263,16 @@ code {
 .blocks-title {
   font-size: 20px;
   font-weight: 600;
-  color: #fff;
+  color: var(--text-color);
   margin-bottom: 20px !important;
 }
 .block-title {
   font-size: 20px;
   word-break: break-all;
-  margin-bottom: 20px !important;
+  /* margin-bottom: 20px !important; */
   color: var(--text-color);
+  position: relative;
+  top: -30px;
 }
 /*** Block Detail */
 .block-detail-card {

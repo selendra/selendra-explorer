@@ -14,7 +14,15 @@ export default function Transfers() {
 
   const transfers = query(
     useQuery(QUERY_TRANSFERS, {
-      variables: { limit: 10, offset: 0 },
+      variables: {
+        limit: 10,
+        offset: 0,
+        orderBy: [
+          {
+            timestamp: 'desc',
+          },
+        ],
+      },
     })
   );
 

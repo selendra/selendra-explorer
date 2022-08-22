@@ -80,19 +80,25 @@ export default function ExtrinsicsTable({ short, loading, data, onChange }) {
             render={(isSigned) => (
               <p>
                 {isSigned ? (
-                  <img
-                    src="/assets/icons/check.svg"
-                    alt=""
-                    width={18}
-                    height={18}
-                  />
+                  <div className="status-background">
+                    <img
+                      src="/assets/icons/check.svg"
+                      alt="finalized"
+                      width={20}
+                      height={20}
+                    />
+                    <span style={{ marginLeft: '4px' }}>Signed</span>
+                  </div>
                 ) : (
-                  <img
-                    src="/assets/icons/x-circle.svg"
-                    alt=""
-                    width={18}
-                    height={18}
-                  />
+                  <div className="failed-background">
+                    <img
+                      src="/assets/icons/x-circle.svg"
+                      alt="finalized"
+                      width={20}
+                      height={20}
+                    />
+                    <span style={{ marginLeft: '4px' }}>Unsigned</span>
+                  </div>
                 )}
               </p>
             )}

@@ -6,7 +6,7 @@ export default function BlocksTable({ short, loading, data, onChange }) {
   return (
     <>
       <Table
-        dataSource={data}
+        dataSource={data.filter((data) => data.id.toString() !== '-1')}
         loading={loading}
         rowKey={(record) => record.blockNumber}
         className="table-styling"

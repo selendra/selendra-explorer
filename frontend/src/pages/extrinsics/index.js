@@ -24,8 +24,13 @@ export default function Extrinsics() {
       variables: {
         limit: 10,
         offset: 0,
+        orderBy: [
+          {
+            id: 'desc',
+          },
+        ],
       },
-    })
+    }),
   );
   const [isSigned, setIsSigned] = useState(false);
   const [selectedModule, setSelectedModule] = useState('all');

@@ -23,7 +23,12 @@ export default function Home() {
     useQuery(QUERY_BLOCKS, {
       variables: {
         limit: 5,
-        offset: 0,
+        offset: 1,
+        orderBy: [
+          {
+            timestamp: 'desc',
+          },
+        ],
       },
     })
   );
@@ -32,7 +37,12 @@ export default function Home() {
     useQuery(QUERY_ACCOUNTS, {
       variables: {
         limit: 5,
-        offset: 0,
+        offset: 1,
+        orderBy: [
+          {
+            timestamp: 'desc',
+          },
+        ],
       },
     })
   );
@@ -41,7 +51,7 @@ export default function Home() {
     useQuery(QUERY_TRANSFERS, {
       variables: {
         limit: 5,
-        offset: 0,
+        offset: 1,
         orderBy: [
           {
             timestamp: 'desc',
@@ -85,11 +95,11 @@ export default function Home() {
       <div className="home-info">
         <Row gutter={[16, { xs: 8, sm: 16, md: 24, lg: 32 }]}>
           <Col xs={24} md={24} lg={12} xl={12}>
-            <p className="home-subTitle">Latest Blocks</p>
+            {/* <p className="home-subTitle">Latest Blocks</p> */}
             {blocks.block ? <BlocksTable short data={blocks?.block} /> : blocks}
           </Col>
           <Col xs={24} md={24} lg={12} xl={12}>
-            <p className="home-subTitle">Account Updates</p>
+            {/* <p className="home-subTitle">Account Updates</p> */}
             {accounts.account ? (
               <AccountsTable short accounts={accounts?.account} />
             ) : (
@@ -99,7 +109,7 @@ export default function Home() {
         </Row>
       </div>
       <div className="home-info">
-        <p className="home-subTitle">Latest Transactions</p>
+        {/* <p className="home-subTitle">Latest Transactions</p> */}
         {transfers.transfer ? (
           <TransferTable short data={transfers?.transfer} />
         ) : (

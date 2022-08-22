@@ -28,7 +28,9 @@ export default function AccountsTable({
             }
       }
       bordered={false}
-      dataSource={accounts}
+      dataSource={accounts.filter(
+        (account) => account.address !== 'deleted' && account.address !== '0x'
+      )}
       rowKey={(record) => record.address}
       className={`${short && 'table-styling'}`}
       tableLayout="fixed"
@@ -36,9 +38,10 @@ export default function AccountsTable({
       <Table.Column
         title="Account"
         dataIndex="address"
+        width="30%"
         render={(_, record) => (
           <Link to={`/accounts/${record.address}`}>
-            <div className="blocks-height">
+            <div className="blocks-height2">
               <p>{shortenAddress(record.address)}</p>
             </div>
           </Link>

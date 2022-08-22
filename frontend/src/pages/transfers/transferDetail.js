@@ -32,23 +32,20 @@ export default function TransferDetail() {
   return (
     <div className="container">
       <div className="spacing" />
-      <p className="block-title">
-        Hash Details {''}
-        <CopyOutlined
-          style={{ fontSize: '20px', marginTop: '8px' }}
-          onClick={() =>
-            navigator.clipboard.writeText(id).then(() =>
-              notification.success(
-                {
-                  message: 'Copied',
-                },
-                3
-              )
-            )
-          }
-        />
-      </p>
+
       <Card className="block-detail-card" style={{ borderRadius: '8px' }}>
+        <table className="table">
+          <tbody>
+            <tr>
+              <td>
+                <p className="block-title">Account</p>
+              </td>
+              <td>
+                <p className="block-title">Details</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
         <table className="table">
           <tbody>
             <tr className="tr-style">
@@ -76,7 +73,7 @@ export default function TransferDetail() {
               <td>{transfer_by_pk?.token_address}</td>
             </tr>
             <tr className="tr-style">
-              <td>Sender</td>
+              <td>From</td>
               <td>
                 <Avatar
                   style={{ marginRight: '4px', backgroundColor: '#87d068' }}
@@ -101,7 +98,7 @@ export default function TransferDetail() {
               />
             </tr>
             <tr className="tr-style">
-              <td>Destination</td>
+              <td>To</td>
               <td>
                 <Avatar
                   style={{ marginRight: '4px', backgroundColor: '#87d068' }}

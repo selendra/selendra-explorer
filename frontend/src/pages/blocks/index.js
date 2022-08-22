@@ -17,14 +17,14 @@ export default function Blocks() {
     useQuery(QUERY_BLOCKS, {
       variables: {
         limit: 10,
-        offset: 0,
+        offset: 1,
         orderBy: [
           {
-            timestamp: null,
+            timestamp: 'desc',
           },
         ],
       },
-    })
+    }),
   );
 
   const { block } = blocks;

@@ -5,7 +5,7 @@ import { timeDuration } from '../../utils';
 import ExtrinsicsTable from '../../components/ExtrinsicsTable';
 import EventsTable from '../../components/EventsTable';
 import LogsTable from '../../components/LogsTable';
-import Loading from '../../components/Loading';
+import LaodingLogo from '../../components/Loading';
 import NotFound from '../../components/NotFound';
 import { CopyOutlined } from '@ant-design/icons';
 import Moment from 'react-moment';
@@ -28,9 +28,9 @@ export default function BlockDetail() {
   return (
     <div className="container">
       <div className="spacing" />
-      <p className="block-title">Block #{id}</p>
       {block.block_by_pk ? (
         <Card className="block-detail-card">
+          <p className="block-title">Block #{id}</p>
           <table className="table">
             <tbody>
               <tr className="tr-style">
@@ -55,7 +55,7 @@ export default function BlockDetail() {
                   ) : (
                     <div>
                       <img
-                        src="/assets/loading.png"
+                        src={<LaodingLogo />}
                         alt="loading"
                         className="loading-img-block"
                       />

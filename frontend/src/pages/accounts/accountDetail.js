@@ -111,24 +111,22 @@ export default function AccountDetail() {
   return (
     <div className="container">
       <div className="spacing" />
-      <p className="block-title">Account Details</p>
       {account.account_by_pk ? (
         <Card className="block-detail-card" style={{ borderRadius: '8px' }}>
           <table className="table">
             <tbody>
-              {/* {data?.identityDetail.identityDisplay && (
               <tr>
-                <td>Identity Display</td>
                 <td>
-                  <Avatar
-                    style={{ marginRight: '4px', backgroundColor: '#87d068' }}
-                    size="small"
-                    src={`https://avatars.dicebear.com/api/pixel-art/${data?.accountId}.svg`}
-                  />
-                  {data?.identityDetail.identityDisplay}
+                  <p className="block-title">Account</p>
+                </td>
+                <td>
+                  <p className="block-title">Details</p>
                 </td>
               </tr>
-            )} */}
+            </tbody>
+          </table>
+          <table className="table">
+            <tbody>
               <tr>
                 <td>Address</td>
                 <td>
