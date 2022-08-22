@@ -26,6 +26,11 @@ export default function Home() {
       variables: {
         limit: 5,
         offset: 0,
+        orderBy: [
+          {
+            timestamp: 'desc',
+          },
+        ],
       },
     }),
   );
@@ -35,6 +40,11 @@ export default function Home() {
       variables: {
         limit: 5,
         offset: 0,
+        orderBy: [
+          {
+            timestamp: 'desc',
+          },
+        ],
       },
     }),
   );

@@ -5,7 +5,7 @@ import { timeDuration } from '../../utils';
 import ExtrinsicsTable from '../../components/ExtrinsicsTable';
 import EventsTable from '../../components/EventsTable';
 import LogsTable from '../../components/LogsTable';
-import Loading from '../../components/Loading';
+import LaodingLogo from '../../components/Loading';
 import NotFound from '../../components/NotFound';
 import { CopyOutlined } from '@ant-design/icons';
 import Moment from 'react-moment';
@@ -20,7 +20,7 @@ export default function BlockDetail() {
   const block = query(
     useQuery(QUERY_BLOCK_BY_PK, {
       variables: { blockByPkId: id },
-    })
+    }),
   );
 
   const { block_by_pk } = block;
@@ -55,7 +55,7 @@ export default function BlockDetail() {
                   ) : (
                     <div>
                       <img
-                        src="/assets/loading.png"
+                        src={<LaodingLogo />}
                         alt="loading"
                         className="loading-img-block"
                       />
@@ -72,7 +72,7 @@ export default function BlockDetail() {
                     navigator.clipboard.writeText(block_by_pk?.hash).then(() =>
                       notification.success({
                         message: 'Copied',
-                      })
+                      }),
                     )
                   }
                 />
@@ -88,7 +88,7 @@ export default function BlockDetail() {
                       .then(() =>
                         notification.success({
                           message: 'Copied',
-                        })
+                        }),
                       )
                   }
                 />
@@ -104,7 +104,7 @@ export default function BlockDetail() {
                       .then(() =>
                         notification.success({
                           message: 'Copied',
-                        })
+                        }),
                       )
                   }
                 />
@@ -120,7 +120,7 @@ export default function BlockDetail() {
                       .then(() =>
                         notification.success({
                           message: 'Copied',
-                        })
+                        }),
                       )
                   }
                 />

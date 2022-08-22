@@ -5,9 +5,9 @@ import { formatNumber, shortenAddress, timeDuration } from '../utils';
 export default function BlocksTable({ short, loading, data, onChange }) {
   return (
     <Table
-      dataSource={data}
+      dataSource={data.filter((data) => data.id.toString() !== '-1')}
       loading={loading}
-      rowKey={(record) => record.blockNumber}
+      rowKey={(record) => record.block_id}
       className="table-styling"
       sortDirections="descend"
       tableLayout="fixed"

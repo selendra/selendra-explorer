@@ -23,8 +23,13 @@ export default function Accounts() {
       variables: {
         limit: parseInt(start),
         offset: parseInt(end),
+        orderBy: [
+          {
+            timestamp: 'desc',
+          },
+        ],
       },
-    })
+    }),
   );
 
   const onShowSizeChange = (current, pageSize) => {

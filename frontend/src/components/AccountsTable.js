@@ -28,7 +28,9 @@ export default function AccountsTable({
             }
       }
       bordered={false}
-      dataSource={accounts}
+      dataSource={accounts.filter(
+        (account) => account.address !== 'deleted' && '0x',
+      )}
       rowKey={(record) => record.address}
       className={`${short && 'table-styling'}`}
       tableLayout="fixed"
