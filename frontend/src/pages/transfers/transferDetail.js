@@ -148,22 +148,25 @@ export default function TransferDetail() {
               <td>Result</td>
               <td>
                 {transfer_by_pk?.success ? (
-                  <div>
+                  <div className="status-background">
                     <img
                       src="/assets/icons/check.svg"
+                      alt="finalized"
+                      width={18}
+                      height={18}
+                    />
+                    <span style={{ marginLeft: '4px' }}>Success</span>
+                  </div>
+                ) : (
+                  <div className="failed-background">
+                    <img
+                      src="/assets/icons/x-circle.svg"
                       alt=""
                       width={18}
                       height={18}
                     />
-                    <span>Success</span>
+                    <span style={{ marginLeft: '4px' }}>Failed</span>
                   </div>
-                ) : (
-                  <img
-                    src="/assets/icons/x-circle.svg"
-                    alt=""
-                    width={18}
-                    height={18}
-                  />
                 )}
               </td>
             </tr>

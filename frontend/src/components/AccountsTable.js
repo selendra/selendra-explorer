@@ -38,7 +38,7 @@ export default function AccountsTable({
         dataIndex="address"
         render={(_, record) => (
           <Link to={`/accounts/${record.address}`}>
-            <div className="address-bg">
+            <div className="blocks-height">
               <p>{shortenAddress(record.address)}</p>
             </div>
           </Link>

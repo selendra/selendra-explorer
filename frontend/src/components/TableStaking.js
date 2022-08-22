@@ -23,7 +23,7 @@ export default function TableStaking({ loading, data, short, onChange }) {
         title="Validator"
         dataIndex="signer"
         render={(signer) => (
-          <Link to={`/validator/${signer}`}>
+          <Link to={`/validator/${signer}`} className="blocks-height">
             <Row>
               <Avatar
                 style={{ marginRight: '4px', backgroundColor: '#87d068' }}

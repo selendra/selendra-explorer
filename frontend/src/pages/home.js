@@ -4,8 +4,6 @@ import Overview from '../components/Overview';
 import BlocksTable from '../components/BlocksTable';
 import TransferTable from '../components/TransferTable';
 import AccountsTable from '../components/AccountsTable';
-// import { useAPIState } from '../context/APIContext';
-// import bannerImg from '../assets/loading.png';
 import {
   TOTAL_BLOCKS,
   TOTAL_EXTRINSIC,
@@ -27,7 +25,7 @@ export default function Home() {
         limit: 5,
         offset: 0,
       },
-    }),
+    })
   );
 
   const accounts = query(
@@ -36,7 +34,7 @@ export default function Home() {
         limit: 5,
         offset: 0,
       },
-    }),
+    })
   );
 
   const transfers = query(
@@ -50,7 +48,7 @@ export default function Home() {
           },
         ],
       },
-    }),
+    })
   );
 
   const { block_aggregate } = query(useQuery(TOTAL_BLOCKS));
@@ -77,19 +75,7 @@ export default function Home() {
             total_extrinsicSigned={extrinsic_aggregate?.aggregate.count}
             total_accounts={account_aggregate?.aggregate.count}
             total_transfers={transfer_aggregate?.aggregate.count}
-            // total_issuance={
-            //   issuance.issuance_aggregate &&
-            //   issuance.issuance_aggregate.aggregate.count
-            // }
             total_validators={staking_aggregate?.aggregate.count}
-            // total_lockBalance={
-            //   lockBalance.lockBalance_aggregate &&
-            //   lockBalance.lockBalance_aggregate.aggregate.count
-            // }
-            // waitingCount={
-            //   waitingCount.waitingCount_aggregate &&
-            //   waitingCount.waitingCount_aggregate.aggregate.count
-            // }
             total_issuance={total_issuance}
             total_lockBalance={total_lockBalance}
             waitingCount={waitingCount}

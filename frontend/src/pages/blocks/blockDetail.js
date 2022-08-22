@@ -43,7 +43,7 @@ export default function BlockDetail() {
                 <td>Status</td>
                 <td>
                   {block_by_pk?.finalized ? (
-                    <div>
+                    <div className="status-background">
                       <img
                         src="/assets/icons/check.svg"
                         alt="finalized"

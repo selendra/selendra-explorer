@@ -22,7 +22,6 @@ export default function Transfers() {
     <div>
       <div className="blocks-bg">
         <div className="container">
-          <p className="blocks-title">Transfers</p>
           {transfers.transfer ? (
             <TransferTable
               // loading={transfers.transfer ? true : false}

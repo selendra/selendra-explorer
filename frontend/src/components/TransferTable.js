@@ -95,16 +95,19 @@ export default function TransferTable({ short, loading, data, onChange }) {
         render={(amount) => <p>{balanceFormat(amount)} SEL</p>}
       />
       <Table.Column
-        title="Success"
+        title="Status"
         dataIndex="success"
         render={(success) =>
           success ? (
-            <img
-              src="/assets/icons/check.svg"
-              alt="finalized"
-              width={18}
-              height={18}
-            />
+            <div className="status-background">
+              <img
+                src="/assets/icons/check.svg"
+                alt="finalized"
+                width={18}
+                height={18}
+              />
+              <span style={{ marginLeft: '4px' }}>Success</span>
+            </div>
           ) : (
             <img
               src="/assets/icons/x-circle.svg"

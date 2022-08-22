@@ -18,7 +18,7 @@ export default function ExtrinsicDetail() {
   const extrinsic = query(
     useQuery(QUERY_EXTRINSIC_BY_PK, {
       variables: { extrinsicByPkId: id },
-    }),
+    })
   );
 
   const { extrinsic_by_pk } = extrinsic;
@@ -82,7 +82,7 @@ export default function ExtrinsicDetail() {
                         .then(() =>
                           notification.success({
                             message: 'Copied',
-                          }),
+                          })
                         )
                     }
                   />
@@ -156,7 +156,7 @@ export default function ExtrinsicDetail() {
                         collapsed={true}
                         src={{
                           documentation: JSON.parse(
-                            JSON.stringify(extrinsic_by_pk?.docs),
+                            JSON.stringify(extrinsic_by_pk?.docs)
                           ),
                         }}
                       />

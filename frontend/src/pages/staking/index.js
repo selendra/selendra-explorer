@@ -17,7 +17,7 @@ export default function Staking() {
   const staking = query(
     useQuery(QUERY_STAKING, {
       variables: { limit: 10, offset: 0 },
-    }),
+    })
   );
   console.log(staking);
   // const { api } = useAPIState();

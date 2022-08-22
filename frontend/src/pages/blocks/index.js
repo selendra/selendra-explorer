@@ -32,7 +32,6 @@ export default function Blocks() {
     <div>
       <div className="blocks-bg">
         <div className="container">
-          <p className="blocks-title">Blocks</p>
           <div className="spacing" />
           <div>
             {blocks.block ? (

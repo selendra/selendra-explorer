@@ -31,7 +31,7 @@ export default function EventsTable({ loading, data, onChange }) {
         title="Block"
         render={(_, record) => (
           <Link to={`/blocks/${record.block_id}`}>
-            <p>#{formatNumber(record.block_id)}</p>
+            <p className="blocks-height">#{formatNumber(record.block_id)}</p>
           </Link>
         )}
       />

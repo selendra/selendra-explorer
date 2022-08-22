@@ -41,7 +41,6 @@ export default function Accounts() {
     <div>
       <div className="blocks-bg">
         <div className="container">
-          <p className="blocks-title">Accounts</p>
           {accounts.account ? (
             <div className="table-account">
               <AccountsTable
