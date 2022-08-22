@@ -2,7 +2,16 @@ import { Table } from 'antd';
 import { Link } from 'react-router-dom';
 import { formatNumber, shortenAddress, timeDuration } from '../utils';
 
-export default function ExtrinsicsTable({ short, loading, data, onChange }) {
+export default function ExtrinsicsTable({
+  short,
+  loading,
+  data,
+  onChange,
+  total,
+  current,
+  onShowSizeChange,
+  sizePage,
+}) {
   console.log(data);
   return (
     <Table
@@ -12,19 +21,21 @@ export default function ExtrinsicsTable({ short, loading, data, onChange }) {
       className="table-styling"
       tableLayout="fixed"
       // sortDirections='descend'
-      // pagination={
-      //   short
-      //     ? false
-      //     : {
-      //         pageSize: 10,
-      //         total: data?.total_page,
-      //         onChange: onChange,
-      //       }
-      // }
+      pagination={
+        short
+          ? false
+          : {
+              pageSize: parseInt(sizePage),
+              total: total,
+              current: parseInt(current),
+              showSizeChanger: false,
+              onShowSizeChange,
+              onChange: onChange,
+            }
+      }
     >
       <Table.Column
         title="Hash"
-        // dataIndex="hash"
         render={(_, record) => (
           <Link to={`/extrinsics/${record.block_id}`}>
             <div className="blocks-height">

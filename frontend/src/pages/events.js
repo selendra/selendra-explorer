@@ -5,26 +5,42 @@ import useFetch from '../hooks/useFetch';
 import LaodingLogo from '../assets/loading.png';
 import { useGraphQL } from '../context/useApp';
 import { useQuery } from '@apollo/client';
-import { QUERY_EVENTS } from '../graphql/query';
+import { QUERY_EVENTS, TOTAL_EVENTS } from '../graphql/query';
+import { useSearchParams } from 'react-router-dom';
 
 const module = ['all', 'system'];
 
 export default function Events() {
   const [selectedModule, setSelectedModule] = useState('all');
-  const [page, setPage] = useState(1);
 
   const { query } = useGraphQL();
+  const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 10 });
+  const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
+  const [sizePage, setSizePage] = useState(searchParams.get('size'));
+  const { event_aggregate } = query(useQuery(TOTAL_EVENTS));
+
+  let start = sizePage;
+  let end = currentPage;
   const events = query(
     useQuery(QUERY_EVENTS, {
-      variables: { limit: 10, offset: 0 },
-    })
+      variables: { limit: parseInt(start), offset: parseInt(end) },
+    }),
   );
 
   function handleChangeModule(value) {
     setSelectedModule(value);
-    setPage(1);
     console.log(`selected: ${value}`);
   }
+
+  const onShowSizeChange = (current, pageSize) => {
+    setSizePage(pageSize);
+    setCurrentPage(current);
+    setSearchParams({ ...searchParams, p: current, size: sizePage });
+  };
+  const onChange = (page) => {
+    setCurrentPage(page);
+    setSearchParams({ ...searchParams, p: page, size: sizePage });
+  };
 
   return (
     <>
@@ -54,7 +70,14 @@ export default function Events() {
           </div>
           <div className="spacing" />
           {events.event ? (
-            <EventsTable data={events.event} onChange={setPage} />
+            <EventsTable
+              data={events.event}
+              onChange={onChange}
+              current={currentPage}
+              sizePage={sizePage}
+              total={event_aggregate?.aggregate.count}
+              onShowSizeChange={onShowSizeChange}
+            />
           ) : (
             events
           )}

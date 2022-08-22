@@ -50,6 +50,16 @@ const QUERY_ACCOUNT_BY_ADDRESS = gql`
   }
 `;
 
+const TOTAL_EVENTS = gql`
+  query {
+    event_aggregate {
+      aggregate {
+        count
+      }
+    }
+  }
+`;
+
 const QUERY_BLOCKS = gql`
   query ($offset: Int, $limit: Int, $orderBy: [block_order_by!]) {
     block(offset: $offset, limit: $limit, order_by: $orderBy) {
@@ -297,6 +307,7 @@ export {
   TOTAL_EXTRINSIC,
   TOTAL_TRANSFER,
   TOTAL_VALIDATOR,
+  TOTAL_EVENTS,
   LATEST_BLOCK,
   QUERY_ACCOUNT_BY_ADDRESS,
   QUERY_COUNT_COLUMNS_ACCOUNT,

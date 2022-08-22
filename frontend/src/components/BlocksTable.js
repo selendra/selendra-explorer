@@ -2,7 +2,16 @@ import { Table } from 'antd';
 import { Link } from 'react-router-dom';
 import { formatNumber, shortenAddress, timeDuration } from '../utils';
 
-export default function BlocksTable({ short, loading, data, onChange }) {
+export default function BlocksTable({
+  short,
+  loading,
+  data,
+  onChange,
+  total,
+  current,
+  onShowSizeChange,
+  sizePage,
+}) {
   return (
     <>
       <Table
@@ -16,8 +25,11 @@ export default function BlocksTable({ short, loading, data, onChange }) {
           short
             ? false
             : {
-                pageSize: 10,
-                total: data?.total_page,
+                pageSize: parseInt(sizePage),
+                current: parseInt(current),
+                showSizeChanger: false,
+                onShowSizeChange,
+                total: total,
                 onChange: (page) => {
                   onChange(page);
                 },
