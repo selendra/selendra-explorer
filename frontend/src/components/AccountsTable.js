@@ -2,10 +2,31 @@ import { Table } from 'antd';
 import { Link } from 'react-router-dom';
 import { shortenAddress, balanceFormat } from '../utils';
 
-export default function AccountsTable({ short, accounts, onChange }) {
+export default function AccountsTable({
+  short,
+  accounts,
+  onChange,
+  account_aggregate,
+  current,
+  onShowSizeChange,
+  sizePage,
+}) {
   return (
     <Table
-      pagination={false}
+      pagination={
+        short
+          ? false
+          : {
+              pageSize: parseInt(sizePage),
+              showSizeChanger: false,
+              onShowSizeChange,
+              current: parseInt(current),
+              total: account_aggregate?.aggregate.count,
+              onChange: (page) => {
+                onChange(page);
+              },
+            }
+      }
       bordered={false}
       dataSource={accounts}
       rowKey={(record) => record.address}
