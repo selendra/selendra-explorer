@@ -15,7 +15,7 @@ export default function Transfers() {
   const transfers = query(
     useQuery(QUERY_TRANSFERS, {
       variables: { limit: 10, offset: 0 },
-    }),
+    })
   );
 
   return (
@@ -42,6 +42,7 @@ export default function Transfers() {
           )}
         </div>
       </div>
+      <div className="container-table-account" />
     </div>
   );
 }

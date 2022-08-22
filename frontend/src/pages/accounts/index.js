@@ -18,7 +18,7 @@ export default function Accounts() {
         limit: 10,
         offset: 0,
       },
-    }),
+    })
   );
   const { account_aggregate } = query(useQuery(TOTAL_ACCOUNT));
 

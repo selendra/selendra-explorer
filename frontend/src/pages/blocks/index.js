@@ -24,7 +24,7 @@ export default function Blocks() {
           },
         ],
       },
-    }),
+    })
   );
 
   const { block } = blocks;
@@ -54,6 +54,7 @@ export default function Blocks() {
           </div>
         </div>
       </div>
+      <div className="container-table-account" />
     </div>
   );
 }

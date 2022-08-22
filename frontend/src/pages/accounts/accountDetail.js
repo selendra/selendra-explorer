@@ -1,12 +1,10 @@
 import { Avatar, Card, Tabs } from 'antd';
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import ExtrinsicsTable from '../../components/ExtrinsicsTable';
-import Loading from '../../components/Loading';
 import TableAccountStaking from '../../components/TableAccountStaking';
 import TransferTable from '../../components/TransferTable';
-import useFetch from '../../hooks/useFetch';
-import { formatNumber } from '../../utils';
+import { formatNumber, balanceFormat } from '../../utils';
 import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
 import {
@@ -86,10 +84,8 @@ export default function AccountDetail() {
           },
         },
       },
-    }),
+    })
   );
-
-  console.log(transfers);
 
   // const [page, setPage] = useState(1);
 
@@ -146,24 +142,26 @@ export default function AccountDetail() {
               </tr>
               <tr>
                 <td>Total Balance</td>
-                {/* <td>{formatNumber(account_by_block_id.account[0].)} SEL</td> */}
+                <td>
+                  {balanceFormat(account.account_by_pk.available_balance)} SEL
+                </td>
               </tr>
               <tr>
                 <td>Available Balance</td>
                 <td>
-                  {formatNumber(account.account_by_pk.available_balance)} SEL
+                  {balanceFormat(account.account_by_pk.available_balance)} SEL
                 </td>
               </tr>
               <tr>
                 <td>Locked Balance</td>
                 <td>
-                  {formatNumber(account.account_by_pk.locked_balance)} SEL
+                  {balanceFormat(account.account_by_pk.locked_balance)} SEL
                 </td>
               </tr>
               <tr>
                 <td>Reserved Balance</td>
                 <td>
-                  {formatNumber(account.account_by_pk.reserved_balance)} SEL
+                  {balanceFormat(account.account_by_pk.reserved_balance)} SEL
                 </td>
               </tr>
               <tr>
@@ -171,23 +169,22 @@ export default function AccountDetail() {
                 <tr>
                   <td>Vest Balance</td>
                   <td>
-                    {formatNumber(account.account_by_pk.vested_balance)} SEL
+                    {balanceFormat(account.account_by_pk.vested_balance)} SEL
                   </td>
                 </tr>
                 <tr>
                   <td style={{ paddingRight: '80px' }}>Vested Claimable</td>
                   <td>
-                    {formatNumber(account.account_by_pk.voting_balance)} SEL
+                    {balanceFormat(account.account_by_pk.voting_balance)} SEL
                   </td>
                 </tr>
                 <tr>
                   <td>Vesting Total</td>
                   <td>
                     {formatNumber(
-                      account_aggregate
-                        ? account_aggregate.aggregate.count
-                        : null
+                      account_aggregate ? account_aggregate.aggregate.count : 0
                     )}{' '}
+                    {''}
                     SEL
                   </td>
                 </tr>

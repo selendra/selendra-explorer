@@ -1,11 +1,6 @@
-import { Avatar, Row, Table, Tooltip } from 'antd';
-import { formatBalance } from '@polkadot/util';
+import { Table } from 'antd';
 import { Link } from 'react-router-dom';
-import {
-  formatNumber,
-  shortenAddress,
-  formatAccountBalanceSEL,
-} from '../utils';
+import { shortenAddress, balanceFormat } from '../utils';
 
 export default function AccountsTable({ short, accounts, onChange }) {
   return (
@@ -31,28 +26,23 @@ export default function AccountsTable({ short, accounts, onChange }) {
       <Table.Column
         title="Free Balance"
         dataIndex="free_balance"
-        render={(free_balance) => (
-          <p>
-            {free_balance !== 0
-              ? formatAccountBalanceSEL(free_balance).slice(0, 12)
-              : formatNumber(free_balance)}{' '}
-            SEL
-          </p>
-        )}
+        render={(free_balance) => <p>{balanceFormat(free_balance)} SEL</p>}
       />
       {!short && (
         <Table.Column
           title="Locked Balance"
           responsive={['md']}
           dataIndex="locked_balance"
-          render={(locked_balance) => <p>{formatNumber(locked_balance)} SEL</p>}
+          render={(locked_balance) => (
+            <p>{balanceFormat(locked_balance)} SEL</p>
+          )}
         />
       )}
       <Table.Column
         title="Available Balance"
         dataIndex="available_balance"
         render={(available_balance) => (
-          <p>{formatNumber(available_balance)} SEL</p>
+          <p>{balanceFormat(available_balance)} SEL</p>
         )}
       />
     </Table>

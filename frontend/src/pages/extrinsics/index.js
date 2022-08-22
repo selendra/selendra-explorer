@@ -25,7 +25,7 @@ export default function Extrinsics() {
         limit: 10,
         offset: 0,
       },
-    }),
+    })
   );
   const [isSigned, setIsSigned] = useState(false);
   const [selectedModule, setSelectedModule] = useState('all');
@@ -50,7 +50,9 @@ export default function Extrinsics() {
           <div className="filter-bg">
             <Row align="middle" gutter={[32, 32]}>
               <Col>
-                <span style={{ paddingRight: '4px' }}>Sign</span>
+                <span style={{ paddingRight: '4px', color: 'white' }}>
+                  Sign
+                </span>
                 <Select
                   style={{ width: '180px' }}
                   defaultValue="All"
@@ -61,7 +63,9 @@ export default function Extrinsics() {
                 </Select>
               </Col>
               <Col>
-                <span style={{ paddingRight: '4px' }}>Module</span>
+                <span style={{ paddingRight: '4px', color: 'white' }}>
+                  Module
+                </span>
                 <Select
                   style={{ width: '180px' }}
                   defaultValue="all"
@@ -97,6 +101,7 @@ export default function Extrinsics() {
           )}
         </div>
       </div>
+      <div className="container-table-account" />
     </div>
   );
 }

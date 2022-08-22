@@ -26,7 +26,7 @@ export default function ExtrinsicsTable({ short, loading, data, onChange }) {
         title="Hash"
         // dataIndex="hash"
         render={(_, record) => (
-          <Link to={`/extrinsics/${record.id}`}>
+          <Link to={`/extrinsics/${record.block_id}`}>
             <div className="blocks-height">
               <p>{shortenAddress(record.hash)}</p>
             </div>

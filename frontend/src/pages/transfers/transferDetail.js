@@ -1,9 +1,7 @@
-import { Avatar, Card, message, notification } from 'antd';
+import { Avatar, Card, notification } from 'antd';
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import Loading from '../../components/Loading';
-import useFetch from '../../hooks/useFetch';
-import { formatNumber } from '../../utils';
+import { formatNumber, balanceFormat } from '../../utils';
 import { CopyOutlined } from '@ant-design/icons';
 import Moment from 'react-moment';
 import { useGraphQL } from '../../context/useApp';
@@ -23,17 +21,19 @@ export default function TransferDetail() {
   //       <Loading />
   //     </div>
   //   );
-  const { transfer_by_pk } = query(
+  const transfers = query(
     useQuery(QUERY_TRANSFER_BY_PK, {
       variables: { transferByPkId: id },
-    }),
+    })
   );
+
+  const { transfer_by_pk } = transfers;
 
   return (
     <div className="container">
       <div className="spacing" />
       <p className="block-title">
-        Hash #{transfer_by_pk?.token_address}{' '}
+        Hash Details {''}
         <CopyOutlined
           style={{ fontSize: '20px', marginTop: '8px' }}
           onClick={() =>
@@ -42,8 +42,8 @@ export default function TransferDetail() {
                 {
                   message: 'Copied',
                 },
-                3,
-              ),
+                3
+              )
             )
           }
         />
@@ -81,21 +81,21 @@ export default function TransferDetail() {
                 <Avatar
                   style={{ marginRight: '4px', backgroundColor: '#87d068' }}
                   size="small"
-                  src={`https://avatars.dicebear.com/api/pixel-art/${transfer_by_pk?.source}.svg`}
+                  src={`https://avatars.dicebear.com/api/pixel-art/${transfer_by_pk?.to_address}.svg`}
                 />
-                <Link to={`/accounts/${transfer_by_pk?.source}`}>
-                  {transfer_by_pk?.source}
+                <Link to={`/accounts/${transfer_by_pk?.to_address}`}>
+                  {transfer_by_pk?.to_address}
                 </Link>
               </td>
               <CopyOutlined
                 style={{ fontSize: '20px', marginTop: '16px' }}
                 onClick={() =>
                   navigator.clipboard
-                    .writeText(transfer_by_pk?.source)
+                    .writeText(transfer_by_pk?.to_address)
                     .then(() =>
                       notification.success({
                         message: 'Copied',
-                      }),
+                      })
                     )
                 }
               />
@@ -106,32 +106,43 @@ export default function TransferDetail() {
                 <Avatar
                   style={{ marginRight: '4px', backgroundColor: '#87d068' }}
                   size="small"
-                  src={`https://avatars.dicebear.com/api/pixel-art/${transfer_by_pk?.destination}.svg`}
+                  src={`https://avatars.dicebear.com/api/pixel-art/${transfer_by_pk?.from_address}.svg`}
                 />
-                <Link to={`/accounts/${transfer_by_pk?.source}`}>
-                  {transfer_by_pk?.destination}
+                <Link to={`/accounts/${transfer_by_pk?.from_address}`}>
+                  {transfer_by_pk?.from_address}
                 </Link>
               </td>
               <CopyOutlined
                 style={{ fontSize: '20px', marginTop: '16px' }}
                 onClick={() =>
                   navigator.clipboard
-                    .writeText(transfer_by_pk?.destination)
+                    .writeText(transfer_by_pk?.from_address)
                     .then(() =>
                       notification.success({
                         message: 'Copied',
-                      }),
+                      })
                     )
                 }
               />
             </tr>
             <tr className="tr-style">
               <td>Amount</td>
-              <td>{formatNumber(transfer_by_pk?.amount)} SEL</td>
+              <td>
+                {transfers.transfer_by_pk
+                  ? balanceFormat(transfers.transfer_by_pk.amount)
+                  : transfers}{' '}
+                SEL
+              </td>
             </tr>
             <tr className="tr-style">
               <td>Fee</td>
-              <td>{transfer_by_pk?.fee_amount} SEL</td>
+              <td>
+                {' '}
+                {transfers.transfer_by_pk
+                  ? balanceFormat(transfers.transfer_by_pk.fee_amount)
+                  : transfers}{' '}
+                SEL
+              </td>
             </tr>
             <tr className="tr-style">
               <td>Result</td>

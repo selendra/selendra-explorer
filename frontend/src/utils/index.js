@@ -10,8 +10,12 @@ export function formatNumber(amount) {
   return new Intl.NumberFormat().format(amount);
 }
 
-export function FormatBalance(amount) {
-  return formatBalance(amount, { withSi: false, forceUnit: '-' }, 12);
+export function balanceFormat(amount) {
+  return formatBalance(
+    amount.toString(),
+    { withSi: false, forceUnit: '-' },
+    12
+  );
 }
 
 export function formatAccountBalanceSEL(amount) {

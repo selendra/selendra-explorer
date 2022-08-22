@@ -1,36 +1,44 @@
-import { Avatar, Card, Row, Table, Tabs } from 'antd'
-import React from 'react'
+import { Avatar, Card, Row, Table, Tabs } from 'antd';
+import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import useFetch from '../../hooks/useFetch';
 import Loading from '../../components/Loading';
-import { FormatBalance, formatNumber, shortenAddress, timeDuration } from '../../utils';
+import {
+  balanceFormat,
+  formatNumber,
+  shortenAddress,
+  timeDuration,
+} from '../../utils';
+
+import { formatBalance } from '@polkadot/util';
 
 export default function ValidatorDetail() {
   let stakeHistory;
   let eraPointsHistory;
-  const {id} = useParams();
+  const { id } = useParams();
 
   const { loading, data = [] } = useFetch(
     `${process.env.REACT_APP_API}/staking/validators/${id}`
   );
 
-  if(data && !loading) {
+  if (data && !loading) {
     stakeHistory = JSON.parse(data?.stakeHistory);
     eraPointsHistory = JSON.parse(data?.eraPointsHistory);
   }
 
-  if(loading) return (
-    <div className="container">
-      <Loading />
-    </div>
-  )
+  if (loading)
+    return (
+      <div className="container">
+        <Loading />
+      </div>
+    );
 
   return (
-    <div className='container'>
-      <div className='spacing' />
-      <p className='block-title'>Validator #{id}</p>
-      <Card className='block-detail-card'>
-        <table className='table'>
+    <div className="container">
+      <div className="spacing" />
+      <p className="block-title">Validator #{id}</p>
+      <Card className="block-detail-card">
+        <table className="table">
           <tbody>
             <tr>
               <td>Block</td>
@@ -47,7 +55,11 @@ export default function ValidatorDetail() {
             <tr>
               <td>Identity</td>
               <td>
-                <Avatar style={{marginRight: '4px', backgroundColor: '#87d068'}} size="small" src={`https://avatars.dicebear.com/api/pixel-art/${data?.stashAddress}.svg`} />
+                <Avatar
+                  style={{ marginRight: '4px', backgroundColor: '#87d068' }}
+                  size="small"
+                  src={`https://avatars.dicebear.com/api/pixel-art/${data?.stashAddress}.svg`}
+                />
                 {data?.name}
               </td>
             </tr>
@@ -55,7 +67,11 @@ export default function ValidatorDetail() {
               <td>Stash</td>
               <td>
                 <Link to={`/accounts/${data?.stashAddress}`}>
-                  <Avatar style={{marginRight: '4px', backgroundColor: '#87d068'}} size="small" src={`https://avatars.dicebear.com/api/pixel-art/${data?.stashAddress}.svg`} />
+                  <Avatar
+                    style={{ marginRight: '4px', backgroundColor: '#87d068' }}
+                    size="small"
+                    src={`https://avatars.dicebear.com/api/pixel-art/${data?.stashAddress}.svg`}
+                  />
                   {data?.stashAddress}
                 </Link>
               </td>
@@ -64,7 +80,11 @@ export default function ValidatorDetail() {
               <td>Controller</td>
               <td>
                 <Link to={`/accounts/${data?.controllerAddress}`}>
-                  <Avatar style={{marginRight: '4px', backgroundColor: '#87d068'}} size="small" src={`https://avatars.dicebear.com/api/pixel-art/${data?.controllerAddress}.svg`} />
+                  <Avatar
+                    style={{ marginRight: '4px', backgroundColor: '#87d068' }}
+                    size="small"
+                    src={`https://avatars.dicebear.com/api/pixel-art/${data?.controllerAddress}.svg`}
+                  />
                   {data?.controllerAddress}
                 </Link>
               </td>
@@ -80,70 +100,88 @@ export default function ValidatorDetail() {
           </tbody>
         </table>
       </Card>
-      <div className='spacing'/>
-      { !loading &&
-        <Tabs size='large'>
-          <Tabs.TabPane tab='Nomination' key='nomination'>
+      <div className="spacing" />
+      {!loading && (
+        <Tabs size="large">
+          <Tabs.TabPane tab="Nomination" key="nomination">
             <Table
               loading={loading}
               pagination={false}
               dataSource={data?.nominations}
-              className='table-styling'
+              className="table-styling"
             >
-              <Table.Column title='Address' dataIndex='staking' 
-                render={staking => (
+              <Table.Column
+                title="Address"
+                dataIndex="staking"
+                render={(staking) => (
                   <Link to={`/accounts/${staking}`}>
                     <Row>
-                      <Avatar style={{marginRight: '4px', backgroundColor: '#87d068'}} size="small" src={`https://avatars.dicebear.com/api/pixel-art/${staking}.svg`} />
+                      <Avatar
+                        style={{
+                          marginRight: '4px',
+                          backgroundColor: '#87d068',
+                        }}
+                        size="small"
+                        src={`https://avatars.dicebear.com/api/pixel-art/${staking}.svg`}
+                      />
                       <p>{shortenAddress(staking)}</p>
                     </Row>
                   </Link>
                 )}
               />
-              <Table.Column title='Amount' dataIndex='amount'
-                render={amount => (
-                  <p>{formatNumber(amount)} SEL</p>
-                )}
+              <Table.Column
+                title="Amount"
+                dataIndex="amount"
+                render={(amount) => <p>{formatNumber(amount)} SEL</p>}
               />
             </Table>
           </Tabs.TabPane>
-          <Tabs.TabPane tab='Staking' key='staking'>
+          <Tabs.TabPane tab="Staking" key="staking">
             <Table
               loading={loading}
               pagination={false}
               dataSource={stakeHistory}
-              className='table-styling'
+              className="table-styling"
             >
-              <Table.Column title='Era' dataIndex='era' />
-              <Table.Column title='Self' dataIndex='self'
-                render={self => (
-                  <p>{FormatBalance(self)} SEL</p>
-                )}
+              <Table.Column title="Era" dataIndex="era" />
+              <Table.Column
+                title="Self"
+                dataIndex="self"
+                // render={(self) => <p>{balanceFormat(self)} SEL</p>}
               />
-              <Table.Column title='Total' dataIndex='total'
-                render={total => (
-                  <p>{FormatBalance(total)} SEL</p>
+              <Table.Column
+                title="Total"
+                dataIndex="total"
+                // render={(total) => <p>{balanceFormat(total)} SEL</p>}
+                render={(total) => (
+                  <p>
+                    {formatBalance(
+                      total,
+                      { withSi: false, forceUnit: '-' },
+                      12
+                    )}
+                  </p>
                 )}
               />
             </Table>
           </Tabs.TabPane>
-          <Tabs.TabPane tab='Era' key='era'>
+          <Tabs.TabPane tab="Era" key="era">
             <Table
               loading={loading}
               pagination={false}
               dataSource={eraPointsHistory}
-              className='table-styling'
+              className="table-styling"
             >
-              <Table.Column title='Era' dataIndex='era' />
-              <Table.Column title='Point' dataIndex='points'
-                render={points => (
-                  <p>{formatNumber(points)}</p>
-                )}
+              <Table.Column title="Era" dataIndex="era" />
+              <Table.Column
+                title="Point"
+                dataIndex="points"
+                render={(points) => <p>{formatNumber(points)}</p>}
               />
             </Table>
           </Tabs.TabPane>
         </Tabs>
-      }
+      )}
     </div>
-  )
+  );
 }

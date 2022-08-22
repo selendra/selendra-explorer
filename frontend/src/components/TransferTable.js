@@ -1,6 +1,11 @@
 import { Avatar, Row, Table } from 'antd';
 import { Link } from 'react-router-dom';
-import { formatNumber, shortenAddress, timeDuration } from '../utils';
+import {
+  formatNumber,
+  shortenAddress,
+  timeDuration,
+  balanceFormat,
+} from '../utils';
 
 export default function TransferTable({ short, loading, data, onChange }) {
   return (
@@ -87,7 +92,7 @@ export default function TransferTable({ short, loading, data, onChange }) {
       <Table.Column
         title="Amount"
         dataIndex="amount"
-        render={(amount) => <p>{formatNumber(amount)} SEL</p>}
+        render={(amount) => <p>{balanceFormat(amount)} SEL</p>}
       />
       <Table.Column
         title="Success"

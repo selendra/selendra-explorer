@@ -20,7 +20,7 @@ export default function BlockDetail() {
   const block = query(
     useQuery(QUERY_BLOCK_BY_PK, {
       variables: { blockByPkId: id },
-    }),
+    })
   );
 
   const { block_by_pk } = block;
@@ -72,7 +72,7 @@ export default function BlockDetail() {
                     navigator.clipboard.writeText(block_by_pk?.hash).then(() =>
                       notification.success({
                         message: 'Copied',
-                      }),
+                      })
                     )
                   }
                 />
@@ -88,7 +88,7 @@ export default function BlockDetail() {
                       .then(() =>
                         notification.success({
                           message: 'Copied',
-                        }),
+                        })
                       )
                   }
                 />
@@ -104,7 +104,7 @@ export default function BlockDetail() {
                       .then(() =>
                         notification.success({
                           message: 'Copied',
-                        }),
+                        })
                       )
                   }
                 />
@@ -120,7 +120,7 @@ export default function BlockDetail() {
                       .then(() =>
                         notification.success({
                           message: 'Copied',
-                        }),
+                        })
                       )
                   }
                 />
