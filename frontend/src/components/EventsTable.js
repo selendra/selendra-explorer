@@ -4,20 +4,29 @@ import React, { useState } from 'react';
 import { formatNumber, shortenAddress, timeDuration } from '../utils';
 import { Link } from 'react-router-dom';
 
-export default function EventsTable({ loading, data, onChange }) {
+export default function EventsTable({
+  loading,
+  data,
+  onChange,
+  total,
+  current,
+  onShowSizeChange,
+  sizePage,
+}) {
   return (
     <Table
       dataSource={data}
       rowKey={(record) => record.block_id + ' ' + record.index}
       loading={loading}
       className="table-styling"
-      // pagination={{
-      //   pageSize: 10,
-      //   total: data?.total_page,
-      //   onChange: (page) => {
-      //     onChange(page);
-      //   },
-      // }}
+      pagination={{
+        pageSize: parseInt(sizePage),
+        total: total,
+        current: parseInt(current),
+        showSizeChanger: false,
+        onShowSizeChange,
+        onChange: onChange,
+      }}
     >
       <Table.Column
         title="Event ID"

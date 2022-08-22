@@ -1,12 +1,12 @@
 import { Card, Col, Row, Select } from 'antd';
 import { useState } from 'react';
 import ExtrinsicsTable from '../../components/ExtrinsicsTable';
-import useFetch from '../../hooks/useFetch';
 import LaodingLogo from '../../assets/loading.png';
 
 import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
-import { QUERY_EXTRINSIC } from '../../graphql/query';
+import { QUERY_EXTRINSIC, TOTAL_EXTRINSIC } from '../../graphql/query';
+import { useSearchParams } from 'react-router-dom';
 
 const module = [
   'all',
@@ -19,6 +19,14 @@ const module = [
 
 export default function Extrinsics() {
   const { query } = useGraphQL();
+
+  const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 10 });
+  const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
+  const [sizePage, setSizePage] = useState(searchParams.get('size'));
+  const { extrinsic_aggregate } = query(useQuery(TOTAL_EXTRINSIC));
+  let start = sizePage;
+  let end = currentPage;
+
   const extrinsic = query(
     useQuery(QUERY_EXTRINSIC, {
       variables: {
@@ -34,18 +42,20 @@ export default function Extrinsics() {
   );
   const [isSigned, setIsSigned] = useState(false);
   const [selectedModule, setSelectedModule] = useState('all');
-  const [page, setPage] = useState(1);
-  // const { loading, data = [] } = useFetch(
-  //   isSigned
-  //     ? `${process.env.REACT_APP_API}/extrinsic/signed/${page}`
-  //     : `${process.env.REACT_APP_API}/extrinsic/${selectedModule}/${page}`,
-  // );
-
   function handleChangeModule(value) {
     setSelectedModule(value);
-    setPage(1);
     console.log(`selected: ${value}`);
   }
+
+  const onShowSizeChange = (current, pageSize) => {
+    setSizePage(pageSize);
+    setCurrentPage(current);
+    setSearchParams({ ...searchParams, p: current, size: sizePage });
+  };
+  const onChange = (page) => {
+    setCurrentPage(page);
+    setSearchParams({ ...searchParams, p: page, size: sizePage });
+  };
 
   return (
     <div>
@@ -89,17 +99,12 @@ export default function Extrinsics() {
           <div className="spacing" />
           {extrinsic.extrinsic ? (
             <ExtrinsicsTable
-              // loading={loading}
-              // loading={{
-              //   indicator: (
-              //     <div>
-              //       <img className="loading-img-block" alt="" src={LaodingLogo} />
-              //     </div>
-              //   ),
-              //   spinning: loading,
-              // }}
               data={extrinsic.extrinsic}
-              onChange={setPage}
+              total={extrinsic_aggregate?.aggregate.count}
+              current={currentPage}
+              onShowSizeChange={onShowSizeChange}
+              sizePage={sizePage}
+              onChange={onChange}
             />
           ) : (
             extrinsic

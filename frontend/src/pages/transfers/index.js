@@ -4,19 +4,23 @@ import useFetch from '../../hooks/useFetch';
 import LaodingLogo from '../../assets/loading.png';
 import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
-import { QUERY_TRANSFERS } from '../../graphql/query';
+import { QUERY_TRANSFERS, TOTAL_TRANSFER } from '../../graphql/query';
+import { useSearchParams } from 'react-router-dom';
+
 export default function Transfers() {
   const { query } = useGraphQL();
-  const [page, setPage] = useState(1);
-  // const { loading, data = [] } = useFetch(
-  //   `${process.env.REACT_APP_API}/transfer/all/${page}`
-  // );
+  const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 10 });
+  const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
+  const [sizePage, setSizePage] = useState(searchParams.get('size'));
+  const { transfer_aggregate } = query(useQuery(TOTAL_TRANSFER));
+  let start = sizePage;
+  let end = currentPage;
 
   const transfers = query(
     useQuery(QUERY_TRANSFERS, {
       variables: {
-        limit: 10,
-        offset: 0,
+        limit: parseInt(start),
+        offset: parseInt(end),
         orderBy: [
           {
             timestamp: 'desc',
@@ -26,6 +30,16 @@ export default function Transfers() {
     }),
   );
 
+  const onShowSizeChange = (current, pageSize) => {
+    setSizePage(pageSize);
+    setCurrentPage(current);
+    setSearchParams({ ...searchParams, p: current, size: sizePage });
+  };
+  const onChange = (page) => {
+    setCurrentPage(page);
+    setSearchParams({ ...searchParams, p: page, size: sizePage });
+  };
+
   return (
     <div>
       <div className="blocks-bg">
@@ -33,17 +47,12 @@ export default function Transfers() {
           <p className="blocks-title">Transfers</p>
           {transfers.transfer ? (
             <TransferTable
-              // loading={transfers.transfer ? true : false}
-              // loading={{
-              //   indicator: (
-              //     <div>
-              //       <img className="loading-img-block" alt="" src={LaodingLogo} />
-              //     </div>
-              //   ),
-              //   spinning: !data,
-              // }}
+              total={transfer_aggregate?.aggregate.count}
+              current={currentPage}
+              onShowSizeChange={onShowSizeChange}
+              sizePage={sizePage}
               data={transfers.transfer}
-              onChange={setPage}
+              onChange={onChange}
             />
           ) : (
             transfers

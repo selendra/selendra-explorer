@@ -4,20 +4,21 @@ import BlocksTable from '../../components/BlocksTable';
 import LaodingLogo from '../../assets/loading.png';
 import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
-import { QUERY_BLOCKS } from '../../graphql/query';
+import { QUERY_BLOCKS, TOTAL_BLOCKS } from '../../graphql/query';
+import { useSearchParams } from 'react-router-dom';
 export default function Blocks() {
   const { query } = useGraphQL();
-  const [page, setPage] = useState(1);
-  // const { loading, data = [] } = useFetch(
-  //   `${process.env.REACT_APP_API}/block/all/${page}`,
-  // );
-  // // console.log(data)
-
+  const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 10 });
+  const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
+  const [sizePage, setSizePage] = useState(searchParams.get('size'));
+  const { block_aggregate } = query(useQuery(TOTAL_BLOCKS));
+  let start = sizePage;
+  let end = currentPage;
   const blocks = query(
     useQuery(QUERY_BLOCKS, {
       variables: {
-        limit: 10,
-        offset: 1,
+        limit: parseInt(start),
+        offset: parseInt(end),
         orderBy: [
           {
             timestamp: 'desc',
@@ -26,6 +27,16 @@ export default function Blocks() {
       },
     }),
   );
+
+  const onShowSizeChange = (current, pageSize) => {
+    setSizePage(pageSize);
+    setCurrentPage(current);
+    setSearchParams({ ...searchParams, p: current, size: sizePage });
+  };
+  const onChange = (page) => {
+    setCurrentPage(page);
+    setSearchParams({ ...searchParams, p: page, size: sizePage });
+  };
 
   const { block } = blocks;
   return (
@@ -37,16 +48,12 @@ export default function Blocks() {
           <div>
             {blocks.block ? (
               <BlocksTable
-                // loading={{
-                //   indicator: (
-                //     <div>
-                //       <img className="loading-img-block" src={LaodingLogo} />
-                //     </div>
-                //   ),
-                //   spinning: !data,
-                // }}
                 data={block}
-                onChange={setPage}
+                total={block_aggregate?.aggregate.count}
+                onChange={onChange}
+                current={currentPage}
+                onShowSizeChange={onShowSizeChange}
+                sizePage={sizePage}
               />
             ) : (
               blocks

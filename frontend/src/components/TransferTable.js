@@ -7,20 +7,31 @@ import {
   balanceFormat,
 } from '../utils';
 
-export default function TransferTable({ short, loading, data, onChange }) {
+export default function TransferTable({
+  short,
+  loading,
+  data,
+  onChange,
+  total,
+  current,
+  onShowSizeChange,
+  sizePage,
+}) {
   return (
     <Table
       dataSource={data}
       rowKey={(record) => record.id}
-      loading={loading}
       className="table-styling"
       tableLayout="fixed"
       pagination={
         short
           ? false
           : {
-              pageSize: 10,
-              total: data?.total_page,
+              pageSize: parseInt(sizePage),
+              total: total,
+              showSizeChanger: false,
+              onShowSizeChange,
+              current: parseInt(current),
               onChange: (page) => {
                 onChange(page);
               },

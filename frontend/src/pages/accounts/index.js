@@ -5,13 +5,10 @@ import LaodingLogo from '../../assets/loading.png';
 import { useGraphQL } from '../../context/useApp';
 import { QUERY_ACCOUNTS, TOTAL_ACCOUNT } from '../../graphql/query';
 import { useQuery } from '@apollo/client';
-import { Pagination } from 'antd';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 export default function Accounts() {
   const { query } = useGraphQL();
-  let navigate = useNavigate();
-  let location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 10 });
   const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
   const [sizePage, setSizePage] = useState(searchParams.get('size'));
