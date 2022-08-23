@@ -35,30 +35,32 @@ export default function Transfers() {
     setCurrentPage(current);
     setSearchParams({ ...searchParams, p: current, size: sizePage });
   };
-  const onChange = (page) => {
+  const onChange = (page, pageSize) => {
     setCurrentPage(page);
-    setSearchParams({ ...searchParams, p: page, size: sizePage });
+    setSearchParams({ ...searchParams, p: page, size: pageSize });
   };
 
   return (
-    <div>
-      <div className="blocks-bg">
+    <>
+      <div className="blocks-bg" />
+      <div className="home-info">
         <div className="container">
-          {transfers.transfer ? (
-            <TransferTable
-              total={transfer_aggregate?.aggregate.count}
-              current={currentPage}
-              onShowSizeChange={onShowSizeChange}
-              sizePage={sizePage}
-              data={transfers.transfer}
-              onChange={onChange}
-            />
-          ) : (
-            transfers
-          )}
+          <div className="table-account">
+            {transfers.transfer ? (
+              <TransferTable
+                total={transfer_aggregate?.aggregate.count}
+                current={currentPage}
+                onShowSizeChange={onShowSizeChange}
+                sizePage={sizePage}
+                data={transfers.transfer}
+                onChange={onChange}
+              />
+            ) : (
+              transfers
+            )}
+          </div>
         </div>
       </div>
-      <div className="container-table-account" />
-    </div>
+    </>
   );
 }

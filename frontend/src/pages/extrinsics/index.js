@@ -30,8 +30,8 @@ export default function Extrinsics() {
   const extrinsic = query(
     useQuery(QUERY_EXTRINSIC, {
       variables: {
-        limit: 12,
-        offset: 0,
+        limit: parseInt(start),
+        offset: parseInt(end),
         orderBy: [
           {
             id: 'desc',
@@ -50,16 +50,17 @@ export default function Extrinsics() {
   const onShowSizeChange = (current, pageSize) => {
     setSizePage(pageSize);
     setCurrentPage(current);
-    setSearchParams({ ...searchParams, p: current, size: sizePage });
+    setSearchParams({ ...searchParams, p: current, size: pageSize });
   };
-  const onChange = (page) => {
+  const onChange = (page, pageSize) => {
     setCurrentPage(page);
-    setSearchParams({ ...searchParams, p: page, size: sizePage });
+    setSearchParams({ ...searchParams, p: page, size: pageSize });
   };
 
   return (
-    <div>
-      <div className="blocks-bg">
+    <>
+      <div className="blocks-bg" />
+      <div className="home-info">
         <div className="container">
           {/* <p className="blocks-title">Extrinsics</p>
           <div className="filter-bg">
@@ -96,22 +97,23 @@ export default function Extrinsics() {
               </Col>
             </Row>
           </div> */}
-          <div className="spacing" />
-          {extrinsic.extrinsic ? (
-            <ExtrinsicsTable
-              data={extrinsic.extrinsic}
-              total={extrinsic_aggregate?.aggregate.count}
-              current={currentPage}
-              onShowSizeChange={onShowSizeChange}
-              sizePage={sizePage}
-              onChange={onChange}
-            />
-          ) : (
-            extrinsic
-          )}
+
+          <div className="table-account">
+            {extrinsic.extrinsic ? (
+              <ExtrinsicsTable
+                data={extrinsic.extrinsic}
+                total={extrinsic_aggregate?.aggregate.count}
+                current={currentPage}
+                onShowSizeChange={onShowSizeChange}
+                sizePage={sizePage}
+                onChange={onChange}
+              />
+            ) : (
+              extrinsic
+            )}
+          </div>
         </div>
       </div>
-      <div className="container-table-account" />
-    </div>
+    </>
   );
 }

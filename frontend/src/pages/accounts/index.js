@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import AccountsTable from '../../components/AccountsTable';
-import useFetch from '../../hooks/useFetch';
-import LaodingLogo from '../../assets/loading.png';
 import { useGraphQL } from '../../context/useApp';
 import { QUERY_ACCOUNTS, TOTAL_ACCOUNT } from '../../graphql/query';
 import { useQuery } from '@apollo/client';
 import { useSearchParams } from 'react-router-dom';
-
+import React from 'react';
 export default function Accounts() {
   const { query } = useGraphQL();
-  const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 15 });
+
+  const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 10 });
   const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
   const [sizePage, setSizePage] = useState(searchParams.get('size'));
   const { account_aggregate } = query(useQuery(TOTAL_ACCOUNT));
@@ -32,19 +31,20 @@ export default function Accounts() {
   const onShowSizeChange = (current, pageSize) => {
     setSizePage(pageSize);
     setCurrentPage(current);
-    setSearchParams({ ...searchParams, p: current, size: sizePage });
+    setSearchParams({ p: current, size: pageSize });
   };
-  const onChange = (page) => {
+  const onChange = (page, pageSize) => {
     setCurrentPage(page);
-    setSearchParams({ ...searchParams, p: page, size: sizePage });
+    setSearchParams({ p: page, size: pageSize });
   };
 
   return (
-    <div>
-      <div className="blocks-bg">
+    <>
+      <div className="blocks-bg" />
+      <div className="home-info">
         <div className="container">
-          {accounts.account ? (
-            <div className="table-account">
+          <div className="table-account">
+            {accounts.account ? (
               <AccountsTable
                 accounts={accounts.account}
                 onChange={onChange}
@@ -53,13 +53,12 @@ export default function Accounts() {
                 onShowSizeChange={onShowSizeChange}
                 sizePage={sizePage}
               />
-            </div>
-          ) : (
-            accounts
-          )}
+            ) : (
+              accounts
+            )}
+          </div>
         </div>
       </div>
-      <div className="container-table-account" />
-    </div>
+    </>
   );
 }

@@ -95,11 +95,15 @@ export default function Home() {
       <div className="home-info">
         <Row gutter={[16, { xs: 8, sm: 16, md: 24, lg: 32 }]}>
           <Col xs={24} md={24} lg={12} xl={12}>
-            {/* <p className="home-subTitle">Latest Blocks</p> */}
-            {blocks.block ? <BlocksTable short data={blocks?.block} /> : blocks}
+            <div className="home-table">
+              {blocks.block ? (
+                <BlocksTable short data={blocks?.block} />
+              ) : (
+                blocks
+              )}
+            </div>
           </Col>
           <Col xs={24} md={24} lg={12} xl={12}>
-            {/* <p className="home-subTitle">Account Updates</p> */}
             {accounts.account ? (
               <AccountsTable short accounts={accounts?.account} />
             ) : (
@@ -109,12 +113,13 @@ export default function Home() {
         </Row>
       </div>
       <div className="home-info">
-        {/* <p className="home-subTitle">Latest Transactions</p> */}
-        {transfers.transfer ? (
-          <TransferTable short data={transfers?.transfer} />
-        ) : (
-          transfers
-        )}
+        <div className="home-table">
+          {transfers.transfer ? (
+            <TransferTable short data={transfers?.transfer} />
+          ) : (
+            transfers
+          )}
+        </div>
       </div>
     </div>
   );

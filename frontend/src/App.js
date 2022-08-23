@@ -10,12 +10,8 @@ import Extrinsics from './pages/extrinsics';
 import ExtrinsicDetail from './pages/extrinsics/extrinsicDetail';
 import Transfers from './pages/transfers';
 import TransferDetail from './pages/transfers/transferDetail';
-import { useAPIState } from './context/APIContext';
-import { Spin } from 'antd';
 import Staking from './pages/staking';
 import ValidatorDetail from './pages/staking/validatorDetail';
-import Loading from './components/Loading';
-import Footer from './components/Footer';
 
 function App() {
   // const { apiState } = useAPIState();

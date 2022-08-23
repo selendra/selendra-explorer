@@ -12,25 +12,25 @@ export default function ExtrinsicsTable({
   onShowSizeChange,
   sizePage,
 }) {
-  console.log(data);
   return (
     <Table
       dataSource={data}
       rowKey={(record) => record.hash}
       loading={loading}
-      className="table-styling"
+      // className="table-styling"
       tableLayout="fixed"
-      // sortDirections='descend'
       pagination={
         short
           ? false
           : {
               pageSize: parseInt(sizePage),
               total: total,
-              current: parseInt(current),
-              showSizeChanger: false,
+              showSizeChanger: true,
               onShowSizeChange,
-              onChange: onChange,
+              current: parseInt(current),
+              onChange: (page, sizePage) => {
+                onChange(page, parseInt(sizePage));
+              },
             }
       }
     >

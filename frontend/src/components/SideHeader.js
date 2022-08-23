@@ -1,19 +1,19 @@
-import React, { useState } from "react";
-import { Layout, Drawer, Row, Col } from "antd";
-import menuWhite from "../assets/menu-white.svg";
-import logo from "../assets/logo.png";
-import logoWhite from "../assets/logo-white.png";
+import React, { useState } from 'react';
+import { Layout, Drawer, Row, Col } from 'antd';
+import menuWhite from '../assets/menu-white.svg';
+import logo from '../assets/logo.png';
+import logoWhite from '../assets/logo-white.png';
 
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 const routes = [
-  { name: "Explore", route: "/" },
-  { name: "Blocks", route: "/blocks" },
-  { name: "Accounts", route: "/accounts" },
-  { name: "Transfers", route: "/transfers" },
-  { name: "Extrinsics", route: "/extrinsics" },
-  { name: "Events", route: "/events" },
-  { name: "Staking", route: "/staking" },
+  { name: 'Explore', route: '/' },
+  { name: 'Blocks', route: '/blocks' },
+  { name: 'Accounts', route: '/accounts' },
+  { name: 'Transfers', route: '/transfers' },
+  { name: 'Extrinsics', route: '/extrinsics' },
+  { name: 'Events', route: '/events' },
+  { name: 'Staking', route: '/staking' },
 ];
 
 function SideMenu() {
@@ -35,10 +35,10 @@ function SideMenu() {
           onClose={onClose}
           visible={visible}
           bodyStyle={{
-            background: "#012D41",
+            background: '#012D41',
           }}
         >
-          <div style={{ padding: "", marginBottom: "30px" }}>
+          <div style={{ padding: '', marginBottom: '30px' }}>
             <img src={logo} alt="selendra-logo" width="60%" />
           </div>
           <Row

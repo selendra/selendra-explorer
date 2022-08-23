@@ -18,7 +18,7 @@ export default function BlocksTable({
         dataSource={data.filter((data) => data.id.toString() !== '-1')}
         loading={loading}
         rowKey={(record) => record.blockNumber}
-        className="table-styling"
+        // className="table-styling"
         sortDirections="descend"
         tableLayout="fixed"
         pagination={
@@ -27,11 +27,11 @@ export default function BlocksTable({
             : {
                 pageSize: parseInt(sizePage),
                 current: parseInt(current),
-                showSizeChanger: false,
+                showSizeChanger: true,
                 onShowSizeChange,
                 total: total,
-                onChange: (page) => {
-                  onChange(page);
+                onChange: (page, pageSize) => {
+                  onChange(page, pageSize);
                 },
               }
         }

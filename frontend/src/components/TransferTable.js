@@ -21,7 +21,7 @@ export default function TransferTable({
     <Table
       dataSource={data}
       rowKey={(record) => record.id}
-      className="table-styling"
+      // className="table-styling"
       tableLayout="fixed"
       pagination={
         short
@@ -29,11 +29,11 @@ export default function TransferTable({
           : {
               pageSize: parseInt(sizePage),
               total: total,
-              showSizeChanger: false,
+              showSizeChanger: true,
               onShowSizeChange,
               current: parseInt(current),
-              onChange: (page) => {
-                onChange(page);
+              onChange: (page, sizePage) => {
+                onChange(page, parseInt(sizePage));
               },
             }
       }

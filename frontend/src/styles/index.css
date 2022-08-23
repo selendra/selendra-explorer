@@ -18,10 +18,11 @@
 }
 
 [data-theme='dark'] {
-  --background: #17171a;
-  --cards: rgb(50, 53, 70);
-  --foreground: #17171a;
-  --table-cards: rgb(50, 53, 70);
+  --background: #011822;
+  --cards: #0a1b31;
+  /* --cards: #112641; */
+  --foreground: #112641;
+  --table-cards: #0a1d35;
   --text-color: #fff;
 }
 
@@ -59,7 +60,7 @@ code {
     monospace;
 }
 .app {
-  /* min-height: calc(100vh - 4rem) !important; */
+  height: 100% !important;
   padding-bottom: 120px;
 }
 .container {
@@ -69,7 +70,7 @@ code {
 /*** Header */
 .header {
   height: 60px;
-  background-color: var(--primary);
+  background-color: var(--background);
 }
 .header-container {
   max-width: 72rem;
@@ -95,15 +96,23 @@ code {
 }
 .container-table-account {
   background: var(--foreground);
-  height: 530px;
+  /* height: 530px; */
 }
 .table-account {
-  /* top: -300px; */
+  top: -200px;
   position: relative;
   padding: 16px 24px;
   background-color: var(--table-cards) !important;
   border-radius: 16px !important;
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px !important;
+  box-shadow: rgba(89, 89, 189, 0.15) 0px 2px 5px 0px,
+    rgba(93, 89, 187, 0.05) 0px 1px 1px 0px;
+}
+.home-table {
+  padding: 16px 24px;
+  background-color: var(--table-cards) !important;
+  border-radius: 16px !important;
+  box-shadow: rgba(89, 89, 189, 0.15) 0px 2px 5px 0px,
+    rgba(93, 89, 187, 0.05) 0px 1px 1px 0px;
 }
 .ant-table-thead > tr > th {
   background: var(--table-cards) !important;
@@ -118,7 +127,8 @@ code {
 .table-styling .ant-table {
   padding: 16px 24px;
   border-radius: 16px !important;
-  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  box-shadow: rgba(89, 89, 189, 0.15) 0px 2px 5px 0px,
+    rgba(93, 89, 187, 0.05) 0px 1px 1px 0px;
 }
 .table-styling .ant-table-tbody tr {
   height: 64px !important;
@@ -719,7 +729,7 @@ code {
 }
 .ant-menu,
 .ant-menu-horizontal > .ant-menu-item a {
-  background: #012d41 !important;
+  background: var(--background) !important;
   color: rgba(255, 255, 255, 0.85) !important;
   font-weight: 900;
   border-radius: 12px !important;

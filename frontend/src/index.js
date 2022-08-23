@@ -11,6 +11,7 @@ import { AppProvider } from './context/useApp';
 import { ThemeProvider } from 'next-themes';
 import 'remixicon/fonts/remixicon.css';
 import CustomFooter from './components/Footer';
+import HeaderComponent from './components/Header';
 
 ConfigProvider.config({
   theme: {
@@ -18,7 +19,7 @@ ConfigProvider.config({
   },
 });
 
-const { Footer, Content } = Layout;
+const { Footer, Content, Header } = Layout;
 
 ReactDOM.render(
   <ApolloProvider client={client}>
@@ -26,7 +27,7 @@ ReactDOM.render(
       <AppProvider>
         <ConfigProvider>
           <Layout>
-            <Content className="app">
+            <Content>
               <App />
             </Content>
             <Footer>

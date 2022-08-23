@@ -28,11 +28,11 @@ export default function TransferDetail() {
   );
 
   const { transfer_by_pk } = transfers;
+  console.log(transfer_by_pk);
 
   return (
     <div className="container">
       <div className="spacing" />
-
       <Card className="block-detail-card" style={{ borderRadius: '8px' }}>
         <table className="table">
           <tbody>
@@ -136,7 +136,9 @@ export default function TransferDetail() {
               <td>
                 {' '}
                 {transfers.transfer_by_pk
-                  ? balanceFormat(transfers.transfer_by_pk.fee_amount)
+                  ? parseInt(
+                      formatNumber(transfers.transfer_by_pk.fee_amount)
+                    ).toPrecision(12)
                   : transfers}{' '}
                 SEL
               </td>
