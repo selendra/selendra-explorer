@@ -26,11 +26,11 @@ export default function BlocksTable({
           : {
               pageSize: parseInt(sizePage),
               current: parseInt(current),
-              showSizeChanger: false,
+              showSizeChanger: true,
               onShowSizeChange,
               total: total,
-              onChange: (page) => {
-                onChange(page);
+              onChange: (page, pageSize) => {
+                onChange(page, pageSize);
               },
             }
       }

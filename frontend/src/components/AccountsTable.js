@@ -18,12 +18,12 @@ export default function AccountsTable({
           ? false
           : {
               pageSize: parseInt(sizePage),
-              showSizeChanger: false,
+              showSizeChanger: true,
               onShowSizeChange,
               current: parseInt(current),
               total: account_aggregate?.aggregate.count,
-              onChange: (page) => {
-                onChange(page);
+              onChange: (page, sizePage) => {
+                onChange(page, parseInt(sizePage));
               },
             }
       }

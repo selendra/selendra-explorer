@@ -31,11 +31,11 @@ export default function Blocks() {
   const onShowSizeChange = (current, pageSize) => {
     setSizePage(pageSize);
     setCurrentPage(current);
-    setSearchParams({ ...searchParams, p: current, size: sizePage });
+    setSearchParams({ ...searchParams, p: current, size: pageSize });
   };
-  const onChange = (page) => {
+  const onChange = (page, pageSize) => {
     setCurrentPage(page);
-    setSearchParams({ ...searchParams, p: page, size: sizePage });
+    setSearchParams({ ...searchParams, p: page, size: pageSize });
   };
 
   const { block } = blocks;

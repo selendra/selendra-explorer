@@ -35,9 +35,9 @@ export default function Transfers() {
     setCurrentPage(current);
     setSearchParams({ ...searchParams, p: current, size: sizePage });
   };
-  const onChange = (page) => {
+  const onChange = (page, pageSize) => {
     setCurrentPage(page);
-    setSearchParams({ ...searchParams, p: page, size: sizePage });
+    setSearchParams({ ...searchParams, p: page, size: pageSize });
   };
 
   return (

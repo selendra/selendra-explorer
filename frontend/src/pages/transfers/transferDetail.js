@@ -24,10 +24,11 @@ export default function TransferDetail() {
   const transfers = query(
     useQuery(QUERY_TRANSFER_BY_PK, {
       variables: { transferByPkId: id },
-    })
+    }),
   );
 
   const { transfer_by_pk } = transfers;
+  console.log(transfer_by_pk);
 
   return (
     <div className="container">
@@ -42,8 +43,8 @@ export default function TransferDetail() {
                 {
                   message: 'Copied',
                 },
-                3
-              )
+                3,
+              ),
             )
           }
         />
@@ -95,7 +96,7 @@ export default function TransferDetail() {
                     .then(() =>
                       notification.success({
                         message: 'Copied',
-                      })
+                      }),
                     )
                 }
               />
@@ -120,7 +121,7 @@ export default function TransferDetail() {
                     .then(() =>
                       notification.success({
                         message: 'Copied',
-                      })
+                      }),
                     )
                 }
               />
@@ -139,7 +140,9 @@ export default function TransferDetail() {
               <td>
                 {' '}
                 {transfers.transfer_by_pk
-                  ? balanceFormat(transfers.transfer_by_pk.fee_amount)
+                  ? parseInt(
+                      formatNumber(transfers.transfer_by_pk.fee_amount),
+                    ).toPrecision(12)
                   : transfers}{' '}
                 SEL
               </td>

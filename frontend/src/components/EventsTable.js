@@ -23,9 +23,11 @@ export default function EventsTable({
         pageSize: parseInt(sizePage),
         total: total,
         current: parseInt(current),
-        showSizeChanger: false,
+        showSizeChanger: true,
         onShowSizeChange,
-        onChange: onChange,
+        onChange: (page, sizePage) => {
+          onChange(page, parseInt(sizePage));
+        },
       }}
     >
       <Table.Column

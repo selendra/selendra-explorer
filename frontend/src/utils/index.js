@@ -14,7 +14,7 @@ export function balanceFormat(amount) {
   return formatBalance(
     amount.toString(),
     { withSi: false, forceUnit: '-' },
-    12
+    12,
   );
 }
 
