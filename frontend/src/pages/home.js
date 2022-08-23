@@ -67,9 +67,9 @@ export default function Home() {
   const { transfer_aggregate } = query(useQuery(TOTAL_TRANSFER));
   const { staking_aggregate } = query(useQuery(TOTAL_VALIDATOR));
 
-  const total_issuance = 100;
-  const total_lockBalance = 100;
-  const waitingCount = 200;
+  const total_issuance = '';
+  const total_lockBalance = '';
+  const waitingCount = '';
 
   return (
     <div>
@@ -86,9 +86,9 @@ export default function Home() {
             total_accounts={account_aggregate?.aggregate.count}
             total_transfers={transfer_aggregate?.aggregate.count}
             total_validators={staking_aggregate?.aggregate.count}
-            total_issuance={total_issuance}
-            total_lockBalance={total_lockBalance}
-            waitingCount={waitingCount}
+            // total_issuance={total_issuance}
+            // total_lockBalance={total_lockBalance}
+            // waitingCount={waitingCount}
           />
         </div>
       </div>

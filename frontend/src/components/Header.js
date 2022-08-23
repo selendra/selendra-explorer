@@ -40,10 +40,10 @@ export default function HeaderComponent() {
       label: <Link to="/transfers">Transfers</Link>,
       key: 'transfer',
     },
-    {
-      label: <Link to="/staking">Staking</Link>,
-      key: 'staking',
-    },
+    // {
+    //   label: <Link to="/staking">Staking</Link>,
+    //   key: 'staking',
+    // },
     {
       label: 'Blockchain',
       key: 'blockchain',
@@ -56,9 +56,23 @@ export default function HeaderComponent() {
           label: <Link to="/extrinsics">Extrinsics</Link>,
           key: 'extrinsisc',
         },
+        // {
+        //   label: <Link to="/events">Events</Link>,
+        //   key: 'events',
+        // },
+      ],
+    },
+    {
+      label: 'Networks',
+      key: 'networks',
+      children: [
         {
-          label: <Link to="/events">Events</Link>,
-          key: 'events',
+          label: <a href="/">Mainnet</a>,
+          key: 'mainnet',
+        },
+        {
+          label: <Link to="/">Testnet</Link>,
+          key: 'testnet',
         },
       ],
     },
@@ -71,6 +85,7 @@ export default function HeaderComponent() {
           <div className="logo" style={{ marginRight: 18, paddingTop: '5px' }}>
             <Link to="/">
               <img src={logo} alt="" height={50} />
+              <sup className="testnet">Testnet</sup>
             </Link>
           </div>
           {/* <div style={{ display: 'flex', paddingTop: '5px' }}>

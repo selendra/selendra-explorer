@@ -8,7 +8,7 @@ import { QUERY_BLOCKS, TOTAL_BLOCKS } from '../../graphql/query';
 import { useSearchParams } from 'react-router-dom';
 export default function Blocks() {
   const { query } = useGraphQL();
-  const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 10 });
+  const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 12 });
   const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
   const [sizePage, setSizePage] = useState(searchParams.get('size'));
   const { block_aggregate } = query(useQuery(TOTAL_BLOCKS));
@@ -25,7 +25,7 @@ export default function Blocks() {
           },
         ],
       },
-    }),
+    })
   );
 
   const onShowSizeChange = (current, pageSize) => {

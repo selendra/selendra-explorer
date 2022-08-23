@@ -8,7 +8,7 @@
 //     </div>
 //   )
 // }
-import LaodingLogo from "../assets/loading.png";
+import LaodingLogo from '../assets/loading.png';
 
 export default function Loading() {
   return (

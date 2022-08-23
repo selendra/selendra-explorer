@@ -20,7 +20,7 @@ const module = [
 export default function Extrinsics() {
   const { query } = useGraphQL();
 
-  const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 10 });
+  const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 12 });
   const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
   const [sizePage, setSizePage] = useState(searchParams.get('size'));
   const { extrinsic_aggregate } = query(useQuery(TOTAL_EXTRINSIC));
@@ -30,7 +30,7 @@ export default function Extrinsics() {
   const extrinsic = query(
     useQuery(QUERY_EXTRINSIC, {
       variables: {
-        limit: 10,
+        limit: 12,
         offset: 0,
         orderBy: [
           {
@@ -38,7 +38,7 @@ export default function Extrinsics() {
           },
         ],
       },
-    }),
+    })
   );
   const [isSigned, setIsSigned] = useState(false);
   const [selectedModule, setSelectedModule] = useState('all');
@@ -61,7 +61,7 @@ export default function Extrinsics() {
     <div>
       <div className="blocks-bg">
         <div className="container">
-          <p className="blocks-title">Extrinsics</p>
+          {/* <p className="blocks-title">Extrinsics</p>
           <div className="filter-bg">
             <Row align="middle" gutter={[32, 32]}>
               <Col>
@@ -95,7 +95,7 @@ export default function Extrinsics() {
                 </Select>
               </Col>
             </Row>
-          </div>
+          </div> */}
           <div className="spacing" />
           {extrinsic.extrinsic ? (
             <ExtrinsicsTable

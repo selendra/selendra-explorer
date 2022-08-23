@@ -41,12 +41,12 @@ export default function Overview(props) {
           data={
             <div style={{ display: 'flex' }}>
               {new Intl.NumberFormat().format(props?.total_validators)}{' '}
-              <span>/{props?.waitingCount}</span>
+              {/* <span>/{props?.waitingCount}</span> */}
             </div>
           }
         />
 
-        <DataField
+        {/* <DataField
           icon="/assets/icons/profile-2user.svg"
           title="Balances"
           data={
@@ -65,7 +65,7 @@ export default function Overview(props) {
               <span>&nbsp;&nbsp;SEL</span>
             </div>
           }
-        />
+        /> */}
       </Row>
     </div>
   );

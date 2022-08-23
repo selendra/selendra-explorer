@@ -9,7 +9,7 @@ import { useSearchParams } from 'react-router-dom';
 
 export default function Transfers() {
   const { query } = useGraphQL();
-  const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 10 });
+  const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 11 });
   const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
   const [sizePage, setSizePage] = useState(searchParams.get('size'));
   const { transfer_aggregate } = query(useQuery(TOTAL_TRANSFER));

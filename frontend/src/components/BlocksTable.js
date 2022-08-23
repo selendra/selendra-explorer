@@ -68,12 +68,14 @@ export default function BlocksTable({
                   <span style={{ marginLeft: '4px' }}>Finalized</span>
                 </div>
               ) : (
-                <div>
+                <div className="failed-background">
                   <img
-                    className="loading-img-block"
-                    alt="loading"
-                    src="/assets/loading.png"
+                    src="/assets/icons/x-circle.svg"
+                    alt="finalized"
+                    width={20}
+                    height={20}
                   />
+                  <span style={{ marginLeft: '4px' }}>Unfinalized</span>
                 </div>
               )}
             </div>

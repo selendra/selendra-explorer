@@ -37,5 +37,5 @@ ReactDOM.render(
       </AppProvider>
     </ThemeProvider>
   </ApolloProvider>,
-  document.getElementById('root'),
+  document.getElementById('root')
 );
