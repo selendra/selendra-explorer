@@ -299,6 +299,24 @@ const QUERY_EXTRINSIC_BY_PK = gql`
   }
 `;
 
+const QUERY_VALIDATOR = gql`
+  query ($limit: Int, $offset: Int, $orderBy: [validator_order_by!]) {
+    validator(limit: $limit, offset: $offset, order_by: $orderBy) {
+      block_id
+      identity
+    }
+  }
+`;
+
+const QUERY_CHANGE_INFO = gql`
+  query {
+    chain_info {
+      count
+      name
+    }
+  }
+`;
+
 export {
   QUERY_ACCOUNTS,
   QUERY_BLOCKS,
@@ -318,4 +336,6 @@ export {
   QUERY_BLOCK_BY_PK,
   QUERY_EXTRINSIC_BY_PK,
   QUERY_EVENTS,
+  QUERY_VALIDATOR,
+  QUERY_CHANGE_INFO,
 };

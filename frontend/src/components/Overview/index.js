@@ -45,7 +45,7 @@ export default function Overview(props) {
             </div>
           }
         />
-
+        {/* 
         <DataField
           icon="/assets/icons/profile-2user.svg"
           title="Balances"
@@ -55,10 +55,10 @@ export default function Overview(props) {
               <span>&nbsp;&nbsp;SEL</span>
             </div>
           }
-        />
+        /> */}
         <DataField
           icon="/assets/icons/lock.svg"
-          title="Locked"
+          title="Nominator"
           data={
             <div style={{ display: 'flex' }}>
               {new Intl.NumberFormat().format(props?.total_lockBalance)}{' '}

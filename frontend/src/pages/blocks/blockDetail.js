@@ -20,7 +20,7 @@ export default function BlockDetail() {
   const block = query(
     useQuery(QUERY_BLOCK_BY_PK, {
       variables: { blockByPkId: id },
-    })
+    }),
   );
 
   const { block_by_pk } = block;
@@ -53,12 +53,14 @@ export default function BlockDetail() {
                       <span style={{ marginLeft: '4px' }}>Finalized</span>
                     </div>
                   ) : (
-                    <div>
+                    <div className="failed-background-2">
                       <img
-                        src={<LaodingLogo />}
-                        alt="loading"
-                        className="loading-img-block"
+                        src="/assets/icons/x-circle.svg"
+                        alt="finalized"
+                        width={20}
+                        height={20}
                       />
+                      <span style={{ marginLeft: '4px' }}>Unfinalized</span>
                     </div>
                   )}
                 </td>
@@ -72,7 +74,7 @@ export default function BlockDetail() {
                     navigator.clipboard.writeText(block_by_pk?.hash).then(() =>
                       notification.success({
                         message: 'Copied',
-                      })
+                      }),
                     )
                   }
                 />
@@ -88,7 +90,7 @@ export default function BlockDetail() {
                       .then(() =>
                         notification.success({
                           message: 'Copied',
-                        })
+                        }),
                       )
                   }
                 />
@@ -104,7 +106,7 @@ export default function BlockDetail() {
                       .then(() =>
                         notification.success({
                           message: 'Copied',
-                        })
+                        }),
                       )
                   }
                 />
@@ -120,7 +122,7 @@ export default function BlockDetail() {
                       .then(() =>
                         notification.success({
                           message: 'Copied',
-                        })
+                        }),
                       )
                   }
                 />
