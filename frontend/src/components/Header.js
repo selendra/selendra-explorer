@@ -20,10 +20,10 @@ export default function HeaderComponent() {
       label: <Link to="/transfers">Transfers</Link>,
       key: 'transfer',
     },
-    // {
-    //   label: <Link to="/staking">Staking</Link>,
-    //   key: 'staking',
-    // },
+    {
+      label: <Link to="/staking">Staking</Link>,
+      key: 'staking',
+    },
     {
       label: 'Blockchain',
       key: 'blockchain',

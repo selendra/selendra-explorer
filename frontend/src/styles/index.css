@@ -260,7 +260,13 @@ code {
 }
 .failed-background {
   background: var(--failed-background) !important;
-  width: 99px !important;
+  width: 100px !important;
+  border-radius: 6px;
+  padding: 2px 5px;
+}
+.failed-background-2 {
+  background: var(--failed-background) !important;
+  width: 110px !important;
   border-radius: 6px;
   padding: 2px 5px;
 }

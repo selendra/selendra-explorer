@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 export default function DataField({ icon, title, data, isPercent, isRoute }) {
   return (
-    <Col xs={10} sm={8} md={8} lg={8} xl={8}>
+    <Col xs={10} sm={6} md={6} lg={6} xl={6}>
       <Row gutter={[8, 8]} align="middle">
         <Col xs={24} sm={4} md={4} lg={4} xl={4}>
           <img src={icon} alt="" width={26} height={26} />

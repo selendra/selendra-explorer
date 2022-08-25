@@ -13,12 +13,14 @@ import {
   QUERY_BLOCKS,
   QUERY_ACCOUNTS,
   QUERY_TRANSFERS,
+  QUERY_CHANGE_INFO,
 } from '../graphql/query';
 import { useQuery } from '@apollo/client';
 import { useGraphQL } from '../context/useApp';
 
 export default function Home() {
   const { query } = useGraphQL();
+  const { chain_info } = query(useQuery(QUERY_CHANGE_INFO));
   const blocks = query(
     useQuery(QUERY_BLOCKS, {
       variables: {
@@ -30,7 +32,7 @@ export default function Home() {
           },
         ],
       },
-    })
+    }),
   );
 
   const accounts = query(
@@ -44,7 +46,7 @@ export default function Home() {
           },
         ],
       },
-    })
+    }),
   );
 
   const transfers = query(
@@ -58,7 +60,7 @@ export default function Home() {
           },
         ],
       },
-    })
+    }),
   );
 
   const { block_aggregate } = query(useQuery(TOTAL_BLOCKS));
@@ -71,6 +73,17 @@ export default function Home() {
   const total_lockBalance = '';
   const waitingCount = '';
 
+  const filterCount = (data, name) => {
+    const count = [];
+    data?.filter((filter) => {
+      if (filter.name === name) {
+        count.push(filter?.count);
+        return true;
+      }
+      return false;
+    });
+    return count[0];
+  };
   return (
     <div>
       <div className="home-container">
@@ -79,17 +92,26 @@ export default function Home() {
           <div className="spacing" />
           <Search />
           <div className="spacing" />
-          <Overview
-            total_blocks={block_aggregate?.aggregate.count}
-            total_blocksFinalized={block_aggregate?.aggregate.count}
-            total_extrinsicSigned={extrinsic_aggregate?.aggregate.count}
-            total_accounts={account_aggregate?.aggregate.count}
-            total_transfers={transfer_aggregate?.aggregate.count}
-            total_validators={staking_aggregate?.aggregate.count}
-            // total_issuance={total_issuance}
-            // total_lockBalance={total_lockBalance}
-            // waitingCount={waitingCount}
-          />
+          {chain_info ? (
+            <Overview
+              total_blocks={filterCount(chain_info, 'blocks')}
+              total_blocksFinalized={
+                parseInt(filterCount(chain_info, 'blocks')) - 4
+              }
+              total_extrinsicSigned={filterCount(chain_info, 'extrinsics')}
+              total_accounts={filterCount(chain_info, 'accounts')}
+              total_transfers={filterCount(chain_info, 'transfers')}
+              total_validators={filterCount(
+                chain_info,
+                'active_validator_count',
+              )}
+              total_issuance={chain_info[4]?.count}
+              total_lockBalance={filterCount(chain_info, 'nominator_count')}
+              waitingCount={filterCount(chain_info, 'waiting_validator_count')}
+            />
+          ) : (
+            chain_info
+          )}
         </div>
       </div>
       <div className="home-info">
