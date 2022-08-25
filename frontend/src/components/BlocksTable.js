@@ -12,6 +12,7 @@ export default function BlocksTable({
   onShowSizeChange,
   sizePage,
 }) {
+  console.log('finalized', data);
   return (
     <>
       <Table

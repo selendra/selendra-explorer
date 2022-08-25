@@ -86,9 +86,9 @@ export default function Home() {
             total_accounts={account_aggregate?.aggregate.count}
             total_transfers={transfer_aggregate?.aggregate.count}
             total_validators={staking_aggregate?.aggregate.count}
-            // total_issuance={total_issuance}
-            // total_lockBalance={total_lockBalance}
-            // waitingCount={waitingCount}
+            total_issuance={total_issuance}
+            total_lockBalance={total_lockBalance}
+            waitingCount={waitingCount}
           />
         </div>
       </div>

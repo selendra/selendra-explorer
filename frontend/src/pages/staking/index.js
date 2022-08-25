@@ -10,6 +10,7 @@ import Chart from '../../components/chart';
 import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
 import { QUERY_STAKING } from '../../graphql/query';
+import { Int } from '@polkadot/types';
 
 export default function Staking() {
   const { query } = useGraphQL();
@@ -19,7 +20,6 @@ export default function Staking() {
       variables: { limit: 10, offset: 0 },
     })
   );
-  console.log(staking);
   // const { api } = useAPIState();
   // const [loading, setLoading] = useState(false);
   // const [data, setData] = useState();
@@ -91,24 +91,27 @@ export default function Staking() {
             <Col xs={24} sm={24} md={24} lg={19}>
               <Card className="staking">
                 <Row justify="start" align="middle" gutter={[32, 32]}>
-                  {/* <DataField
+                  <DataField
                     icon="/assets/icons/box-time.svg"
                     title="Staking"
                     // data={new Intl.NumberFormat().format(
                     //   data?.total_staking.totalStake
                     // )}
+                    data={new Intl.NumberFormat().format(100)}
                   />
                   <DataField
                     icon="/assets/icons/box-time.svg"
                     title="Self-Staking"
-                    data={new Intl.NumberFormat().format(data?.self_staking)}
+                    // data={new Intl.NumberFormat().format(data?.self_staking)}
+                    data={new Intl.NumberFormat().format(90)}
                   />
                   <DataField
                     icon="/assets/icons/norminate.svg"
-                    title="Norminate"
+                    title="Norminator"
                     // data={new Intl.NumberFormat().format(
                     //   data?.norminate_balance.otherStake
                     // )}
+                    data={new Intl.NumberFormat().format(10)}
                   />
                   <DataField
                     icon="/assets/icons/validator-white.svg"
@@ -116,6 +119,7 @@ export default function Staking() {
                     // data={new Intl.NumberFormat().format(
                     //   data?.validators.total_valalidaors
                     // )}
+                    data={new Intl.NumberFormat().format(1)}
                   />
                   <DataField
                     icon="/assets/icons/timer.svg"
@@ -123,22 +127,26 @@ export default function Staking() {
                     // data={new Intl.NumberFormat().format(
                     //   data?.status.waitingValidatorCount
                     // )}
+                    data={new Intl.NumberFormat().format(0)}
                   />
                   <DataField
                     icon="/assets/icons/candle.svg"
                     title="Inflation Rate"
                     // data={new Intl.NumberFormat().format(inflation?.inflation)}
+                    data={new Intl.NumberFormat().format(100)}
                     isPercent
-                  /> */}
+                  />
                 </Row>
               </Card>
             </Col>
             <Col xs={24} sm={24} md={24} lg={5}>
               <center className="staking">
-                {/* <Chart
-                  dataEra={data?.status.activeEra}
-                  datacurrentEra={data?.status.currentEra}
-                /> */}
+                <Chart
+                  // dataEra={data?.status.activeEra}
+                  // datacurrentEra={data?.status.currentEra}
+                  dataEra={12}
+                  datacurrentEra={20}
+                />
                 {/* <Row justify="space-between">
                   <p className="home-all-data-title">Era</p>
                   <p className="home-all-data-data">

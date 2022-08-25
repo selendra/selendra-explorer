@@ -99,16 +99,16 @@
 
 // export default Chart;
 
-import React from "react";
-import { Pie } from "@ant-design/plots";
+import React from 'react';
+import { Pie } from '@ant-design/plots';
 const Chart = ({ dataEra, datacurrentEra }) => {
   const data = [
     {
-      type: "Ended",
+      type: 'Ended',
       value: datacurrentEra,
     },
     {
-      type: "Active",
+      type: 'Active',
       value: dataEra,
     },
   ];
@@ -119,45 +119,45 @@ const Chart = ({ dataEra, datacurrentEra }) => {
     legend: false,
     // fill: "red",
     border: false,
-    color: ["#ED1576", "#03A9F4"],
-    border: "6px solid black",
+    color: ['#ED1576', '#03A9F4'],
+    border: '6px solid black',
     // legend: { position: "top" },
-    angleField: "value",
-    colorField: "type",
+    angleField: 'value',
+    colorField: 'type',
     radius: 1,
     innerRadius: 0.5,
     label: {
-      type: "inner",
-      offset: "-50%",
-      content: "{value}",
+      type: 'inner',
+      offset: '-50%',
+      content: '{value}',
       style: {
-        textAlign: "center",
+        textAlign: 'center',
         fontSize: 14,
       },
     },
     interactions: [
       {
-        type: "element-selected",
+        type: 'element-selected',
       },
       {
-        type: "element-active",
+        type: 'element-active',
       },
     ],
     statistic: {
       title: false,
       content: {
         style: {
-          whiteSpace: "pre-wrap",
-          color: "white",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          fontSize: "20px",
+          whiteSpace: 'pre-wrap',
+          color: 'white',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          fontSize: '20px',
         },
-        content: "Eras",
+        content: 'Eras',
       },
     },
   };
-  return <Pie style={{ width: "200px", height: "200px" }} {...config} />;
+  return <Pie style={{ width: '200px', height: '200px' }} {...config} />;
 };
 
 export default Chart;

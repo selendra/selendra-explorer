@@ -18,7 +18,7 @@ export default function Blocks() {
     useQuery(QUERY_BLOCKS, {
       variables: {
         limit: parseInt(start),
-        offset: parseInt(end),
+        offset: parseInt(end) - 1,
         orderBy: [
           {
             timestamp: 'desc',
@@ -39,6 +39,8 @@ export default function Blocks() {
   };
 
   const { block } = blocks;
+
+  console.log('block', block);
   return (
     <>
       <div className="blocks-bg" />

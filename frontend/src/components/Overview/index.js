@@ -4,7 +4,7 @@ import DataField from './DataField';
 export default function Overview(props) {
   return (
     <div className="home-all-data">
-      <Row justify="center" align="middle" gutter={[32, 32]}>
+      <Row align="middle" gutter={[32, 32]}>
         <DataField
           icon="/assets/icons/box.svg"
           title="Blocks"
@@ -41,12 +41,12 @@ export default function Overview(props) {
           data={
             <div style={{ display: 'flex' }}>
               {new Intl.NumberFormat().format(props?.total_validators)}{' '}
-              {/* <span>/{props?.waitingCount}</span> */}
+              <span>/{props?.waitingCount}</span>
             </div>
           }
         />
 
-        {/* <DataField
+        <DataField
           icon="/assets/icons/profile-2user.svg"
           title="Balances"
           data={
@@ -65,7 +65,7 @@ export default function Overview(props) {
               <span>&nbsp;&nbsp;SEL</span>
             </div>
           }
-        /> */}
+        />
       </Row>
     </div>
   );
