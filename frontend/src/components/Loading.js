@@ -8,6 +8,8 @@ export default function Loading() {
         justifyContent: 'center',
         height: '200px',
         alignItems: 'center',
+        backgroundColor: 'white',
+        borderRadius: '12px',
       }}
     >
       <img className="loading-img" alt="loading" src={LoadingLogo} />
