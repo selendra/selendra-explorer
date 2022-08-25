@@ -11,6 +11,7 @@ import { AppProvider } from './context/useApp';
 import { ThemeProvider } from 'next-themes';
 import 'remixicon/fonts/remixicon.css';
 import CustomFooter from './components/Footer';
+import * as serviceWorker from './serviceWorker';
 
 ConfigProvider.config({
   theme: {
@@ -37,5 +38,6 @@ ReactDOM.render(
       </AppProvider>
     </ThemeProvider>
   </ApolloProvider>,
-  document.getElementById('root')
+  document.getElementById('root'),
 );
+serviceWorker.unregister();

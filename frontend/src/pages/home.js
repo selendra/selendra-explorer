@@ -4,6 +4,7 @@ import Overview from '../components/Overview';
 import BlocksTable from '../components/BlocksTable';
 import TransferTable from '../components/TransferTable';
 import AccountsTable from '../components/AccountsTable';
+import process from 'process';
 import {
   QUERY_BLOCKS,
   QUERY_ACCOUNTS,

@@ -5,7 +5,7 @@ const client = new ApolloClient({
     uri: 'https://testnet-graphql.selendra.org/v1/graphql',
     headers: {
       'content-type': 'application/json',
-      'x-hasura-admin-secret': 'testnetscretkey',
+      'x-hasura-admin-secret': process.env.REACT_APP_SECRET_KEY,
     },
   }),
   cache: new InMemoryCache(),

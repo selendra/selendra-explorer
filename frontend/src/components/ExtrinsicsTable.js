@@ -4,7 +4,6 @@ import { formatNumber, shortenAddress, timeDuration } from '../utils';
 
 export default function ExtrinsicsTable({
   short,
-  loading,
   data,
   onChange,
   total,
@@ -16,8 +15,7 @@ export default function ExtrinsicsTable({
     <Table
       dataSource={data}
       rowKey={(record) => record.hash}
-      loading={loading}
-      // className="table-styling"
+      className="table-styling"
       tableLayout="fixed"
       pagination={
         short
