@@ -302,13 +302,22 @@ const QUERY_EXTRINSIC_BY_PK = gql`
 const QUERY_VALIDATOR = gql`
   query ($limit: Int, $offset: Int, $orderBy: [validator_order_by!]) {
     validator(limit: $limit, offset: $offset, order_by: $orderBy) {
-      block_id
-      identity
+      stash_address
+      name
+      total_stake
+      verified_identity
+      rank
+      nominators
+      active_eras
+      self_stake
+      total_rating
+      performance
+      commission
     }
   }
 `;
 
-const QUERY_CHANGE_INFO = gql`
+const QUERY_CHAIN_INFO = gql`
   query {
     chain_info {
       count
@@ -337,5 +346,5 @@ export {
   QUERY_EXTRINSIC_BY_PK,
   QUERY_EVENTS,
   QUERY_VALIDATOR,
-  QUERY_CHANGE_INFO,
+  QUERY_CHAIN_INFO,
 };

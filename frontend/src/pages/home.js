@@ -5,22 +5,18 @@ import BlocksTable from '../components/BlocksTable';
 import TransferTable from '../components/TransferTable';
 import AccountsTable from '../components/AccountsTable';
 import {
-  TOTAL_BLOCKS,
-  TOTAL_EXTRINSIC,
-  TOTAL_ACCOUNT,
-  TOTAL_TRANSFER,
-  TOTAL_VALIDATOR,
   QUERY_BLOCKS,
   QUERY_ACCOUNTS,
   QUERY_TRANSFERS,
-  QUERY_CHANGE_INFO,
+  QUERY_CHAIN_INFO,
 } from '../graphql/query';
 import { useQuery } from '@apollo/client';
 import { useGraphQL } from '../context/useApp';
+import { filterCount } from '../utils/chainInfo';
 
 export default function Home() {
   const { query } = useGraphQL();
-  const { chain_info } = query(useQuery(QUERY_CHANGE_INFO));
+  const { chain_info } = query(useQuery(QUERY_CHAIN_INFO));
   const blocks = query(
     useQuery(QUERY_BLOCKS, {
       variables: {
@@ -63,17 +59,6 @@ export default function Home() {
     })
   );
 
-  const filterCount = (data, name) => {
-    const count = [];
-    data?.filter((filter) => {
-      if (filter.name === name) {
-        count.push(filter?.count);
-        return true;
-      }
-      return false;
-    });
-    return count[0];
-  };
   return (
     <div>
       <div className="home-container">

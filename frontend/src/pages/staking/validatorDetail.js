@@ -36,7 +36,7 @@ export default function ValidatorDetail() {
   return (
     <div className="container">
       <div className="spacing" />
-      <p className="block-title">Validator #{id}</p>
+      {/* <p className="block-title">Validator #{id}</p> */}
       <Card className="block-detail-card">
         <table className="table">
           <tbody>
