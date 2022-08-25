@@ -12,14 +12,15 @@ export default function BlocksTable({
   onShowSizeChange,
   sizePage,
 }) {
-  console.log('finalized', data);
   return (
     <>
       <Table
-        dataSource={data.filter((data) => data.id.toString() !== '-1')}
+        dataSource={
+          data.block &&
+          data.block.filter((data) => data?.id.toString() !== '-1')
+        }
         loading={loading}
-        rowKey={(record) => record.blockNumber}
-        // className="table-styling"
+        rowKey={(record) => record.id}
         sortDirections="descend"
         tableLayout="fixed"
         pagination={
@@ -90,24 +91,6 @@ export default function BlocksTable({
             render={(timestamp) => <p>{timeDuration(timestamp)}</p>}
           />
         )}
-        {/* <Table.Column
-       title="Extrinsics"
-       responsive={["md"]}
-       dataIndex="totalExtrinsics"
-     />
-     <Table.Column
-       title="Events"
-       responsive={["md"]}
-       dataIndex="totalEvents"
-     />
-     {!short && (
-       <Table.Column
-         title="Validator"
-         responsive={["md"]}
-         dataIndex="blockAuthor"
-         render={(blockAuthor) => <p>{shortenAddress(blockAuthor)}</p>}
-       />
-     )} */}
       </Table>
     </>
   );

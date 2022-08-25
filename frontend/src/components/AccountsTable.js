@@ -2,7 +2,7 @@ import { Table } from 'antd';
 import { Link } from 'react-router-dom';
 import { shortenAddress, balanceFormat } from '../utils';
 
-export default function AccountsTable({
+export default function ssAccountsTable({
   short,
   accounts,
   onChange,
@@ -10,6 +10,7 @@ export default function AccountsTable({
   current,
   onShowSizeChange,
   sizePage,
+  loading,
 }) {
   return (
     <Table
@@ -27,12 +28,16 @@ export default function AccountsTable({
               },
             }
       }
+      loading={loading}
       bordered={false}
-      dataSource={accounts.filter(
-        (account) => account.address !== 'deleted' && account.address !== '0x'
-      )}
+      dataSource={
+        accounts.account &&
+        accounts.account.filter(
+          (account) =>
+            account.address !== 'deleted' && account.address !== '0x',
+        )
+      }
       rowKey={(record) => record.address}
-      className={`${short && 'table-styling'}`}
       tableLayout="fixed"
     >
       <Table.Column

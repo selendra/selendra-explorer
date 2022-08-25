@@ -1,27 +1,40 @@
-import { Card, Spin, Tabs, notification, message } from 'antd';
+import React, { useState } from 'react';
+import { Card, Tabs, notification } from 'antd';
 import { useParams } from 'react-router-dom';
-import useFetch from '../../hooks/useFetch';
 import { timeDuration } from '../../utils';
 import ExtrinsicsTable from '../../components/ExtrinsicsTable';
 import EventsTable from '../../components/EventsTable';
 import LogsTable from '../../components/LogsTable';
-import LaodingLogo from '../../components/Loading';
-import NotFound from '../../components/NotFound';
 import { CopyOutlined } from '@ant-design/icons';
 import Moment from 'react-moment';
 import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
 import { QUERY_BLOCK_BY_PK } from '../../graphql/query';
+import { useSearchParams } from 'react-router-dom';
 
 export default function BlockDetail() {
   const { id } = useParams();
   const { query } = useGraphQL();
+
+  const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 5 });
+  const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
+  const [sizePage, setSizePage] = useState(searchParams.get('size'));
 
   const block = query(
     useQuery(QUERY_BLOCK_BY_PK, {
       variables: { blockByPkId: id },
     }),
   );
+
+  const onShowSizeChange = (current, pageSize) => {
+    setSizePage(pageSize);
+    setCurrentPage(current);
+    setSearchParams({ p: current, size: pageSize });
+  };
+  const onChange = (page, pageSize) => {
+    setCurrentPage(page);
+    setSearchParams({ p: page, size: pageSize });
+  };
 
   const { block_by_pk } = block;
 
@@ -138,17 +151,45 @@ export default function BlockDetail() {
         block
       )}
       <div className="spacing" />
-      {/* <Tabs size="large">
-        <Tabs.TabPane tab="Extrinsics" key="extrinsics">
-          <ExtrinsicsTable data={extrinsicData} loading={loading} />
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Events" key="events">
-          <EventsTable data={eventData} loading={loading} />
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Logs" key="logs">
-          <LogsTable data={logData} loading={loading} />
-        </Tabs.TabPane>
-      </Tabs> */}
+      {block.block_by_pk ? (
+        <Tabs size="large">
+          <Tabs.TabPane tab="Extrinsics" key="extrinsics">
+            <ExtrinsicsTable
+              data={block_by_pk}
+              loading={block.block_by_pk ? false : true}
+              total={block?.block_by_pk.extrinsics.length}
+              current={currentPage}
+              onShowSizeChange={onShowSizeChange}
+              sizePage={sizePage}
+              onChange={onChange}
+            />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Events" key="events">
+            <EventsTable
+              data={block_by_pk}
+              loading={block.block_by_pk ? false : true}
+              total={block?.block_by_pk.events.length}
+              current={currentPage}
+              onShowSizeChange={onShowSizeChange}
+              sizePage={sizePage}
+              onChange={onChange}
+            />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Logs" key="logs">
+            <LogsTable
+              data={block_by_pk}
+              loading={block.block_by_pk ? false : true}
+              total={block?.block_by_pk.logs.length}
+              current={currentPage}
+              onShowSizeChange={onShowSizeChange}
+              sizePage={sizePage}
+              onChange={onChange}
+            />
+          </Tabs.TabPane>
+        </Tabs>
+      ) : (
+        block
+      )}
     </div>
   );
 }

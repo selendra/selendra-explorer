@@ -29,7 +29,7 @@ export default function Home() {
           },
         ],
       },
-    })
+    }),
   );
 
   const accounts = query(
@@ -43,7 +43,7 @@ export default function Home() {
           },
         ],
       },
-    })
+    }),
   );
 
   const transfers = query(
@@ -57,7 +57,7 @@ export default function Home() {
           },
         ],
       },
-    })
+    }),
   );
 
   return (
@@ -79,7 +79,7 @@ export default function Home() {
               total_transfers={filterCount(chain_info, 'transfers')}
               total_validators={filterCount(
                 chain_info,
-                'active_validator_count'
+                'active_validator_count',
               )}
               total_issuance={chain_info[4]?.count}
               total_lockBalance={filterCount(chain_info, 'nominator_count')}
@@ -94,26 +94,24 @@ export default function Home() {
         <Row gutter={[16, { xs: 8, sm: 16, md: 24, lg: 32 }]}>
           <Col xs={24} md={24} lg={12} xl={12}>
             <div className="home-table">
-              {blocks.block ? (
-                <BlocksTable short data={blocks?.block} />
-              ) : (
-                blocks
-              )}
+              {blocks.block ? <BlocksTable short data={blocks} /> : blocks}
             </div>
           </Col>
           <Col xs={24} md={24} lg={12} xl={12}>
-            {accounts.account ? (
-              <AccountsTable short accounts={accounts?.account} />
-            ) : (
-              accounts
-            )}
+            <div className="home-table">
+              {accounts.account ? (
+                <AccountsTable short accounts={accounts} />
+              ) : (
+                accounts
+              )}
+            </div>
           </Col>
         </Row>
       </div>
       <div className="home-info">
         <div className="home-table">
           {transfers.transfer ? (
-            <TransferTable short data={transfers?.transfer} />
+            <TransferTable short data={transfers} />
           ) : (
             transfers
           )}

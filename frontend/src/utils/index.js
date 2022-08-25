@@ -11,11 +11,6 @@ export function formatNumber(amount) {
 }
 
 export function balanceFormat(amount) {
-  // return formatBalance(
-  //   amount.toString(),
-  //   { withSi: false, forceUnit: '-' },
-  //   12
-  // );
   const data = parseFloat(amount / Math.pow(10, 12));
 
   return new Intl.NumberFormat('en-US', {

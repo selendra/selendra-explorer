@@ -1,49 +1,47 @@
-import { Table, Row } from 'antd'
-import { CaretRightOutlined } from '@ant-design/icons'
-import React, { useState } from 'react'
+import { Table, Row } from 'antd';
+import { CaretRightOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
 import { formatNumber, shortenAddress, timeDuration } from '../utils';
 import { Link } from 'react-router-dom';
 
-export default function LogsTable({loading, data, onChange}) {
+export default function LogsTable({ loading, data, onChange }) {
   return (
     <Table
       dataSource={data?.logs}
       loading={loading}
-      className='table-styling'
+      className="table-styling"
       pagination={{
         pageSize: 10,
-        total: data?.total_page,
-        onChange:(page) => {
-          onChange(page)
-        }
+        total: data?.logs.length,
+        onChange: (page) => {
+          onChange(page);
+        },
       }}
     >
-      <Table.Column 
-        title='Log Index'
+      <Table.Column
+        title="Log Index"
         render={(text, record) => (
-          <p>#{formatNumber(record.blockNumber)}-{record.index}</p>
+          <p>
+            #{formatNumber(record.block_id)}-{record.index}
+          </p>
         )}
       />
-      <Table.Column 
-        title='Block'
+      <Table.Column
+        title="Block"
         render={(text, record) => (
-          <Link to={`/blocks/${record?.blockNumber}`}>
-            <p>#{formatNumber(record.blockNumber)}</p>
+          <Link to={`/blocks/${record?.block_id}`}>
+            <p>#{formatNumber(record.block_id)}</p>
           </Link>
         )}
       />
-      <Table.Column 
-        title='Type'
-        render={(text, record) => (
-          <p>{record.type}</p>
-        )}
+      <Table.Column
+        title="Type"
+        render={(text, record) => <p>{record.type}</p>}
       />
-      <Table.Column 
-        title='Engine'
-        render={(text, record) => (
-          <p>{record.engine}</p>
-        )}
+      <Table.Column
+        title="Engine"
+        render={(text, record) => <p>{record.engine}</p>}
       />
     </Table>
-  )
+  );
 }

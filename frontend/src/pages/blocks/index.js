@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import useFetch from '../../hooks/useFetch';
 import BlocksTable from '../../components/BlocksTable';
-import LaodingLogo from '../../assets/loading.png';
 import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
 import { QUERY_BLOCKS, TOTAL_BLOCKS } from '../../graphql/query';
@@ -25,7 +23,7 @@ export default function Blocks() {
           },
         ],
       },
-    })
+    }),
   );
 
   const onShowSizeChange = (current, pageSize) => {
@@ -38,9 +36,6 @@ export default function Blocks() {
     setSearchParams({ ...searchParams, p: page, size: pageSize });
   };
 
-  const { block } = blocks;
-
-  console.log('block', block);
   return (
     <>
       <div className="blocks-bg" />
@@ -49,7 +44,8 @@ export default function Blocks() {
           <div className="table-account">
             {blocks.block ? (
               <BlocksTable
-                data={block}
+                data={blocks}
+                loading={blocks.block ? false : true}
                 total={block_aggregate?.aggregate.count}
                 onChange={onChange}
                 current={currentPage}
