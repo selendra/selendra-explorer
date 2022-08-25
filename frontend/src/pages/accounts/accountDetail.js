@@ -1,5 +1,5 @@
 import { Avatar, Card, Tabs } from 'antd';
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ExtrinsicsTable from '../../components/ExtrinsicsTable';
 import TableAccountStaking from '../../components/TableAccountStaking';
@@ -7,6 +7,7 @@ import TransferTable from '../../components/TransferTable';
 import { formatNumber, balanceFormat } from '../../utils';
 import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
+import { useSearchParams } from 'react-router-dom';
 import {
   QUERY_ACCOUNT_BY_ADDRESS,
   QUERY_COUNT_COLUMNS_ACCOUNT,
@@ -18,13 +19,16 @@ import {
 export default function AccountDetail() {
   const { id } = useParams();
   const { query } = useGraphQL();
+  const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 5 });
+  const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
+  const [sizePage, setSizePage] = useState(searchParams.get('size'));
 
   const account = query(
     useQuery(QUERY_ACCOUNT_BY_ADDRESS, {
       variables: {
         address: id,
       },
-    })
+    }),
   );
 
   const { account_aggregate } = query(
@@ -32,7 +36,7 @@ export default function AccountDetail() {
       variables: {
         columns: 'vested_balance',
       },
-    })
+    }),
   );
 
   const extrinsic = query(
@@ -46,7 +50,7 @@ export default function AccountDetail() {
           },
         },
       },
-    })
+    }),
   );
 
   const staking = query(
@@ -65,7 +69,7 @@ export default function AccountDetail() {
           },
         },
       },
-    })
+    }),
   );
 
   const transfers = query(
@@ -84,30 +88,19 @@ export default function AccountDetail() {
           },
         },
       },
-    })
+    }),
   );
 
-  // const [page, setPage] = useState(1);
+  const onShowSizeChange = (current, pageSize) => {
+    setSizePage(pageSize);
+    setCurrentPage(current);
+    setSearchParams({ p: current, size: pageSize });
+  };
+  const onChange = (page, pageSize) => {
+    setCurrentPage(page);
+    setSearchParams({ p: page, size: pageSize });
+  };
 
-  // const { loading, data = [] } = useFetch(
-  //   `${process.env.REACT_APP_API}/account/${id}`,
-  // );
-  // const { data: extrinsicData = [] } = useFetch(
-  //   `${process.env.REACT_APP_API}/account/extrinsics/${id}/1`,
-  // );
-  // const { data: trxData = [] } = useFetch(
-  //   `${process.env.REACT_APP_API}/account/transfer/${id}/1`,
-  // );
-  // const { data: stakingData = [] } = useFetch(
-  //   `${process.env.REACT_APP_API}/account/staking/${id}/${page}`,
-  // );
-
-  // if (loading)
-  //   return (
-  //     <div className="container">
-  //       <Loading />
-  //     </div>
-  //   );
   return (
     <div className="container">
       <div className="spacing" />
@@ -180,7 +173,7 @@ export default function AccountDetail() {
                   <td>Vesting Total</td>
                   <td>
                     {formatNumber(
-                      account_aggregate ? account_aggregate.aggregate.count : 0
+                      account_aggregate ? account_aggregate.aggregate.count : 0,
                     )}{' '}
                     {''}
                     SEL
@@ -197,14 +190,28 @@ export default function AccountDetail() {
       <Tabs size="large">
         <Tabs.TabPane tab="Extrinsics" key="extrinsics">
           {extrinsic.extrinsic ? (
-            <ExtrinsicsTable data={extrinsic.extrinsic} />
+            <ExtrinsicsTable
+              data={extrinsic.extrinsic}
+              total={extrinsic.extrinsic.length}
+              current={currentPage}
+              onShowSizeChange={onShowSizeChange}
+              sizePage={sizePage}
+              onChange={onChange}
+            />
           ) : (
             extrinsic
           )}
         </Tabs.TabPane>
         <Tabs.TabPane tab="Transfers" key="transfers">
           {transfers.transfer ? (
-            <TransferTable data={transfers.transfer} />
+            <TransferTable
+              data={transfers.transfer}
+              total={transfers.transfer.length}
+              current={currentPage}
+              onShowSizeChange={onShowSizeChange}
+              sizePage={sizePage}
+              onChange={onChange}
+            />
           ) : (
             transfers
           )}
@@ -213,8 +220,11 @@ export default function AccountDetail() {
           {staking.staking ? (
             <TableAccountStaking
               data={staking.staking}
-              // loading={loading}
-              // onChange={setPage}
+              total={staking.staking.length}
+              current={currentPage}
+              onShowSizeChange={onShowSizeChange}
+              sizePage={sizePage}
+              onChange={onChange}
             />
           ) : (
             staking
