@@ -13,6 +13,7 @@ import {
   QUERY_STAKING,
   QUERY_CHAIN_INFO,
   QUERY_VALIDATOR,
+  TOTAL_STAKING
 } from '../../graphql/query';
 import { filterCount } from '../../utils/chainInfo';
 import { useSearchParams } from 'react-router-dom';
@@ -39,6 +40,11 @@ export default function Staking() {
       variables: { limit: 10, offset: 0 },
     }),
   );
+  
+  const { staking_aggregate } = query(useQuery(TOTAL_STAKING));
+  const nominator_count = filterCount(chain_info, 'nominator_count');
+  const inflation = calcInflation(staking_aggregate?.aggregate.count, 10);
+
   // const { api } = useAPIState();
   // const [loading, setLoading] = useState(false);
   // const [data, setData] = useState();
@@ -77,12 +83,12 @@ export default function Staking() {
 
   // useEffect(() => {
   //   async function calcInflationFunc() {
-  //     const totalStake = filterCount(chain_info, 'total_stake');
+      // const totalStake = filterCount(chain_info, 'total_stake');
   //     const issu = await api.query.balances.totalIssuance();
   //     const totalIssuance = new BigNumber(issu)
   //       .dividedBy(Math.pow(10, 12))
   //       .toNumber();
-  //     const inflation = calcInflation(totalStake, totalIssuance);
+      // const inflation = calcInflation(totalStake, totalIssuance);
   //     // console.log(inflation);
   //     setInflation(inflation);
   //   }
@@ -92,17 +98,6 @@ export default function Staking() {
   //   api.query.balances.totalIssuance,
   //   data?.total_staking.totalStake,
   // ]);
-
-  // if (loading)
-  //   return (
-  //     <div className="container">
-  //       <Loading />
-  //     </div>
-  //   );
-
-  console.log('chain', chain_info);
-
-  console.log('validator', validator);
 
   const onShowSizeChange = (current, pageSize) => {
     setSizePage(pageSize);
@@ -129,13 +124,13 @@ export default function Staking() {
                     // data={new Intl.NumberFormat().format(
                     //   data?.total_staking.totalStake
                     // )}
-                    data={new Intl.NumberFormat().format(100)}
+                    data={new Intl.NumberFormat().format(staking_aggregate?.aggregate.count)}
                   />
                   <DataField
                     icon="/assets/icons/box-time.svg"
                     title="Self-Staking"
                     // data={new Intl.NumberFormat().format(data?.self_staking)}
-                    data={new Intl.NumberFormat().format(90)}
+                    data={new Intl.NumberFormat().format(staking_aggregate?.aggregate.count - nominator_count)}
                   />
                   <DataField
                     icon="/assets/icons/norminate.svg"
@@ -165,7 +160,7 @@ export default function Staking() {
                     icon="/assets/icons/candle.svg"
                     title="Inflation Rate"
                     // data={new Intl.NumberFormat().format(inflation?.inflation)}
-                    data={new Intl.NumberFormat().format(100)}
+                    data={new Intl.NumberFormat().format(inflation?.inflation)}
                     isPercent
                   />
                 </Row>
@@ -177,20 +172,6 @@ export default function Staking() {
                   dataEra={filterCount(chain_info, 'active_era')}
                   datacurrentEra={filterCount(chain_info, 'current_era')}
                 />
-                {/* <Row justify="space-between">
-                  <p className="home-all-data-title">Era</p>
-                  <p className="home-all-data-data">
-                    {filterCount(chain_info, 'active_era')}/
-                    {filterCount(chain_info, 'current_era')}
-                  </p>
-                </Row>
-                <Progress
-                  percent={
-                    (data?.status.activeEra / data?.status.currentEra) * 100
-                  }
-                  showInfo={false}
-                  strokeColor="#03A9F4"
-                /> */}
               </center>
             </Col>
           </Row>

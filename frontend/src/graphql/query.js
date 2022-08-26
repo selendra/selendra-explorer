@@ -370,6 +370,16 @@ const QUERY_CHAIN_INFO = gql`
   }
 `;
 
+const TOTAL_STAKING = gql`
+  query {
+    staking_aggregate {
+      aggregate {
+        count
+      }
+    }
+  } 
+`
+
 export {
   QUERY_ACCOUNTS,
   QUERY_BLOCKS,
@@ -392,4 +402,5 @@ export {
   QUERY_VALIDATOR,
   QUERY_CHAIN_INFO,
   QUERY_VALIDATOR_BY_PK,
+  TOTAL_STAKING
 };
