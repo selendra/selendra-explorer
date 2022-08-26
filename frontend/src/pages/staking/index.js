@@ -10,13 +10,14 @@ import Chart from '../../components/chart';
 import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
 import {
-  QUERY_STAKING,
   QUERY_CHAIN_INFO,
   QUERY_VALIDATOR,
-  TOTAL_STAKING
+  TOTAL_VALIDATOR,
+  TOTAL_ACCOUNT
 } from '../../graphql/query';
 import { filterCount } from '../../utils/chainInfo';
 import { useSearchParams } from 'react-router-dom';
+import { balanceFormat, percentNumber } from '../../utils'
 
 export default function Staking() {
   const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 10 });
@@ -35,70 +36,15 @@ export default function Staking() {
     }),
   );
 
-  const staking = query(
-    useQuery(QUERY_STAKING, {
-      variables: { limit: 10, offset: 0 },
-    }),
-  );
-  
-  const { staking_aggregate } = query(useQuery(TOTAL_STAKING));
-  const nominator_count = filterCount(chain_info, 'nominator_count');
-  const inflation = calcInflation(staking_aggregate?.aggregate.count, 10);
+  const { account_aggregate } = query(useQuery(TOTAL_ACCOUNT))
+  const { validator_aggregate } = query(useQuery(TOTAL_VALIDATOR));
+  const total_stake = Number(validator_aggregate?.aggregate.sum.total_stake);
+  const self_stake = Number(validator_aggregate?.aggregate.sum.self_stake);
+  const free_balance=  Number(account_aggregate?.aggregate.sum.free_balance)
+  const inflation = calcInflation(parseInt(total_stake), parseInt(free_balance)); 
 
-  // const { api } = useAPIState();
-  // const [loading, setLoading] = useState(false);
-  // const [data, setData] = useState();
-  // const [inflation, setInflation] = useState();
 
-  // useEffect(() => {
-  //   setLoading(true);
-  //   Promise.all([
-  //     fetch(`${process.env.REACT_APP_API}/staking/status`),
-  //     fetch(`${process.env.REACT_APP_API}/totals/norminate`),
-  //     fetch(`${process.env.REACT_APP_API}/staking/validators`),
-  //     fetch(`${process.env.REACT_APP_API}/totals/staking`),
-  //   ])
-  //     .then(async ([a, b, c, d]) => {
-  //       const status = await a.json();
-  //       const norminate_balance = await b.json();
-  //       const validators = await c.json();
-  //       const total_staking = await d.json();
-
-  //       setLoading(false);
-  //       setData({
-  //         status,
-  //         norminate_balance,
-  //         validators,
-  //         total_staking,
-  //         self_staking:
-  //           Number(total_staking.totalStake) -
-  //           Number(norminate_balance.otherStake),
-  //       });
-  //     })
-  //     .catch((err) => {
-  //       setLoading(false);
-  //       // console.log(err);
-  //     });
-  // }, []);
-
-  // useEffect(() => {
-  //   async function calcInflationFunc() {
-      // const totalStake = filterCount(chain_info, 'total_stake');
-  //     const issu = await api.query.balances.totalIssuance();
-  //     const totalIssuance = new BigNumber(issu)
-  //       .dividedBy(Math.pow(10, 12))
-  //       .toNumber();
-      // const inflation = calcInflation(totalStake, totalIssuance);
-  //     // console.log(inflation);
-  //     setInflation(inflation);
-  //   }
-  //   calcInflationFunc();
-  // }, [
-  //   api.query.balances,
-  //   api.query.balances.totalIssuance,
-  //   data?.total_staking.totalStake,
-  // ]);
-
+  console.log(inflation);
   const onShowSizeChange = (current, pageSize) => {
     setSizePage(pageSize);
     setCurrentPage(current);
@@ -121,47 +67,32 @@ export default function Staking() {
                   <DataField
                     icon="/assets/icons/box-time.svg"
                     title="Staking"
-                    // data={new Intl.NumberFormat().format(
-                    //   data?.total_staking.totalStake
-                    // )}
-                    data={new Intl.NumberFormat().format(staking_aggregate?.aggregate.count)}
+                    data={balanceFormat(total_stake)}
                   />
                   <DataField
                     icon="/assets/icons/box-time.svg"
                     title="Self-Staking"
-                    // data={new Intl.NumberFormat().format(data?.self_staking)}
-                    data={new Intl.NumberFormat().format(staking_aggregate?.aggregate.count - nominator_count)}
+                    data={balanceFormat(self_stake)}
                   />
                   <DataField
                     icon="/assets/icons/norminate.svg"
                     title="Norminator"
-                    // data={new Intl.NumberFormat().format(
-                    //   data?.norminate_balance.otherStake
-                    // )}
                     data={filterCount(chain_info, 'nominator_count')}
                   />
                   <DataField
                     icon="/assets/icons/validator-white.svg"
                     title="Validator"
-                    // data={new Intl.NumberFormat().format(
-                    //   data?.validators.total_valalidaors
-                    // )}
                     data={filterCount(chain_info, 'active_validator_count')}
                   />
                   <DataField
                     icon="/assets/icons/timer.svg"
                     title="Waiting"
-                    // data={new Intl.NumberFormat().format(
-                    //   data?.status.waitingValidatorCount
-                    // )}
                     data={filterCount(chain_info, 'waiting_validator_count')}
                   />
                   <DataField
                     icon="/assets/icons/candle.svg"
                     title="Inflation Rate"
-                    // data={new Intl.NumberFormat().format(inflation?.inflation)}
-                    data={new Intl.NumberFormat().format(inflation?.inflation)}
-                    isPercent
+                    data={percentNumber(inflation?.inflation)}
                   />
                 </Row>
               </Card>
@@ -179,7 +110,7 @@ export default function Staking() {
       </div>
       <div className="container">
         <div className="spacing" />
-        {staking.staking ? (
+        {validator.validator ? (
           <TableStaking
             data={validator}
             loading={validator.validator ? false : true}
@@ -193,7 +124,7 @@ export default function Staking() {
             sizePage={sizePage}
           />
         ) : (
-          staking
+          validator
         )}
       </div>
     </div>
