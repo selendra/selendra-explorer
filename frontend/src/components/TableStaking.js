@@ -1,7 +1,7 @@
 import { Avatar, Row, Table } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { balanceFormat, shortenAddress } from '../utils';
+import { balanceFormat, shortenAddress, percentNumber } from '../utils';
 
 export default function TableStaking({
   loading,
@@ -13,7 +13,6 @@ export default function TableStaking({
   onShowSizeChange,
   account_aggregate,
 }) {
-  console.log('data', data);
   return (
     <Table
       dataSource={data}
@@ -80,11 +79,37 @@ export default function TableStaking({
         dataIndex="total_stake"
         render={(total_stake) => <p>{balanceFormat(total_stake)} SEL</p>}
       />
-      <Table.Column title="Nominator" dataIndex="nominators" />
+      <Table.Column
+        title="Self Stake"
+        dataIndex="self_stake"
+        render={(self_stake) => <p>{balanceFormat(self_stake)} SEL</p>}
+      />
+      <Table.Column
+        title="Nominator"
+        dataIndex="nominators"
+        width="10%"
+        align="center"
+      />
+      <Table.Column
+        title="Score"
+        responsive={['md']}
+        width="10%"
+        dataIndex="total_rating"
+        align="center"
+      />
       <Table.Column
         title="Active Eras"
         responsive={['md']}
         dataIndex="active_eras"
+        width="10%"
+        align="center"
+      />
+      <Table.Column
+        title="Commission"
+        responsive={['md']}
+        dataIndex="commission"
+        align="center"
+        render={(commission) => <p>{percentNumber(commission)} </p>}
       />
     </Table>
   );

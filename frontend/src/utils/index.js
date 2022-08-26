@@ -1,4 +1,4 @@
-import { formatBalance } from '@polkadot/util';
+// import { formatBalance } from '@polkadot/util';
 import moment from 'moment';
 
 export function shortenAddress(address) {
@@ -8,6 +8,10 @@ export function shortenAddress(address) {
 
 export function formatNumber(amount) {
   return new Intl.NumberFormat().format(amount);
+}
+
+export function percentNumber(amount) {
+  return parseFloat(amount).toFixed(2) + '%';
 }
 
 export function balanceFormat(amount) {

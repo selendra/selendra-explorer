@@ -38,7 +38,7 @@ export default function AccountsTable({
       <Table.Column
         title="Account"
         dataIndex="address"
-        width="30%"
+        width="20%"
         render={(_, record) => (
           <Link to={`/accounts/${record.address}`}>
             <div className="blocks-height2">

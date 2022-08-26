@@ -77,11 +77,10 @@ export default function Staking() {
 
   // useEffect(() => {
   //   async function calcInflationFunc() {
-  //     const totalStake = data?.total_staking.totalStake;
+  //     const totalStake = filterCount(chain_info, 'total_stake');
   //     const issu = await api.query.balances.totalIssuance();
-  //     // eslint-disable-next-line no-undef
   //     const totalIssuance = new BigNumber(issu)
-  //       .dividedBy(Math.pow(10, 18))
+  //       .dividedBy(Math.pow(10, 12))
   //       .toNumber();
   //     const inflation = calcInflation(totalStake, totalIssuance);
   //     // console.log(inflation);
@@ -176,12 +175,13 @@ export default function Staking() {
               <center className="staking">
                 <Chart
                   dataEra={filterCount(chain_info, 'active_era')}
-                  datacurrentEra={filterCount(chain_info, 'active_era')}
+                  datacurrentEra={filterCount(chain_info, 'current_era')}
                 />
                 {/* <Row justify="space-between">
                   <p className="home-all-data-title">Era</p>
                   <p className="home-all-data-data">
-                    {data?.status.activeEra}/{data?.status.currentEra}
+                    {filterCount(chain_info, 'active_era')}/
+                    {filterCount(chain_info, 'current_era')}
                   </p>
                 </Row>
                 <Progress

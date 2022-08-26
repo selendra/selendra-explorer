@@ -125,7 +125,7 @@ code {
   font-size: 12px !important;
 }
 .table-styling .ant-table {
-  padding: 16px 24px;
+  padding: 16px 10px;
   border-radius: 16px !important;
   box-shadow: rgba(89, 89, 189, 0.15) 0px 2px 5px 0px,
     rgba(93, 89, 187, 0.05) 0px 1px 1px 0px;
