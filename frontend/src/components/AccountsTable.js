@@ -1,4 +1,4 @@
-import { Table } from 'antd';
+import { Table, Tag } from 'antd';
 import { Link } from 'react-router-dom';
 import { shortenAddress, balanceFormat } from '../utils';
 
@@ -33,8 +33,7 @@ export default function ssAccountsTable({
       dataSource={
         accounts.account &&
         accounts.account.filter(
-          (account) =>
-            account.address !== 'deleted' && account.address !== '0x',
+          (account) => account.address !== 'deleted' && account.address !== '0x'
         )
       }
       rowKey={(record) => record.address}
@@ -43,7 +42,7 @@ export default function ssAccountsTable({
       <Table.Column
         title="Account"
         dataIndex="address"
-        width="20%"
+        width="25%"
         render={(_, record) => (
           <Link to={`/accounts/${record.address}`}>
             <div className="blocks-height2">

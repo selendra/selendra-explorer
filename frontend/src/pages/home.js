@@ -29,7 +29,7 @@ export default function Home() {
           },
         ],
       },
-    }),
+    })
   );
 
   const accounts = query(
@@ -43,7 +43,7 @@ export default function Home() {
           },
         ],
       },
-    }),
+    })
   );
 
   const transfers = query(
@@ -57,7 +57,7 @@ export default function Home() {
           },
         ],
       },
-    }),
+    })
   );
 
   return (
@@ -79,7 +79,7 @@ export default function Home() {
               total_transfers={filterCount(chain_info, 'transfers')}
               total_validators={filterCount(
                 chain_info,
-                'active_validator_count',
+                'active_validator_count'
               )}
               total_issuance={chain_info[4]?.count}
               total_lockBalance={filterCount(chain_info, 'nominator_count')}
