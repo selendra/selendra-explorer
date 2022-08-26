@@ -31,13 +31,13 @@ export default function Staking() {
   const validator = query(
     useQuery(QUERY_VALIDATOR, {
       variables: { limit: parseInt(start), offset: parseInt(end) - 1 },
-    })
+    }),
   );
 
   const staking = query(
     useQuery(QUERY_STAKING, {
       variables: { limit: 10, offset: 0 },
-    })
+    }),
   );
   // const { api } = useAPIState();
   // const [loading, setLoading] = useState(false);
@@ -198,9 +198,10 @@ export default function Staking() {
       </div>
       <div className="container">
         <div className="spacing" />
-        {staking ? (
+        {staking.staking ? (
           <TableStaking
-            data={validator?.validator}
+            data={validator}
+            loading={validator.validator ? false : true}
             onChange={onChange}
             account_aggregate={
               filterCount(chain_info, 'waiting_validator_count') +

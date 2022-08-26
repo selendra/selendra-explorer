@@ -15,9 +15,9 @@ export default function TableStaking({
 }) {
   return (
     <Table
-      dataSource={data}
+      dataSource={data?.validator}
       rowKey={(record) => record.stash_address}
-      // loading={loading}
+      loading={loading}
       className="table-styling"
       tableLayout="fixed"
       pagination={
@@ -42,7 +42,7 @@ export default function TableStaking({
           if (record.name === '') {
             return (
               <Link
-                to={`/validator/${stash_address}`}
+                to={`/validator/${stash_address}?block_id=${record.block_id}`}
                 className="blocks-height"
               >
                 <Row>
@@ -58,7 +58,7 @@ export default function TableStaking({
           } else {
             return (
               <Link
-                to={`/validator/${stash_address}`}
+                to={`/validator/${stash_address}?block_id=${record.block_id}`}
                 className="blocks-height"
               >
                 <Row>

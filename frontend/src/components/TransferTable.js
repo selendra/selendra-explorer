@@ -19,9 +19,9 @@ export default function TransferTable({
 }) {
   return (
     <Table
-      dataSource={data}
+      dataSource={data?.transfer}
+      loading={loading}
       rowKey={(record) => record.id}
-      // className="table-styling"
       tableLayout="fixed"
       pagination={
         short

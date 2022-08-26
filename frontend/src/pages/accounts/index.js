@@ -25,7 +25,7 @@ export default function Accounts() {
           },
         ],
       },
-    })
+    }),
   );
 
   const onShowSizeChange = (current, pageSize) => {
@@ -46,12 +46,13 @@ export default function Accounts() {
           <div className="table-account">
             {accounts.account ? (
               <AccountsTable
-                accounts={accounts.account}
+                accounts={accounts}
                 onChange={onChange}
                 account_aggregate={account_aggregate}
                 current={currentPage}
                 onShowSizeChange={onShowSizeChange}
                 sizePage={sizePage}
+                loading={accounts.account ? false : true}
               />
             ) : (
               accounts

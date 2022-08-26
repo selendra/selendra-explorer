@@ -273,6 +273,30 @@ const QUERY_BLOCK_BY_PK = gql`
       parent_hash
       state_root
       timestamp
+      extrinsics {
+        block_id
+        hash
+        index
+        section
+        timestamp
+        status
+        method
+      }
+      logs {
+        block_id
+        data
+        engine
+        index
+        timestamp
+        type
+      }
+      events {
+        block_id
+        index
+        method
+        section
+        timestamp
+      }
     }
   }
 `;
@@ -299,6 +323,25 @@ const QUERY_EXTRINSIC_BY_PK = gql`
   }
 `;
 
+const QUERY_VALIDATOR_BY_PK = gql`
+  query ($blockId: bigint!, $stashAddress: String!) {
+    validator_by_pk(block_id: $blockId, stash_address: $stashAddress) {
+      timestamp
+      identity
+      stash_address
+      controller_address
+      commission
+      total_stake
+      block_id
+      commission_rating
+      name
+      nominations
+      stake_history
+      era_points_history
+    }
+  }
+`;
+
 const QUERY_VALIDATOR = gql`
   query ($limit: Int, $offset: Int, $orderBy: [validator_order_by!]) {
     validator(limit: $limit, offset: $offset, order_by: $orderBy) {
@@ -313,6 +356,7 @@ const QUERY_VALIDATOR = gql`
       total_rating
       performance
       commission
+      block_id
     }
   }
 `;
@@ -347,4 +391,5 @@ export {
   QUERY_EVENTS,
   QUERY_VALIDATOR,
   QUERY_CHAIN_INFO,
+  QUERY_VALIDATOR_BY_PK,
 };

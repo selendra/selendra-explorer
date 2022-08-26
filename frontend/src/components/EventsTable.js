@@ -15,7 +15,7 @@ export default function EventsTable({
 }) {
   return (
     <Table
-      dataSource={data}
+      dataSource={data?.events}
       rowKey={(record) => record.block_id + ' ' + record.index}
       loading={loading}
       className="table-styling"

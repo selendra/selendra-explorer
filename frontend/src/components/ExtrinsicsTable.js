@@ -13,7 +13,7 @@ export default function ExtrinsicsTable({
 }) {
   return (
     <Table
-      dataSource={data}
+      dataSource={data?.block_by_pk}
       rowKey={(record) => record.hash}
       className="table-styling"
       tableLayout="fixed"

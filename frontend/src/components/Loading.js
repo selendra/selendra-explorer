@@ -1,21 +1,18 @@
-// import { Spin } from 'antd'
-
-// export default function Loading() {
-//   return (
-//     <div className="wrap-loading">
-//       <Spin />
-//       <p>Please wait...</p>
-//     </div>
-//   )
-// }
-import LaodingLogo from '../assets/loading.png';
+import LoadingLogo from '../assets/loading.png';
 
 export default function Loading() {
   return (
-    <div className="wrap-loading">
-      {/* <div className="bg-img-loading"> */}
-      <img className="loading-img" src={LaodingLogo} />
-      {/* </div> */}
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        height: '200px',
+        alignItems: 'center',
+        backgroundColor: 'white',
+        borderRadius: '12px',
+      }}
+    >
+      <img className="loading-img" alt="loading" src={LoadingLogo} />
     </div>
   );
 }

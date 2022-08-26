@@ -52,7 +52,8 @@ export default function Transfers() {
                 current={currentPage}
                 onShowSizeChange={onShowSizeChange}
                 sizePage={sizePage}
-                data={transfers.transfer}
+                data={transfers}
+                loading={transfers.transfer ? false : true}
                 onChange={onChange}
               />
             ) : (
