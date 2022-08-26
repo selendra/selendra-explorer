@@ -27,7 +27,7 @@ export default function Transfers() {
           },
         ],
       },
-    }),
+    })
   );
 
   const onShowSizeChange = (current, pageSize) => {

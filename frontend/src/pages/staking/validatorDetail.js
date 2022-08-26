@@ -1,4 +1,4 @@
-import { Avatar, Card, Row, Table, Tabs } from 'antd';
+import { Avatar, Card, Row, Table, Tabs, Pagination } from 'antd';
 import React from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useGraphQL } from '../../context/useApp';
@@ -7,6 +7,7 @@ import { QUERY_VALIDATOR_BY_PK } from '../../graphql/query';
 import {
   balanceFormat,
   formatNumber,
+  percentNumber,
   shortenAddress,
   timeDuration,
 } from '../../utils';
@@ -14,17 +15,27 @@ import {
 import { formatBalance } from '@polkadot/util';
 
 export default function ValidatorDetail() {
-  const [searchParams] = useSearchParams();
   const { id } = useParams();
   const { query } = useGraphQL();
+  const [searchParams] = useSearchParams();
+  // const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
+  // const [sizePage, setSizePage] = useState(searchParams.get('size'));
+
+  // let start = sizePage;
+  // let end = currentPage;
 
   const validator = query(
     useQuery(QUERY_VALIDATOR_BY_PK, {
       variables: { blockId: searchParams.get('block_id'), stashAddress: id },
-    }),
+    })
   );
-
   const { validator_by_pk } = validator;
+
+  // const testing = [];
+  // const test = eras.filter((data) => testing.push(data.era));
+
+  // console.log(validator.validator_by_pk.stake_history);
+
   return (
     <div className="container">
       <div className="spacing" />
@@ -52,7 +63,9 @@ export default function ValidatorDetail() {
                     size="small"
                     src={`https://avatars.dicebear.com/api/pixel-art/${validator_by_pk?.stash_address}.svg`}
                   />
-                  {validator_by_pk?.identity}
+                  {JSON.parse(validator_by_pk?.identity).display
+                    ? JSON.parse(validator_by_pk?.identity).display
+                    : validator_by_pk?.stash_address}
                 </td>
               </tr>
               <tr>
@@ -83,7 +96,7 @@ export default function ValidatorDetail() {
               </tr>
               <tr>
                 <td>Commission</td>
-                <td>{validator_by_pk?.commission_rating}%</td>
+                <td>{percentNumber(validator_by_pk?.commission_rating)}</td>
               </tr>
               <tr>
                 <td>Total Stake</td>
@@ -127,21 +140,27 @@ export default function ValidatorDetail() {
               <Table.Column
                 title="Amount"
                 dataIndex="value"
-                render={(amount) => <p>{formatNumber(amount)} SEL</p>}
+                render={(amount) => <p>{balanceFormat(amount)} SEL</p>}
               />
             </Table>
           </Tabs.TabPane>
           <Tabs.TabPane tab="Staking" key="staking">
             <Table
               loading={validator.validator_by_pk ? false : true}
-              pagination={false}
-              dataSource={JSON.parse(validator.validator_by_pk.stake_history)}
+              pagination={{
+                pageSize: parseInt(5),
+                total: JSON.parse(validator.validator_by_pk.stake_history)
+                  .length,
+              }}
+              dataSource={JSON.parse(
+                validator.validator_by_pk.stake_history
+              ).reverse()}
               className="table-styling"
             >
               <Table.Column
                 title="Era"
                 dataIndex="era"
-                render={(era) => <p>{balanceFormat(era)}</p>}
+                render={(era) => <p>{formatNumber(era)}</p>}
               />
               <Table.Column
                 title="Self"
@@ -156,7 +175,7 @@ export default function ValidatorDetail() {
                     {formatBalance(
                       other,
                       { withSi: false, forceUnit: '-' },
-                      12,
+                      12
                     )}
                   </p>
                 )}
@@ -169,7 +188,7 @@ export default function ValidatorDetail() {
                     {formatBalance(
                       total,
                       { withSi: false, forceUnit: '-' },
-                      12,
+                      12
                     )}
                   </p>
                 )}
@@ -181,7 +200,7 @@ export default function ValidatorDetail() {
               loading={validator.validator_by_pk ? false : true}
               pagination={false}
               dataSource={JSON.parse(
-                validator.validator_by_pk.era_points_history,
+                validator.validator_by_pk.era_points_history
               )}
               className="table-styling"
             >

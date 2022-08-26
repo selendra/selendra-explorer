@@ -14,10 +14,11 @@ export default function TransferDetail() {
   const transfers = query(
     useQuery(QUERY_TRANSFER_BY_PK, {
       variables: { transferByPkId: id },
-    }),
+    })
   );
 
   const { transfer_by_pk } = transfers;
+
   return (
     <div className="container">
       <div className="spacing" />
@@ -81,7 +82,7 @@ export default function TransferDetail() {
                       .then(() =>
                         notification.success({
                           message: 'Copied',
-                        }),
+                        })
                       )
                   }
                 />
@@ -106,7 +107,7 @@ export default function TransferDetail() {
                       .then(() =>
                         notification.success({
                           message: 'Copied',
-                        }),
+                        })
                       )
                   }
                 />
@@ -126,7 +127,7 @@ export default function TransferDetail() {
                   {' '}
                   {transfers.transfer_by_pk
                     ? parseInt(
-                        formatNumber(transfers.transfer_by_pk.fee_amount),
+                        formatNumber(transfers.transfer_by_pk.fee_amount)
                       ).toPrecision(12)
                     : transfers}{' '}
                   SEL
