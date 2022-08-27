@@ -14,26 +14,6 @@ import Staking from './pages/staking';
 import ValidatorDetail from './pages/staking/validatorDetail';
 
 function App() {
-  // const { apiState } = useAPIState();
-
-  // if (apiState !== 'READY') {
-  //   return (
-  //     <div className="wrap-loading">
-  //       <Loading />
-  //       {/* <Spin />
-  //       <p>Please wait...</p> */}
-  //     </div>
-  //   );
-  // } else if (apiState === 'ERROR') {
-  //   return (
-  //     <div className="wrap-loading">
-  //       {/* <Spin /> */}
-  //       <Loading />
-  //       <p>Something went wrong at our end.</p>
-  //     </div>
-  //   );
-  // }
-
   return (
     <BrowserRouter>
       <HeaderComponent />

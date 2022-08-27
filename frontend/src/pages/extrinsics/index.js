@@ -1,21 +1,10 @@
-import { Card, Col, Row, Select } from 'antd';
 import { useState } from 'react';
 import ExtrinsicsTable from '../../components/ExtrinsicsTable';
-import LaodingLogo from '../../assets/loading.png';
 
 import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
 import { QUERY_EXTRINSIC, TOTAL_EXTRINSIC } from '../../graphql/query';
 import { useSearchParams } from 'react-router-dom';
-
-const module = [
-  'all',
-  'timestamp',
-  'paraInherent',
-  'utility',
-  'balances',
-  'staking',
-];
 
 export default function Extrinsics() {
   const { query } = useGraphQL();
@@ -40,12 +29,6 @@ export default function Extrinsics() {
       },
     })
   );
-  const [isSigned, setIsSigned] = useState(false);
-  const [selectedModule, setSelectedModule] = useState('all');
-  function handleChangeModule(value) {
-    setSelectedModule(value);
-    console.log(`selected: ${value}`);
-  }
 
   const onShowSizeChange = (current, pageSize) => {
     setSizePage(pageSize);
@@ -62,42 +45,6 @@ export default function Extrinsics() {
       <div className="blocks-bg" />
       <div className="home-info">
         <div className="container">
-          {/* <p className="blocks-title">Extrinsics</p>
-          <div className="filter-bg">
-            <Row align="middle" gutter={[32, 32]}>
-              <Col>
-                <span style={{ paddingRight: '4px', color: 'white' }}>
-                  Sign
-                </span>
-                <Select
-                  style={{ width: '180px' }}
-                  defaultValue="All"
-                  onChange={setIsSigned}
-                >
-                  <Select.Option value={false}>ALL</Select.Option>
-                  <Select.Option value={true}>SIGNED ONLY</Select.Option>
-                </Select>
-              </Col>
-              <Col>
-                <span style={{ paddingRight: '4px', color: 'white' }}>
-                  Module
-                </span>
-                <Select
-                  style={{ width: '180px' }}
-                  defaultValue="all"
-                  placeholder="Module"
-                  onChange={handleChangeModule}
-                >
-                  {module.map((i, key) => (
-                    <Select.Option key={key} value={i}>
-                      {i.toUpperCase()}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Col>
-            </Row>
-          </div> */}
-
           <div className="table-account">
             {extrinsic.extrinsic ? (
               <ExtrinsicsTable

@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import TransferTable from '../../components/TransferTable';
-import useFetch from '../../hooks/useFetch';
-import LaodingLogo from '../../assets/loading.png';
 import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
 import { QUERY_TRANSFERS, TOTAL_TRANSFER } from '../../graphql/query';

@@ -1,7 +1,6 @@
-import { Table, Row } from 'antd';
-import { CaretRightOutlined } from '@ant-design/icons';
-import React, { useState } from 'react';
-import { formatNumber, shortenAddress, timeDuration } from '../utils';
+import { Table } from 'antd';
+import React from 'react';
+import { formatNumber, timeDuration } from '../utils';
 import { Link } from 'react-router-dom';
 
 export default function EventsTable({
@@ -15,7 +14,7 @@ export default function EventsTable({
 }) {
   return (
     <Table
-      dataSource={data?.events}
+      dataSource={data}
       rowKey={(record) => record.block_id + ' ' + record.index}
       loading={loading}
       className="table-styling"

@@ -23,7 +23,7 @@ export default function Blocks() {
           },
         ],
       },
-    }),
+    })
   );
 
   const onShowSizeChange = (current, pageSize) => {

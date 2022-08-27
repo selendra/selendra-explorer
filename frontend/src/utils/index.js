@@ -1,4 +1,3 @@
-// import { formatBalance } from '@polkadot/util';
 import moment from 'moment';
 
 export function shortenAddress(address) {

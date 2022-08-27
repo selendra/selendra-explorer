@@ -1,9 +1,6 @@
-import { Card, notification, message } from 'antd';
+import { Card, notification } from 'antd';
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import Loading from '../../components/Loading';
-import NotFound from '../../components/NotFound';
-import useFetch from '../../hooks/useFetch';
 import { formatNumber, timeDuration } from '../../utils';
 import { CopyOutlined } from '@ant-design/icons';
 import ReactJson from 'react-json-view';
@@ -23,35 +20,12 @@ export default function ExtrinsicDetail() {
 
   const { extrinsic_by_pk } = extrinsic;
 
-  // const {
-  //   loading,
-  //   data = [],
-  //   error,
-  // } = useFetch(`${process.env.REACT_APP_API}/extrinsic/${id}`);
-
-  // if (loading)
-  //   return (
-  //     <div className="container">
-  //       <Loading />
-  //     </div>
-  //   );
-  // console.log('error', error);
-
-  // if (error)
-  //   return (
-  //     <div className="container">
-  //       <NotFound error={error} />
-  //     </div>
-  //   );
-
   return (
     <div className="container">
       {extrinsic_by_pk ? (
         <>
           <div className="spacing" />
-          <p className="block-title">
-            Extrinsic #{extrinsic_by_pk?.block_id}-{extrinsic_by_pk?.index}
-          </p>
+
           <Card className="block-detail-card" style={{ borderRadius: '8px' }}>
             <table className="table">
               <tbody>
@@ -91,22 +65,24 @@ export default function ExtrinsicDetail() {
                   <td>Status</td>
                   <td>
                     {extrinsic_by_pk?.success ? (
-                      <div>
+                      <div className="status-background">
                         <img
                           src="/assets/icons/check.svg"
+                          alt="finalized"
+                          width={18}
+                          height={18}
+                        />
+                      </div>
+                    ) : (
+                      <div className="failed-background">
+                        <img
+                          src="/assets/icons/x-circle.svg"
                           alt=""
                           width={18}
                           height={18}
                         />
-                        <span>Success</span>
+                        <span style={{ marginLeft: '4px' }}>Unsuccess</span>
                       </div>
-                    ) : (
-                      <img
-                        src="/assets/icons/x-circle.svg"
-                        alt=""
-                        width={18}
-                        height={18}
-                      />
                     )}
                   </td>
                 </tr>
@@ -115,19 +91,26 @@ export default function ExtrinsicDetail() {
                   <td>Signed</td>
                   <td>
                     {extrinsic_by_pk?.signed_data ? (
-                      <img
-                        src="/assets/icons/check.svg"
-                        alt=""
-                        width={18}
-                        height={18}
-                      />
+                      <div className="status-background">
+                        <img
+                          src="/assets/icons/check.svg"
+                          alt="finalized"
+                          width={18}
+                          height={18}
+                        />
+                        <span style={{ marginLeft: '4px' }}>Success</span>
+                      </div>
                     ) : (
-                      <img
-                        src="/assets/icons/x-circle.svg"
-                        alt=""
-                        width={18}
-                        height={18}
-                      />
+                      <div className="unsigned-background">
+                        <img
+                          src="/assets/icons/box-time.svg"
+                          alt="unsigned"
+                          className="unsigned-icon"
+                          width={20}
+                          height={20}
+                        />
+                        <span style={{ marginLeft: '4px' }}>Unsigned</span>
+                      </div>
                     )}
                   </td>
                 </tr>

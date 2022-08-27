@@ -4,7 +4,6 @@ import Overview from '../components/Overview';
 import BlocksTable from '../components/BlocksTable';
 import TransferTable from '../components/TransferTable';
 import AccountsTable from '../components/AccountsTable';
-import process from 'process';
 import {
   QUERY_BLOCKS,
   QUERY_ACCOUNTS,
@@ -81,9 +80,9 @@ export default function Home() {
                 chain_info,
                 'active_validator_count'
               )}
-              total_issuance={chain_info[4]?.count}
               total_lockBalance={filterCount(chain_info, 'nominator_count')}
               waitingCount={filterCount(chain_info, 'waiting_validator_count')}
+              total_issuance={filterCount(chain_info, 'totalIssuance')}
             />
           ) : (
             chain_info

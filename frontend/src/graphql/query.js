@@ -80,7 +80,9 @@ const TOTAL_ACCOUNT = gql`
   query {
     account_aggregate {
       aggregate {
-        count
+        sum {
+          free_balance
+        }
       }
     }
   }
@@ -107,16 +109,6 @@ const TOTAL_EXTRINSIC = gql`
 const TOTAL_TRANSFER = gql`
   query {
     transfer_aggregate {
-      aggregate {
-        count
-      }
-    }
-  }
-`;
-
-const TOTAL_VALIDATOR = gql`
-  query MyQuery {
-    staking_aggregate {
       aggregate {
         count
       }
@@ -370,6 +362,19 @@ const QUERY_CHAIN_INFO = gql`
   }
 `;
 
+const TOTAL_VALIDATOR = gql`
+  query {
+    validator_aggregate {
+      aggregate {
+        sum {
+          total_stake
+          self_stake
+        }
+      }
+    }
+  }
+`;
+
 export {
   QUERY_ACCOUNTS,
   QUERY_BLOCKS,
@@ -377,7 +382,6 @@ export {
   TOTAL_ACCOUNT,
   TOTAL_EXTRINSIC,
   TOTAL_TRANSFER,
-  TOTAL_VALIDATOR,
   TOTAL_EVENTS,
   LATEST_BLOCK,
   QUERY_ACCOUNT_BY_ADDRESS,
@@ -392,4 +396,5 @@ export {
   QUERY_VALIDATOR,
   QUERY_CHAIN_INFO,
   QUERY_VALIDATOR_BY_PK,
+  TOTAL_VALIDATOR,
 };

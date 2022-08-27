@@ -1,8 +1,6 @@
-import { Card, Col, Row, Select } from 'antd';
+import { Col, Row, Select } from 'antd';
 import React, { useState } from 'react';
 import EventsTable from '../components/EventsTable';
-import useFetch from '../hooks/useFetch';
-import LaodingLogo from '../assets/loading.png';
 import { useGraphQL } from '../context/useApp';
 import { useQuery } from '@apollo/client';
 import { QUERY_EVENTS, TOTAL_EVENTS } from '../graphql/query';
@@ -11,7 +9,7 @@ import { useSearchParams } from 'react-router-dom';
 const module = ['all', 'system'];
 
 export default function Events() {
-  const [selectedModule, setSelectedModule] = useState('all');
+  const [, setSelectedModule] = useState('all');
 
   const { query } = useGraphQL();
   const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 10 });
@@ -24,7 +22,7 @@ export default function Events() {
   const events = query(
     useQuery(QUERY_EVENTS, {
       variables: { limit: parseInt(start), offset: parseInt(end) },
-    }),
+    })
   );
 
   function handleChangeModule(value) {
@@ -41,6 +39,8 @@ export default function Events() {
     setCurrentPage(page);
     setSearchParams({ ...searchParams, p: page, size: pageSize });
   };
+
+  console.log(events);
 
   return (
     <>
@@ -71,7 +71,7 @@ export default function Events() {
           <div className="spacing" />
           {events.event ? (
             <EventsTable
-              data={events.event}
+              data={events?.event}
               onChange={onChange}
               current={currentPage}
               sizePage={sizePage}

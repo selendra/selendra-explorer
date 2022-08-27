@@ -1,4 +1,4 @@
-import { Table, Tag } from 'antd';
+import { Table } from 'antd';
 import { Link } from 'react-router-dom';
 import { shortenAddress, balanceFormat } from '../utils';
 

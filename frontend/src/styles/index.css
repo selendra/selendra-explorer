@@ -7,6 +7,7 @@
   --text-link: #03a9f4;
   --success-status: rgba(0, 201, 167, 0.1);
   --failed-background: rgba(201, 0, 0, 0.122);
+  --unsigned-background: rgba(197, 216, 247, 0.317);
 }
 
 [data-theme='light'] {
@@ -271,6 +272,16 @@ code {
   border-radius: 6px;
   padding: 2px 5px;
 }
+.unsigned-background {
+  background: var(--unsigned-background) !important;
+  width: 110px !important;
+  border-radius: 6px;
+  padding: 2px 5px;
+}
+.unsigned-icon {
+  filter: brightness(0.2) sepia(1) hue-rotate(180deg) saturate(5);
+}
+
 /*** blocks */
 .blocks-bg {
   background-color: var(--background);
@@ -376,7 +387,7 @@ code {
   border: none !important;
   border-radius: 16px !important;
   color: #fff !important;
-  background-color: #03a9f440 !important;
+  background-color: var(--cards) !important;
   padding: 10px;
   /* height: 50px !important; */
   /* box-shadow: rgba(21, 1, 1, 0) 0px 1px 4px,

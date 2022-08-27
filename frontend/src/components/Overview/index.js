@@ -1,4 +1,5 @@
 import { Row } from 'antd';
+import { balanceFormat } from '../../utils';
 import DataField from './DataField';
 
 export default function Overview(props) {
@@ -45,17 +46,17 @@ export default function Overview(props) {
             </div>
           }
         />
-        {/* 
+
         <DataField
           icon="/assets/icons/profile-2user.svg"
           title="Balances"
           data={
             <div style={{ display: 'flex' }}>
-              {new Intl.NumberFormat().format(props?.total_issuance)}{' '}
+              {balanceFormat(props?.total_issuance)}{' '}
               <span>&nbsp;&nbsp;SEL</span>
             </div>
           }
-        /> */}
+        />
         <DataField
           icon="/assets/icons/lock.svg"
           title="Nominator"

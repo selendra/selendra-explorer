@@ -5,7 +5,30 @@ import logo from '../assets/logo.png';
 import SideHeader from './SideHeader';
 
 export default function HeaderComponent() {
-  const [current, setCurrent] = useState('home');
+  const [current] = useState('home');
+  const network = localStorage.getItem('network');
+
+  if (
+    network === null ||
+    network === '' ||
+    network === undefined ||
+    network === 'mainnet'
+  ) {
+    localStorage.setItem('network', 'mainnet');
+  }
+  if (network === 'testnet') {
+    localStorage.setItem('network', 'testnet');
+  }
+
+  const toTestnet = () => {
+    localStorage.setItem('network', 'testnet');
+    window.location.reload();
+  };
+
+  const toMainnet = () => {
+    localStorage.setItem('network', 'mainnet');
+    window.location.reload();
+  };
 
   const items = [
     {
@@ -36,22 +59,22 @@ export default function HeaderComponent() {
           label: <Link to="/extrinsics">Extrinsics</Link>,
           key: 'extrinsisc',
         },
-        // {
-        //   label: <Link to="/events">Events</Link>,
-        //   key: 'events',
-        // },
+        {
+          label: <Link to="/events">Events</Link>,
+          key: 'events',
+        },
       ],
     },
     {
-      label: 'Networks',
+      label: network === 'mainnet' ? 'Mainnet' : 'Testnet',
       key: 'networks',
       children: [
         {
-          label: <a href="/">Mainnet</a>,
+          label: <div onClick={() => toMainnet()}>Mainnet</div>,
           key: 'mainnet',
         },
         {
-          label: <Link to="/">Testnet</Link>,
+          label: <div onClick={() => toTestnet()}>Testnet</div>,
           key: 'testnet',
         },
       ],
@@ -65,7 +88,11 @@ export default function HeaderComponent() {
           <div className="logo" style={{ marginRight: 18, paddingTop: '5px' }}>
             <Link to="/">
               <img src={logo} alt="" height={50} />
-              <sup className="testnet">Testnet</sup>
+              {network === 'testnet' ? (
+                <sup className="testnet">Testnet</sup>
+              ) : (
+                ''
+              )}
             </Link>
           </div>
           <Menu selectedKeys={[current]} mode="horizontal" items={items} />

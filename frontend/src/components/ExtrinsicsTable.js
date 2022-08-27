@@ -13,9 +13,8 @@ export default function ExtrinsicsTable({
 }) {
   return (
     <Table
-      dataSource={data?.block_by_pk}
+      dataSource={data}
       rowKey={(record) => record.hash}
-      className="table-styling"
       tableLayout="fixed"
       pagination={
         short
@@ -42,20 +41,7 @@ export default function ExtrinsicsTable({
           </Link>
         )}
       />
-      {/* { !short &&
-        <Table.Column
-          title='Block'
-          responsive={['md']}
-          dataIndex='blockNumber'
-          render={blockNumber => (
-            <Link to={`/blocks/${blockNumber}`}>
-              <div className='blocks-height'>
-                <p>#{formatNumber(blockNumber)}</p>
-              </div>
-            </Link>
-          )}
-        />
-      } */}
+
       <Table.Column
         title="Extrinsic ID"
         render={(text, record) => (
@@ -69,7 +55,7 @@ export default function ExtrinsicsTable({
         render={(text, render) => (
           <span>
             {render.section}{' '}
-            <img src="/assets/icons/arrow.svg" alt="" width={14} height={14} />{' '}
+            <img src="/assets/icons/arrow.svg" alt="" width={14} height={14} />
             {render.method}
           </span>
         )}
@@ -99,10 +85,11 @@ export default function ExtrinsicsTable({
                     <span style={{ marginLeft: '4px' }}>Signed</span>
                   </div>
                 ) : (
-                  <div className="failed-background">
+                  <div className="unsigned-background">
                     <img
-                      src="/assets/icons/x-circle.svg"
-                      alt="finalized"
+                      src="/assets/icons/box-time.svg"
+                      alt="unsigned"
+                      className="unsigned-icon"
                       width={20}
                       height={20}
                     />

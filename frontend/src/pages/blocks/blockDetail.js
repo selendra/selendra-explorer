@@ -23,7 +23,7 @@ export default function BlockDetail() {
   const block = query(
     useQuery(QUERY_BLOCK_BY_PK, {
       variables: { blockByPkId: id },
-    }),
+    })
   );
 
   const onShowSizeChange = (current, pageSize) => {
@@ -87,7 +87,7 @@ export default function BlockDetail() {
                     navigator.clipboard.writeText(block_by_pk?.hash).then(() =>
                       notification.success({
                         message: 'Copied',
-                      }),
+                      })
                     )
                   }
                 />
@@ -103,7 +103,7 @@ export default function BlockDetail() {
                       .then(() =>
                         notification.success({
                           message: 'Copied',
-                        }),
+                        })
                       )
                   }
                 />
@@ -119,7 +119,7 @@ export default function BlockDetail() {
                       .then(() =>
                         notification.success({
                           message: 'Copied',
-                        }),
+                        })
                       )
                   }
                 />
@@ -135,7 +135,7 @@ export default function BlockDetail() {
                       .then(() =>
                         notification.success({
                           message: 'Copied',
-                        }),
+                        })
                       )
                   }
                 />
@@ -155,7 +155,7 @@ export default function BlockDetail() {
         <Tabs size="large">
           <Tabs.TabPane tab="Extrinsics" key="extrinsics">
             <ExtrinsicsTable
-              data={block_by_pk}
+              data={block_by_pk?.block}
               loading={block.block_by_pk ? false : true}
               total={block?.block_by_pk.extrinsics.length}
               current={currentPage}
@@ -166,7 +166,7 @@ export default function BlockDetail() {
           </Tabs.TabPane>
           <Tabs.TabPane tab="Events" key="events">
             <EventsTable
-              data={block_by_pk}
+              data={block?.block_by_pk.events}
               loading={block.block_by_pk ? false : true}
               total={block?.block_by_pk.events.length}
               current={currentPage}
