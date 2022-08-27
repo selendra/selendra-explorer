@@ -1,5 +1,4 @@
 import { createContext, useContext } from 'react';
-import { useQuery } from '@apollo/client';
 import Loading from '../components/Loading';
 
 const AppContext = createContext({});

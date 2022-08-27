@@ -1,7 +1,6 @@
-import { Table, Row } from 'antd';
-import { CaretRightOutlined } from '@ant-design/icons';
-import React, { useState } from 'react';
-import { formatNumber, shortenAddress, timeDuration } from '../utils';
+import { Table } from 'antd';
+import React from 'react';
+import { formatNumber } from '../utils';
 import { Link } from 'react-router-dom';
 
 export default function LogsTable({ loading, data, onChange }) {

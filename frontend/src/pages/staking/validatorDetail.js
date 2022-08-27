@@ -1,4 +1,4 @@
-import { Avatar, Card, Row, Table, Tabs, Pagination } from 'antd';
+import { Avatar, Card, Row, Table, Tabs } from 'antd';
 import React from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useGraphQL } from '../../context/useApp';
@@ -18,11 +18,6 @@ export default function ValidatorDetail() {
   const { id } = useParams();
   const { query } = useGraphQL();
   const [searchParams] = useSearchParams();
-  // const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
-  // const [sizePage, setSizePage] = useState(searchParams.get('size'));
-
-  // let start = sizePage;
-  // let end = currentPage;
 
   const validator = query(
     useQuery(QUERY_VALIDATOR_BY_PK, {
@@ -30,11 +25,6 @@ export default function ValidatorDetail() {
     })
   );
   const { validator_by_pk } = validator;
-
-  // const testing = [];
-  // const test = eras.filter((data) => testing.push(data.era));
-
-  // console.log(validator.validator_by_pk.stake_history);
 
   return (
     <div className="container">

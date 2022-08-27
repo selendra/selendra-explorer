@@ -1,11 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Card, Col, Row } from 'antd';
 import TableStaking from '../../components/TableStaking';
 import DataField from '../../components/Overview/DataFieldStack';
 import { calcInflation } from '../../utils/calcInflation';
-import { useAPIState } from '../../context/APIContext';
-import { BigNumber } from 'bignumber.js';
-import Loading from '../../components/Loading';
 import Chart from '../../components/chart';
 import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Layout, Drawer, Row, Col } from 'antd';
+import { Drawer, Row, Col } from 'antd';
 import menuWhite from '../assets/menu-white.svg';
 import logo from '../assets/logo.png';
-import logoWhite from '../assets/logo-white.png';
 
 import { Link } from 'react-router-dom';
 
