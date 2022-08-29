@@ -289,6 +289,12 @@ const QUERY_BLOCK_BY_PK = gql`
         section
         timestamp
       }
+      transfers {
+        success
+        amount
+        from_address
+        to_address
+      }
     }
   }
 `;

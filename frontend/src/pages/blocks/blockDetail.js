@@ -11,6 +11,8 @@ import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
 import { QUERY_BLOCK_BY_PK } from '../../graphql/query';
 import { useSearchParams } from 'react-router-dom';
+import TransferTable from '../../components/TransferTable';
+import NoHashTransactions from '../../components/TransferNoHash';
 
 export default function BlockDetail() {
   const { id } = useParams();
@@ -37,6 +39,8 @@ export default function BlockDetail() {
   };
 
   const { block_by_pk } = block;
+
+  console.log('transfer', block);
 
   return (
     <div className="container">
@@ -164,9 +168,21 @@ export default function BlockDetail() {
               onChange={onChange}
             />
           </Tabs.TabPane>
+          <Tabs.TabPane tab="Transactions" key="Transactions">
+            <NoHashTransactions
+              short
+              data={block?.block_by_pk.transfers}
+              loading={block.block_by_pk ? false : true}
+              total={block?.block_by_pk.transfers.length}
+              current={currentPage}
+              onShowSizeChange={onShowSizeChange}
+              sizePage={sizePage}
+              onChange={onChange}
+            />
+          </Tabs.TabPane>
           <Tabs.TabPane tab="Events" key="events">
             <EventsTable
-              data={block?.block_by_pk.events}
+              data={block?.block_by_pk.transfers}
               loading={block.block_by_pk ? false : true}
               total={block?.block_by_pk.events.length}
               current={currentPage}
