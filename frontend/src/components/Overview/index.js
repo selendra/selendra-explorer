@@ -1,5 +1,5 @@
 import { Row } from 'antd';
-import { balanceFormat } from '../../utils';
+import { balanceFormat, standardBalance } from '../../utils';
 import DataField from './DataField';
 
 export default function Overview(props) {
@@ -52,7 +52,7 @@ export default function Overview(props) {
           title="Balances"
           data={
             <div style={{ display: 'flex' }}>
-              {balanceFormat(props?.total_issuance)}{' '}
+              {standardBalance(props?.total_issuance)}
               <span>&nbsp;&nbsp;SEL</span>
             </div>
           }
