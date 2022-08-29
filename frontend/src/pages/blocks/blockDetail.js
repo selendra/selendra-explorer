@@ -11,7 +11,6 @@ import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
 import { QUERY_BLOCK_BY_PK } from '../../graphql/query';
 import { useSearchParams } from 'react-router-dom';
-import TransferTable from '../../components/TransferTable';
 import NoHashTransactions from '../../components/TransferNoHash';
 
 export default function BlockDetail() {
