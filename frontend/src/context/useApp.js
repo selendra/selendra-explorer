@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import Loading from '../components/Loading';
+import { Loading, Error } from '../components/Loading';
 
 const AppContext = createContext({});
 
@@ -10,7 +10,7 @@ export const AppProvider = ({ children }) => {
       return <Loading />;
     }
     if (error) {
-      return <Loading />;
+      return <Error />;
     }
     return data;
   };

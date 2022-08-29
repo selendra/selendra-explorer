@@ -1,6 +1,18 @@
 import LoadingLogo from '../assets/loading.png';
+import React from 'react';
+import Lottie from 'lottie-react';
+import loading from '../assets/loadings/loading5.json';
 
-export default function Loading() {
+function Loading() {
+  return (
+    <div className="loading-container">
+      <Lottie animationData={loading} loop={true} />
+      <p>Loading...</p>
+    </div>
+  );
+}
+
+function Error() {
   return (
     <div
       style={{
@@ -16,3 +28,5 @@ export default function Loading() {
     </div>
   );
 }
+
+export { Loading, Error };

@@ -795,3 +795,10 @@ a:focus {
   border-radius: 4px;
   font-weight: 600;
 }
+.loading-container {
+  width: 100px;
+  margin: auto !important;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-color) !important;
+}

@@ -38,6 +38,7 @@ export default function TableStaking({
       <Table.Column
         title="Validator"
         dataIndex="stash_address"
+        width="20%"
         render={(stash_address, record) => {
           if (record.name === '') {
             return (
@@ -67,7 +68,7 @@ export default function TableStaking({
                     size="small"
                     src={`https://avatars.dicebear.com/api/pixel-art/${stash_address}.svg`}
                   />
-                  <p>{record.name}</p>
+                  <p>{record.name.toUpperCase()}</p>
                 </Row>
               </Link>
             );
@@ -108,6 +109,7 @@ export default function TableStaking({
         title="Commission"
         responsive={['md']}
         dataIndex="commission"
+        width="10%"
         align="center"
         render={(commission) => <p>{percentNumber(commission)} </p>}
       />

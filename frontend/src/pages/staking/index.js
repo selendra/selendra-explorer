@@ -14,7 +14,7 @@ import {
 } from '../../graphql/query';
 import { filterCount } from '../../utils/chainInfo';
 import { useSearchParams } from 'react-router-dom';
-import { balanceFormat, percentNumber, standardBalance } from '../../utils';
+import { balanceFormat, percentNumber } from '../../utils';
 
 export default function Staking() {
   const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 10 });
@@ -68,7 +68,7 @@ export default function Staking() {
                     title="Staking"
                     data={
                       <div>
-                        {standardBalance(total_stake)}
+                        {balanceFormat(total_stake)}
                         <span>&nbsp;&nbsp;SEL</span>
                       </div>
                     }
@@ -78,7 +78,7 @@ export default function Staking() {
                     title="Self-Staking"
                     data={
                       <div>
-                        {standardBalance(self_stake)}
+                        {balanceFormat(self_stake)}
                         <span>&nbsp;&nbsp;SEL</span>
                       </div>
                     }

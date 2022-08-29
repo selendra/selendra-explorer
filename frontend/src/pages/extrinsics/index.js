@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import ExtrinsicsTable from '../../components/ExtrinsicsTable';
-
 import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
 import { QUERY_EXTRINSIC, TOTAL_EXTRINSIC } from '../../graphql/query';
@@ -8,7 +7,6 @@ import { useSearchParams } from 'react-router-dom';
 
 export default function Extrinsics() {
   const { query } = useGraphQL();
-
   const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 12 });
   const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
   const [sizePage, setSizePage] = useState(searchParams.get('size'));
@@ -26,7 +24,7 @@ export default function Extrinsics() {
             id: 'desc',
           },
         ],
-      },   
+      },
     })
   );
 

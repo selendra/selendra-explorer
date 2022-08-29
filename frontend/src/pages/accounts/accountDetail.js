@@ -1,12 +1,13 @@
 import { Avatar, Card, Tabs } from 'antd';
-import React from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import ExtrinsicsTable from '../../components/ExtrinsicsTable';
 import TableAccountStaking from '../../components/TableAccountStaking';
 import TransferTable from '../../components/TransferTable';
 import { formatNumber, balanceFormat } from '../../utils';
 import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
+
 import {
   QUERY_ACCOUNT_BY_ADDRESS,
   QUERY_COUNT_COLUMNS_ACCOUNT,
@@ -18,6 +19,22 @@ import {
 export default function AccountDetail() {
   const { id } = useParams();
   const { query } = useGraphQL();
+  const [searchParams, setSearchParams] = useSearchParams({ p: 1, size: 12 });
+  const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
+  const [sizePage, setSizePage] = useState(searchParams.get('size'));
+
+  let start = sizePage;
+  let end = currentPage;
+
+  const onShowSizeChange = (current, pageSize) => {
+    setSizePage(pageSize);
+    setCurrentPage(current);
+    setSearchParams({ ...searchParams, p: current, size: pageSize });
+  };
+  const onChange = (page, pageSize) => {
+    setCurrentPage(page);
+    setSearchParams({ ...searchParams, p: page, size: pageSize });
+  };
 
   const account = query(
     useQuery(QUERY_ACCOUNT_BY_ADDRESS, {
@@ -176,7 +193,14 @@ export default function AccountDetail() {
       <Tabs size="large">
         <Tabs.TabPane tab="Extrinsics" key="extrinsics">
           {extrinsic.extrinsic ? (
-            <ExtrinsicsTable data={extrinsic.extrinsic} />
+            <ExtrinsicsTable
+              data={extrinsic.extrinsic}
+              total={extrinsic.extrinsic.length}
+              current={currentPage}
+              onShowSizeChange={onShowSizeChange}
+              sizePage={sizePage}
+              onChange={onChange}
+            />
           ) : (
             extrinsic
           )}
@@ -190,11 +214,7 @@ export default function AccountDetail() {
         </Tabs.TabPane>
         <Tabs.TabPane tab="Staking" key="staking">
           {staking.staking ? (
-            <TableAccountStaking
-              data={staking.staking}
-              // loading={loading}
-              // onChange={setPage}
-            />
+            <TableAccountStaking data={staking.staking} />
           ) : (
             staking
           )}
