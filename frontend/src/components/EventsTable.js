@@ -17,7 +17,7 @@ export default function EventsTable({
       dataSource={data}
       rowKey={(record) => record.block_id + ' ' + record.index}
       loading={loading}
-      className="table-styling"
+      // className="table-styling"
       pagination={{
         pageSize: parseInt(sizePage),
         total: total,

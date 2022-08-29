@@ -10,7 +10,7 @@ export const AppProvider = ({ children }) => {
       return <Loading />;
     }
     if (error) {
-      return <div>Error</div>;
+      return <div>error</div>;
     }
     return data;
   };

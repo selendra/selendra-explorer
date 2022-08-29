@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { formatBalance } from '@polkadot/util';
 
 export function shortenAddress(address) {
   if (!address) return;
@@ -20,6 +21,14 @@ export function balanceFormat(amount) {
     minimumFractionDigits: 12,
     maximumFractionDigits: 12,
   }).format(data);
+}
+
+export function standardBalance(amount) {
+  return formatBalance(
+    amount.toString(),
+    { withSi: false, forceUnit: '-' },
+    12
+  );
 }
 
 export function formatAccountBalanceSEL(amount) {
