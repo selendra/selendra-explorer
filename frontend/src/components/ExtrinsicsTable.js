@@ -11,6 +11,7 @@ export default function ExtrinsicsTable({
   onShowSizeChange,
   sizePage,
 }) {
+  console.log(sizePage);
   return (
     <Table
       dataSource={data}

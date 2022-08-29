@@ -25,7 +25,7 @@ export default function Accounts() {
           },
         ],
       },
-    }),
+    })
   );
 
   const onShowSizeChange = (current, pageSize) => {
