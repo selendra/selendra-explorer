@@ -1,45 +1,38 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Deploy Explorer
+name: Selendra Explorer frontend
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
-  Explorer:
-    name: Production
-    runs-on: ubuntu-latest
-    environment:
-      name: production
-      url: 'https://explorer.selendra.org'
+  testnet-explorer:
+    runs-on: explorer-hosted
+    environment: production
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
     steps:
-      - name: Checkout Here
-        uses: actions/checkout@v2
-      - name: Create Directory
-        run: |
-          mkdir -p ${{ github.workspace }}/production
-      - name: Build
-        run: |
-          cd ${{ github.workspace }}/frontend
-          npm ci
-          CI= npm run build 
-          mv ${{ github.workspace }}/frontend/build ${{ github.workspace }}/production/frontend
-          mv ${{ github.workspace }}/.run.sh ${{ github.workspace }}/production/
-      - name: Install ssh key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_KEY }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}  
-      - name: Env
-        env:
-          BASH_SECRET: ${{ secrets.BASH_SHELL }}
-        run: |
-          echo "$BASH_SECRET" > ./deploy
-          chmod +x ./deploy
-      - name: Deploying to Production...     
-        run: |
-          ./deploy
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: build and run
+      run: |
+        cd frontend
+        touch .env
+          echo REACT_APP_SECRET_KEY_TESTNET=${{ secrets.REACT_APP_SECRET_KEY_TESTNET }} >> .env
+          echo REACT_APP_SELENDRA_TESTNET=${{ secrets.REACT_APP_SELENDRA_TESTNET }} >> .env
+          echo REACT_APP_SELENDRA_MAINNET=${{ secrets.REACT_APP_SELENDRA_MAINNET }} >> .env
+          echo REACT_APP_SECRET_KEY_MAINNET=${{ secrets.REACT_APP_SECRET_KEY_MAINNET }} >> .env
+        yarn
+        yarn run build
+        pm2 restart frontend
+  
