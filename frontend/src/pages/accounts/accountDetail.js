@@ -23,9 +23,6 @@ export default function AccountDetail() {
   const [currentPage, setCurrentPage] = useState(searchParams.get('p'));
   const [sizePage, setSizePage] = useState(searchParams.get('size'));
 
-  let start = sizePage;
-  let end = currentPage;
-
   const onShowSizeChange = (current, pageSize) => {
     setSizePage(pageSize);
     setCurrentPage(current);
