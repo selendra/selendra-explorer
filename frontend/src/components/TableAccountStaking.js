@@ -1,6 +1,6 @@
 import { Table } from 'antd';
 import React from 'react';
-import { formatNumber, timeDuration } from '../utils';
+import { balanceFormat, formatNumber, timeDuration } from '../utils';
 
 export default function TableAccountStaking({
   loading,
@@ -8,10 +8,10 @@ export default function TableAccountStaking({
   short,
   onChange,
 }) {
+  console.log(data);
   return (
     <Table
       dataSource={data}
-      // loading={loading}
       className="table-styling"
       sortDirections="descend"
       pagination={
@@ -43,10 +43,8 @@ export default function TableAccountStaking({
       <Table.Column
         title="Amount"
         dataIndex="amount"
-        render={(amount) => <p>{formatNumber(amount)} SEL</p>}
+        render={(amount) => <p>{balanceFormat(amount)} SEL</p>}
       />
-      <Table.Column title="Era" dataIndex="era" />
-      <Table.Column title="Action" dataIndex="action" />
     </Table>
   );
 }

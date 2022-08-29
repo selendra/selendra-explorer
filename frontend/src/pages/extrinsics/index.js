@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import ExtrinsicsTable from '../../components/ExtrinsicsTable';
-
 import { useGraphQL } from '../../context/useApp';
 import { useQuery } from '@apollo/client';
 import { QUERY_EXTRINSIC, TOTAL_EXTRINSIC } from '../../graphql/query';
@@ -26,7 +25,7 @@ export default function Extrinsics() {
             id: 'desc',
           },
         ],
-      },   
+      },
     })
   );
 

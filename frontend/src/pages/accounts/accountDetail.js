@@ -87,6 +87,8 @@ export default function AccountDetail() {
     })
   );
 
+  console.log('staknig', staking);
+
   return (
     <div className="container">
       <div className="spacing" />
@@ -190,11 +192,7 @@ export default function AccountDetail() {
         </Tabs.TabPane>
         <Tabs.TabPane tab="Staking" key="staking">
           {staking.staking ? (
-            <TableAccountStaking
-              data={staking.staking}
-              // loading={loading}
-              // onChange={setPage}
-            />
+            <TableAccountStaking data={staking.staking} />
           ) : (
             staking
           )}

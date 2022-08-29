@@ -13,8 +13,11 @@ import {
 import { useQuery } from '@apollo/client';
 import { useGraphQL } from '../context/useApp';
 import { filterCount } from '../utils/chainInfo';
+import { useState } from 'react';
+import Loading from '../components/Loading';
 
 export default function Home() {
+  const [loading, setLoading] = useState(true);
   const { query } = useGraphQL();
   const { chain_info } = query(useQuery(QUERY_CHAIN_INFO));
   const blocks = query(
