@@ -1,5 +1,5 @@
 import { Row } from 'antd';
-import { balanceFormat, standardBalance } from '../../utils';
+import { standardBalance } from '../../utils';
 import DataField from './DataField';
 
 export default function Overview(props) {
