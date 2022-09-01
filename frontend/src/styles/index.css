@@ -743,7 +743,7 @@ code {
 }
 .ant-menu-horizontal {
   border: none !important;
-  width: 52% !important;
+  width: 60% !important;
 }
 .ant-menu,
 .ant-menu-horizontal > .ant-menu-item a {
@@ -801,4 +801,10 @@ a:focus {
   justify-content: center;
   text-align: center;
   color: var(--text-color) !important;
+}
+.button-options-header {
+  border-radius: 12px !important;
+  background: #0a1d35 !important;
+  padding: 0px 50px !important;
+  animation: online 2s infinite;
 }

@@ -3,7 +3,7 @@ import { Space } from 'antd';
 import { useTheme } from 'next-themes';
 
 export default function CustomFooter() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme('dark');
 
   const onChange = () => {
     if (theme === 'light') {

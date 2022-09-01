@@ -66,7 +66,12 @@ export default function HeaderComponent() {
       ],
     },
     {
-      label: network === 'mainnet' ? 'Mainnet' : 'Testnet',
+      label:
+        network === 'mainnet' ? (
+          <p className="button-options-header">Mainnet</p>
+        ) : (
+          <p className="button-options-header">Testnet</p>
+        ),
       key: 'networks',
       children: [
         {

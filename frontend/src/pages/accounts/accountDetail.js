@@ -132,7 +132,7 @@ export default function AccountDetail() {
                 </td>
               </tr>
               <tr>
-                <td>Total Balance</td>
+                <td>Balance</td>
                 <td>
                   {balanceFormat(
                     account.account_by_pk.available_balance +
@@ -143,19 +143,19 @@ export default function AccountDetail() {
                 </td>
               </tr>
               <tr>
-                <td>Available Balance</td>
+                <td>Available</td>
                 <td>
                   {balanceFormat(account.account_by_pk.available_balance)} SEL
                 </td>
               </tr>
               <tr>
-                <td>Locked Balance</td>
+                <td>Locked</td>
                 <td>
                   {balanceFormat(account.account_by_pk.locked_balance)} SEL
                 </td>
               </tr>
               <tr>
-                <td>Reserved Balance</td>
+                <td>Reserved </td>
                 <td>
                   {balanceFormat(account.account_by_pk.reserved_balance)} SEL
                 </td>

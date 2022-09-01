@@ -124,11 +124,8 @@ export default function TransferDetail() {
               <tr className="tr-style">
                 <td>Fee</td>
                 <td>
-                  {' '}
                   {transfers.transfer_by_pk
-                    ? parseInt(
-                        formatNumber(transfers.transfer_by_pk.fee_amount)
-                      ).toPrecision(12)
+                    ? balanceFormat(transfers.transfer_by_pk.fee_amount)
                     : transfers}{' '}
                   SEL
                 </td>

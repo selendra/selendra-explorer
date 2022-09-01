@@ -52,13 +52,13 @@ export default function ssAccountsTable({
         )}
       />
       <Table.Column
-        title="Free Balance"
+        title="Balance"
         dataIndex="free_balance"
         render={(free_balance) => <p>{balanceFormat(free_balance)} SEL</p>}
       />
       {!short && (
         <Table.Column
-          title="Locked Balance"
+          title="Locked"
           responsive={['md']}
           dataIndex="locked_balance"
           render={(locked_balance) => (
@@ -67,7 +67,7 @@ export default function ssAccountsTable({
         />
       )}
       <Table.Column
-        title="Available Balance"
+        title="Available"
         dataIndex="available_balance"
         render={(available_balance) => (
           <p>{balanceFormat(available_balance)} SEL</p>

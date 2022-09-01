@@ -38,7 +38,7 @@ export default function Overview(props) {
         />
         <DataField
           icon="/assets/icons/validator-white.svg"
-          title="Validators"
+          title="Validators/Waiting"
           data={
             <div style={{ display: 'flex' }}>
               {new Intl.NumberFormat().format(props?.total_validators)}{' '}
@@ -49,7 +49,7 @@ export default function Overview(props) {
 
         <DataField
           icon="/assets/icons/profile-2user.svg"
-          title="Balances"
+          title="Balance"
           data={
             <div style={{ display: 'flex' }}>
               {standardBalance(props?.total_issuance)}
@@ -59,7 +59,7 @@ export default function Overview(props) {
         />
         <DataField
           icon="/assets/icons/lock.svg"
-          title="Nominator"
+          title="Nominators"
           data={
             <div style={{ display: 'flex' }}>
               {new Intl.NumberFormat().format(props?.total_lockBalance)}{' '}
