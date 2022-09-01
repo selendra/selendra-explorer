@@ -5,24 +5,35 @@ import { formatNumber, balanceFormat } from '../../utils';
 import { CopyOutlined } from '@ant-design/icons';
 import Moment from 'react-moment';
 import { useGraphQL } from '../../context/useApp';
-import { QUERY_TRANSFER_BY_PK } from '../../graphql/query';
+import { QUERY_EXTRINSIC } from '../../graphql/query';
 import { useQuery } from '@apollo/client';
+import { NoData } from '../../components/Loading';
 
 export default function TransferDetail() {
-  const { id } = useParams();
+  const { hash } = useParams();
   const { query } = useGraphQL();
-  const transfers = query(
-    useQuery(QUERY_TRANSFER_BY_PK, {
-      variables: { transferByPkId: id },
+
+  const extrinsics = query(
+    useQuery(QUERY_EXTRINSIC, {
+      variables: { where: { hash: { _eq: hash.toString() } } },
     })
   );
 
-  const { transfer_by_pk } = transfers;
+  const {
+    extrinsic_id,
+    from_address,
+    fee_amount,
+    success,
+    timestamp,
+    to_address,
+    amount,
+    error_message,
+  } = extrinsics?.extrinsic ? extrinsics?.extrinsic[0].transfers[0] : [];
 
   return (
     <div className="container">
       <div className="spacing" />
-      {transfers.transfer_by_pk ? (
+      {extrinsics.extrinsic ? (
         <Card className="block-detail-card" style={{ borderRadius: '8px' }}>
           <table className="table">
             <tbody>
@@ -41,26 +52,26 @@ export default function TransferDetail() {
               <tr className="tr-style">
                 <td>Block</td>
                 <td>
-                  <Link to={`/blocks/${transfer_by_pk?.block_id}`}>
-                    <p>#{formatNumber(transfer_by_pk?.block_id)}</p>
+                  <Link to={`/blocks/${extrinsics?.extrinsic[0].block_id}`}>
+                    <p>#{formatNumber(extrinsics?.extrinsic[0].block_id)}</p>
                   </Link>
                 </td>
               </tr>
               <tr className="tr-style">
                 <td>Time</td>
                 <td>
-                  <Moment>{transfer_by_pk?.timestamp}</Moment>
+                  <Moment>{timestamp}</Moment>
                 </td>
               </tr>
               <tr className="tr-style">
                 <td>Extrinsic ID</td>
                 <td>
-                  {transfer_by_pk?.block_id}-{transfer_by_pk?.extrinsic_id}
+                  {extrinsics?.extrinsic[0].block_id} - {extrinsic_id}
                 </td>
               </tr>
               <tr>
                 <td>Hash</td>
-                <td>{transfer_by_pk?.extrinsic.hash}</td>
+                <td>{hash}</td>
               </tr>
               <tr className="tr-style">
                 <td>From</td>
@@ -68,22 +79,18 @@ export default function TransferDetail() {
                   <Avatar
                     style={{ marginRight: '4px', backgroundColor: '#87d068' }}
                     size="small"
-                    src={`https://avatars.dicebear.com/api/pixel-art/${transfer_by_pk?.to_address}.svg`}
+                    src={`https://avatars.dicebear.com/api/pixel-art/${to_address}.svg`}
                   />
-                  <Link to={`/accounts/${transfer_by_pk?.to_address}`}>
-                    {transfer_by_pk?.to_address}
-                  </Link>
+                  <Link to={`/accounts/${to_address}`}>{to_address}</Link>
                 </td>
                 <CopyOutlined
                   style={{ fontSize: '20px', marginTop: '16px' }}
                   onClick={() =>
-                    navigator.clipboard
-                      .writeText(transfer_by_pk?.to_address)
-                      .then(() =>
-                        notification.success({
-                          message: 'Copied',
-                        })
-                      )
+                    navigator.clipboard.writeText(to_address).then(() =>
+                      notification.success({
+                        message: 'Copied',
+                      })
+                    )
                   }
                 />
               </tr>
@@ -93,47 +100,41 @@ export default function TransferDetail() {
                   <Avatar
                     style={{ marginRight: '4px', backgroundColor: '#87d068' }}
                     size="small"
-                    src={`https://avatars.dicebear.com/api/pixel-art/${transfer_by_pk?.from_address}.svg`}
+                    src={`https://avatars.dicebear.com/api/pixel-art/${from_address}.svg`}
                   />
-                  <Link to={`/accounts/${transfer_by_pk?.from_address}`}>
-                    {transfer_by_pk?.from_address}
-                  </Link>
+                  <Link to={`/accounts/${from_address}`}>{from_address}</Link>
                 </td>
                 <CopyOutlined
                   style={{ fontSize: '20px', marginTop: '16px' }}
                   onClick={() =>
-                    navigator.clipboard
-                      .writeText(transfer_by_pk?.from_address)
-                      .then(() =>
-                        notification.success({
-                          message: 'Copied',
-                        })
-                      )
+                    navigator.clipboard.writeText(from_address).then(() =>
+                      notification.success({
+                        message: 'Copied',
+                      })
+                    )
                   }
                 />
               </tr>
               <tr className="tr-style">
                 <td>Amount</td>
                 <td>
-                  {transfers.transfer_by_pk
-                    ? balanceFormat(transfers.transfer_by_pk.amount)
-                    : transfers}{' '}
+                  {extrinsics?.extrinsic ? balanceFormat(amount) : extrinsics}{' '}
                   SEL
                 </td>
               </tr>
               <tr className="tr-style">
                 <td>Fee</td>
                 <td>
-                  {transfers.transfer_by_pk
-                    ? balanceFormat(transfers.transfer_by_pk.fee_amount)
-                    : transfers}{' '}
+                  {extrinsics?.extrinsic
+                    ? balanceFormat(fee_amount)
+                    : extrinsics?.transfers}
                   SEL
                 </td>
               </tr>
               <tr className="tr-style">
                 <td>Result</td>
                 <td>
-                  {transfer_by_pk?.success ? (
+                  {success ? (
                     <div className="status-background">
                       <img
                         src="/assets/icons/check.svg"
@@ -156,17 +157,17 @@ export default function TransferDetail() {
                   )}
                 </td>
               </tr>
-              {transfer_by_pk?.error_message && (
+              {error_message && (
                 <tr className="tr-style">
                   <td>Error Message</td>
-                  <td>{transfer_by_pk?.error_messages}</td>
+                  <td>{error_message}</td>
                 </tr>
               )}
             </tbody>
           </table>
         </Card>
       ) : (
-        transfers
+        <NoData />
       )}
     </div>
   );

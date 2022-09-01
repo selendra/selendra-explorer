@@ -29,4 +29,13 @@ function Error() {
   );
 }
 
-export { Loading, Error };
+function NoData() {
+  return (
+    <div className="loading-container no-data-container">
+      <Lottie animationData={loading} loop={true} />
+      <p>No Result...</p>
+    </div>
+  );
+}
+
+export { Loading, Error, NoData };

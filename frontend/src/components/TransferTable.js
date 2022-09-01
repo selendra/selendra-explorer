@@ -40,9 +40,8 @@ export default function TransferTable({
     >
       <Table.Column
         title="Hash"
-        // dataIndex="from_address"
         render={(_, record) => (
-          <Link to={`/transfers/${record.id}`}>
+          <Link to={`/transfers/${record.extrinsic.hash}`}>
             <div className="blocks-height">
               <p>{shortenAddress(record.extrinsic.hash)}</p>
             </div>

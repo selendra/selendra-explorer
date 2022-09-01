@@ -21,7 +21,7 @@ export default function Transfers() {
         offset: parseInt(end) - 1,
         orderBy: [
           {
-            timestamp: null,
+            timestamp: 'desc',
           },
         ],
       },

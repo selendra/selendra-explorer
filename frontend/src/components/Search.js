@@ -23,23 +23,12 @@ export default function Search() {
       (selected === 'BLOCK NUMBER'
         ? navigate(`/blocks/${form}`)
         : selected === 'EXTRINSIC HASH'
-        ? navigate(`/extrinsics/${form}`)
+        ? navigate(`/transfers/${form}`)
         : navigate(`/accounts/${form}`))[navigate]
   );
 
   return (
     <Row align="middle" gutter={[16, 16]}>
-      {/* <Col xs={8} sm={8} md={6} lg={4} xl={4}>
-        <Select 
-          className='search-select'
-          defaultValue='BLOCK NUMBER'
-          onChange={setSelected}
-        >
-          { searchBy.map((i,key) =>
-            <Select.Option key={key} value={i}>{i}</Select.Option>  
-          )}
-        </Select>
-      </Col> */}
       <Col xs={16} sm={16} md={18} lg={20} xl={20}>
         <Input
           placeholder="Search by block number, extrinsic hash or account address"
@@ -60,7 +49,7 @@ export default function Search() {
             selected === 'BLOCK NUMBER'
               ? `/blocks/${form}`
               : selected === 'EXTRINSIC HASH'
-              ? `/extrinsics/${form}`
+              ? `/transfers/${form}`
               : `/accounts/${form}`
           }
         >

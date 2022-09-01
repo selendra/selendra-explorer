@@ -802,9 +802,16 @@ a:focus {
   text-align: center;
   color: var(--text-color) !important;
 }
+.no-data-container {
+  height: 80vh;
+  padding-top: 260px;
+}
 .button-options-header {
   border-radius: 12px !important;
   background: #0a1d35 !important;
   padding: 0px 50px !important;
   animation: online 2s infinite;
+}
+.ant-empty-normal {
+  color: var(--text-color) !important;
 }

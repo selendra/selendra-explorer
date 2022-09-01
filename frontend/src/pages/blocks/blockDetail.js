@@ -12,6 +12,7 @@ import { useQuery } from '@apollo/client';
 import { QUERY_BLOCK_BY_PK } from '../../graphql/query';
 import { useSearchParams } from 'react-router-dom';
 import NoHashTransactions from '../../components/TransferNoHash';
+import { NoData } from '../../components/Loading';
 
 export default function BlockDetail() {
   const { id } = useParams();
@@ -38,6 +39,10 @@ export default function BlockDetail() {
   };
 
   const { block_by_pk } = block;
+
+  if (block_by_pk === null || block_by_pk === undefined) {
+    return <NoData />;
+  }
 
   return (
     <div className="container">

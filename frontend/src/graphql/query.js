@@ -154,6 +154,18 @@ const QUERY_EXTRINSIC = gql`
       status
       timestamp
       type
+      block_id
+      hash
+      transfers {
+        extrinsic_id
+        from_address
+        fee_amount
+        success
+        timestamp
+        to_address
+        amount
+        error_message
+      }
     }
   }
 `;
@@ -395,6 +407,7 @@ export {
   TOTAL_EXTRINSIC,
   TOTAL_TRANSFER,
   TOTAL_EVENTS,
+  TOTAL_VALIDATOR,
   LATEST_BLOCK,
   QUERY_ACCOUNT_BY_ADDRESS,
   QUERY_COUNT_COLUMNS_ACCOUNT,
@@ -408,5 +421,4 @@ export {
   QUERY_VALIDATOR,
   QUERY_CHAIN_INFO,
   QUERY_VALIDATOR_BY_PK,
-  TOTAL_VALIDATOR,
 };

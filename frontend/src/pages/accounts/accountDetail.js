@@ -15,6 +15,7 @@ import {
   QUERY_STAKING,
   QUERY_TRANSFERS,
 } from '../../graphql/query';
+import { NoData } from '../../components/Loading';
 
 export default function AccountDetail() {
   const { id } = useParams();
@@ -105,123 +106,128 @@ export default function AccountDetail() {
     <div className="container">
       <div className="spacing" />
       {account.account_by_pk ? (
-        <Card className="block-detail-card" style={{ borderRadius: '8px' }}>
-          <table className="table">
-            <tbody>
-              <tr>
-                <td>
-                  <p className="block-title">Account</p>
-                </td>
-                <td>
-                  <p className="block-title">Details</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <table className="table">
-            <tbody>
-              <tr>
-                <td>Address</td>
-                <td>
-                  <Avatar
-                    style={{ marginRight: '4px', backgroundColor: '#87d068' }}
-                    size="small"
-                    src={`https://avatars.dicebear.com/api/pixel-art/${account.account_by_pk.address}.svg`}
-                  />
-                  {account.account_by_pk.address}
-                </td>
-              </tr>
-              <tr>
-                <td>Balance</td>
-                <td>
-                  {balanceFormat(
-                    account.account_by_pk.available_balance +
-                      account.account_by_pk.locked_balance +
-                      account.account_by_pk.reserved_balance
-                  )}
-                  SEL
-                </td>
-              </tr>
-              <tr>
-                <td>Available</td>
-                <td>
-                  {balanceFormat(account.account_by_pk.available_balance)} SEL
-                </td>
-              </tr>
-              <tr>
-                <td>Locked</td>
-                <td>
-                  {balanceFormat(account.account_by_pk.locked_balance)} SEL
-                </td>
-              </tr>
-              <tr>
-                <td>Reserved </td>
-                <td>
-                  {balanceFormat(account.account_by_pk.reserved_balance)} SEL
-                </td>
-              </tr>
-              <tr>
-                <td>Vest Details</td>
+        <>
+          {' '}
+          <Card className="block-detail-card" style={{ borderRadius: '8px' }}>
+            <table className="table">
+              <tbody>
                 <tr>
-                  <td>Vest Balance</td>
                   <td>
-                    {balanceFormat(account.account_by_pk.vested_balance)} SEL
+                    <p className="block-title">Account</p>
+                  </td>
+                  <td>
+                    <p className="block-title">Details</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <table className="table">
+              <tbody>
+                <tr>
+                  <td>Address</td>
+                  <td>
+                    <Avatar
+                      style={{ marginRight: '4px', backgroundColor: '#87d068' }}
+                      size="small"
+                      src={`https://avatars.dicebear.com/api/pixel-art/${account.account_by_pk.address}.svg`}
+                    />
+                    {account.account_by_pk.address}
                   </td>
                 </tr>
                 <tr>
-                  <td style={{ paddingRight: '80px' }}>Vested Claimable</td>
+                  <td>Balance</td>
                   <td>
-                    {balanceFormat(account.account_by_pk.voting_balance)} SEL
-                  </td>
-                </tr>
-                <tr>
-                  <td>Vesting Total</td>
-                  <td>
-                    {formatNumber(
-                      account_aggregate ? account_aggregate.aggregate.count : 0
-                    )}{' '}
-                    {''}
+                    {balanceFormat(
+                      account.account_by_pk.available_balance +
+                        account.account_by_pk.locked_balance +
+                        account.account_by_pk.reserved_balance
+                    )}
                     SEL
                   </td>
                 </tr>
-              </tr>
-            </tbody>
-          </table>
-        </Card>
+                <tr>
+                  <td>Available</td>
+                  <td>
+                    {balanceFormat(account.account_by_pk.available_balance)} SEL
+                  </td>
+                </tr>
+                <tr>
+                  <td>Locked</td>
+                  <td>
+                    {balanceFormat(account.account_by_pk.locked_balance)} SEL
+                  </td>
+                </tr>
+                <tr>
+                  <td>Reserved </td>
+                  <td>
+                    {balanceFormat(account.account_by_pk.reserved_balance)} SEL
+                  </td>
+                </tr>
+                <tr>
+                  <td>Vest Details</td>
+                  <tr>
+                    <td>Vest Balance</td>
+                    <td>
+                      {balanceFormat(account.account_by_pk.vested_balance)} SEL
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ paddingRight: '80px' }}>Vested Claimable</td>
+                    <td>
+                      {balanceFormat(account.account_by_pk.voting_balance)} SEL
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Vesting Total</td>
+                    <td>
+                      {formatNumber(
+                        account_aggregate
+                          ? account_aggregate.aggregate.count
+                          : 0
+                      )}{' '}
+                      {''}
+                      SEL
+                    </td>
+                  </tr>
+                </tr>
+              </tbody>
+            </table>
+          </Card>
+          <div className="spacing" />
+          <Tabs size="large">
+            <Tabs.TabPane tab="Extrinsics" key="extrinsics">
+              {extrinsic.extrinsic ? (
+                <ExtrinsicsTable
+                  data={extrinsic.extrinsic}
+                  total={extrinsic.extrinsic.length}
+                  current={currentPage}
+                  onShowSizeChange={onShowSizeChange}
+                  sizePage={sizePage}
+                  onChange={onChange}
+                />
+              ) : (
+                extrinsic
+              )}
+            </Tabs.TabPane>
+            <Tabs.TabPane tab="Transactions" key="transactions">
+              {transfers.transfer ? (
+                <TransferTable data={transfers.transfer} />
+              ) : (
+                transfers
+              )}
+            </Tabs.TabPane>
+            <Tabs.TabPane tab="Staking" key="staking">
+              {staking.staking ? (
+                <TableAccountStaking data={staking.staking} />
+              ) : (
+                staking
+              )}
+            </Tabs.TabPane>
+          </Tabs>
+        </>
       ) : (
-        account
+        <NoData />
       )}
-      <div className="spacing" />
-      <Tabs size="large">
-        <Tabs.TabPane tab="Extrinsics" key="extrinsics">
-          {extrinsic.extrinsic ? (
-            <ExtrinsicsTable
-              data={extrinsic.extrinsic}
-              total={extrinsic.extrinsic.length}
-              current={currentPage}
-              onShowSizeChange={onShowSizeChange}
-              sizePage={sizePage}
-              onChange={onChange}
-            />
-          ) : (
-            extrinsic
-          )}
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Transactions" key="transactions">
-          {transfers.transfer ? (
-            <TransferTable data={transfers.transfer} />
-          ) : (
-            transfers
-          )}
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Staking" key="staking">
-          {staking.staking ? (
-            <TableAccountStaking data={staking.staking} />
-          ) : (
-            staking
-          )}
-        </Tabs.TabPane>
-      </Tabs>
     </div>
   );
 }

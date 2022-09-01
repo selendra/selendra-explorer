@@ -22,7 +22,7 @@ function App() {
         <Route path="/blocks" element={<Blocks />} />
         <Route path="/blocks/:id" element={<BlockDetail />} />
         <Route path="/transfers" element={<Transfers />} />
-        <Route path="/transfers/:id" element={<TransferDetail />} />
+        <Route path="/transfers/:hash" element={<TransferDetail />} />
         <Route path="/accounts" element={<Accounts />} />
         <Route path="/accounts/:id" element={<AccountDetail />} />
         <Route path="/extrinsics" element={<Extrinsics />} />
