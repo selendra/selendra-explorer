@@ -205,6 +205,9 @@ const QUERY_TRANSFERS = gql`
       to_evm_address
       token_address
       type
+      extrinsic {
+        hash
+      }
     }
   }
 `;
@@ -249,6 +252,9 @@ const QUERY_TRANSFER_BY_PK = gql`
       to_evm_address
       token_address
       type
+      extrinsic {
+        hash
+      }
     }
   }
 `;

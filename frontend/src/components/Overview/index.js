@@ -63,7 +63,6 @@ export default function Overview(props) {
           data={
             <div style={{ display: 'flex' }}>
               {new Intl.NumberFormat().format(props?.total_lockBalance)}{' '}
-              <span>&nbsp;&nbsp;SEL</span>
             </div>
           }
         />

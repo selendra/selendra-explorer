@@ -60,7 +60,7 @@ export default function TransferDetail() {
               </tr>
               <tr>
                 <td>Hash</td>
-                <td>{transfer_by_pk?.token_address}</td>
+                <td>{transfer_by_pk?.extrinsic.hash}</td>
               </tr>
               <tr className="tr-style">
                 <td>From</td>

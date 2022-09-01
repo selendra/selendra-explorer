@@ -44,7 +44,7 @@ export default function TransferTable({
         render={(_, record) => (
           <Link to={`/transfers/${record.id}`}>
             <div className="blocks-height">
-              <p>{shortenAddress(record.token_address)}</p>
+              <p>{shortenAddress(record.extrinsic.hash)}</p>
             </div>
           </Link>
         )}
@@ -82,7 +82,9 @@ export default function TransferTable({
               size="small"
               src={`https://avatars.dicebear.com/api/pixel-art/${from_address}.svg`}
             />
-            <p>{shortenAddress(from_address)}</p>
+            <a href={`accounts/${from_address}`}>
+              {shortenAddress(from_address)}
+            </a>
           </Row>
         )}
       />
@@ -96,7 +98,7 @@ export default function TransferTable({
               size="small"
               src={`https://avatars.dicebear.com/api/pixel-art/${to_address}.svg`}
             />
-            <p>{shortenAddress(to_address)}</p>
+            <a href={`accounts/${to_address}`}>{shortenAddress(to_address)}</a>
           </Row>
         )}
       />

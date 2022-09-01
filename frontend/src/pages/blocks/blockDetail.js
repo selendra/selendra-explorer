@@ -39,8 +39,6 @@ export default function BlockDetail() {
 
   const { block_by_pk } = block;
 
-  console.log('transfer', block);
-
   return (
     <div className="container">
       <div className="spacing" />

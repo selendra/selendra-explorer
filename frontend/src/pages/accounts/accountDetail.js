@@ -134,7 +134,12 @@ export default function AccountDetail() {
               <tr>
                 <td>Total Balance</td>
                 <td>
-                  {balanceFormat(account.account_by_pk.available_balance)} SEL
+                  {balanceFormat(
+                    account.account_by_pk.available_balance +
+                      account.account_by_pk.locked_balance +
+                      account.account_by_pk.reserved_balance
+                  )}
+                  SEL
                 </td>
               </tr>
               <tr>
@@ -202,7 +207,7 @@ export default function AccountDetail() {
             extrinsic
           )}
         </Tabs.TabPane>
-        <Tabs.TabPane tab="Transfers" key="transfers">
+        <Tabs.TabPane tab="Transactions" key="transactions">
           {transfers.transfer ? (
             <TransferTable data={transfers.transfer} />
           ) : (
