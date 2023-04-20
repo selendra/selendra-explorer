@@ -1,31 +1,36 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 const QUERY_ACCOUNTS = gql`
   query ($limit: Int, $offset: Int, $orderBy: [account_order_by!]) {
     account(limit: $limit, offset: $offset, order_by: $orderBy) {
-      address
-      voting_balance
-      vested_balance
-      timestamp
+      account_id
       free_balance
-      evm_nonce
-      evm_address
       available_balance
-      block_id
-      reserved_balance
-      locked_balance
       nonce
-      active
+      reserved_balance
+      total_balance
+      timestamp
+      locked_balance
+      block_height
+      identity
+      identity_display
+      identity_display_parent
     }
   }
 `;
 
 const TOTAL_BLOCKS = gql`
-  query {
-    block_aggregate {
-      aggregate {
-        count
-      }
+  query ($orderBy: [block_order_by!], $limit: Int, $offset: Int) {
+    block(order_by: $orderBy, limit: $limit, offset: $offset){
+      block_number
+    }
+  }
+`;
+
+const TOTAL_ISSUANCE = gql`
+  query ($orderBy: [block_order_by!], $limit: Int, $offset: Int) {
+    block(order_by: $orderBy, limit: $limit, offset: $offset){
+      total_issuance
     }
   }
 `;
@@ -63,15 +68,14 @@ const TOTAL_EVENTS = gql`
 const QUERY_BLOCKS = gql`
   query ($offset: Int, $limit: Int, $orderBy: [block_order_by!]) {
     block(offset: $offset, limit: $limit, order_by: $orderBy) {
-      author
-      crawler_timestamp
-      extrinsic_root
+      block_author
+      extrinsics_root
       finalized
-      hash
-      id
+      block_hash      
       parent_hash
       state_root
       timestamp
+      block_number
     }
   }
 `;
@@ -180,7 +184,7 @@ const QUERY_TRANSFERS = gql`
   query (
     $limit: Int
     $offset: Int
-    $orderBy: [transfer_order_by]
+    $orderBy: [transfer_order_by!]
     $where: transfer_bool_exp
   ) {
     transfer(
@@ -190,24 +194,15 @@ const QUERY_TRANSFERS = gql`
       where: $where
     ) {
       amount
-      block_id
-      denom
-      error_message
-      extrinsic_id
+      block_number
+      source
+      destination
+      extrinsic_index
       fee_amount
-      from_address
-      from_evm_address
-      id
-      nft_id
+      hash
       success
       timestamp
-      to_address
-      to_evm_address
-      token_address
-      type
-      extrinsic {
-        hash
-      }
+      error_message
     }
   }
 `;
@@ -367,7 +362,7 @@ const QUERY_VALIDATOR = gql`
 
 const QUERY_CHAIN_INFO = gql`
   query {
-    chain_info {
+    total {
       count
       name
     }
@@ -388,25 +383,26 @@ const TOTAL_VALIDATOR = gql`
 `;
 
 export {
-  QUERY_ACCOUNTS,
-  QUERY_BLOCKS,
-  TOTAL_BLOCKS,
-  TOTAL_ACCOUNT,
-  TOTAL_EXTRINSIC,
-  TOTAL_TRANSFER,
-  TOTAL_EVENTS,
-  LATEST_BLOCK,
-  QUERY_ACCOUNT_BY_ADDRESS,
-  QUERY_COUNT_COLUMNS_ACCOUNT,
-  QUERY_EXTRINSIC,
-  QUERY_STAKING,
-  QUERY_TRANSFERS,
-  QUERY_TRANSFER_BY_PK,
-  QUERY_BLOCK_BY_PK,
-  QUERY_EXTRINSIC_BY_PK,
-  QUERY_EVENTS,
-  QUERY_VALIDATOR,
-  QUERY_CHAIN_INFO,
-  QUERY_VALIDATOR_BY_PK,
-  TOTAL_VALIDATOR,
+	QUERY_ACCOUNTS,
+	QUERY_BLOCKS,
+	TOTAL_BLOCKS,
+	TOTAL_ISSUANCE,
+	TOTAL_ACCOUNT,
+	TOTAL_EXTRINSIC,
+	TOTAL_TRANSFER,
+	TOTAL_EVENTS,
+	LATEST_BLOCK,
+	QUERY_ACCOUNT_BY_ADDRESS,
+	QUERY_COUNT_COLUMNS_ACCOUNT,
+	QUERY_EXTRINSIC,
+	QUERY_STAKING,
+	QUERY_TRANSFERS,
+	QUERY_TRANSFER_BY_PK,
+	QUERY_BLOCK_BY_PK,
+	QUERY_EXTRINSIC_BY_PK,
+	QUERY_EVENTS,
+	QUERY_VALIDATOR,
+	QUERY_CHAIN_INFO,
+	QUERY_VALIDATOR_BY_PK,
+	TOTAL_VALIDATOR,
 };

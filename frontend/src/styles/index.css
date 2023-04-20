@@ -802,3 +802,10 @@ a:focus {
   text-align: center;
   color: var(--text-color) !important;
 }
+.sel-icon-transparent{
+  width: 42rem !important;
+  top: 40px;
+  left: -15rem;
+  position: absolute;
+  opacity: 0.03;
+}
