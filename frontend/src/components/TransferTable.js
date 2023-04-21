@@ -5,6 +5,7 @@ import {
 	shortenAddress,
 	timeDuration,
 	balanceFormat,
+	standardBalance,
 } from "../utils";
 
 export default function TransferTable({
@@ -105,7 +106,7 @@ export default function TransferTable({
 			<Table.Column
 				title="Amount"
 				dataIndex="amount"
-				render={(amount) => <p>{amount} SEL</p>}
+				render={(amount) => <p>{standardBalance(amount)} SEL</p>}
 			/>
 			<Table.Column
 				title="Status"
