@@ -43,7 +43,9 @@ export default function TransferTable({
 				title="Hash"
 				// dataIndex="from_address"
 				render={(_, record) => (
-					<Link to={`/transfers/${record.hash}`}>
+					<Link
+						to={`/transfers/${record.block_number}#${record.extrinsic_index}`}
+					>
 						<div className="blocks-height">
 							<p>{shortenAddress(record.hash)}</p>
 						</div>

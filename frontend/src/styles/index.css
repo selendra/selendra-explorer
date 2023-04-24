@@ -5,17 +5,18 @@
   --primary: #012d41;
   --foreground: black;
   --text-link: #03a9f4;
-  --success-status: rgba(0, 201, 167, 0.1);
+  --success-status: rgba(255, 255, 255, 0.1);
   --failed-background: rgba(201, 0, 0, 0.122);
   --unsigned-background: rgba(197, 216, 247, 0.317);
 }
 
 [data-theme='light'] {
-  --background: #012d41;
-  --cards: #03a9f440;
+  --background: #03a9f4;
+  --cards: #fff;
   --foreground: #e0e7eb;
   --table-cards: #fff;
   --text-color: #000;
+  --text-secondary:#03a9f4;
 }
 
 [data-theme='dark'] {
@@ -25,6 +26,7 @@
   --foreground: #112641;
   --table-cards: #0a1d35;
   --text-color: #fff;
+  --text-secondary:#fff;
 }
 
 * {
@@ -75,19 +77,21 @@ code {
 }
 .header-container {
   max-width: 72rem;
-  height: 60px;
-  margin: 0 auto;
+  height: 50px;
+  margin: auto;
   /* margin-right: auto !important;
   margin-left: auto !important; */
   /* width: 60%; */
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: end;
 }
 .header-container p {
   color: #fff;
   font-weight: 600;
 }
+
+
 /*** Block Table */
 .ant-tabs > .ant-tabs-nav .ant-tabs-nav-wrap,
 .ant-tabs > div > .ant-tabs-nav .ant-tabs-nav-wrap {
@@ -205,7 +209,7 @@ code {
   border: none !important;
   border-radius: 6px !important; */
   border: none !important;
-  color: white !important;
+  color: var(--text-secondary) !important;
   width: 100%;
   height: 50px !important;
   font-weight: 600 !important;
@@ -236,12 +240,11 @@ code {
   background-color: #c4c4c4;
 }
 .home-all-data-title {
-  color: #fff;
+  color: var(--text-secondary);
   font-size: 14px;
   font-weight: 500;
 }
 .home-all-data-data {
-  /* color: #90dcfe; */
   color: #03a9f4;
   font-weight: 600;
 }
@@ -808,4 +811,16 @@ a:focus {
   left: -15rem;
   position: absolute;
   opacity: 0.03;
+}
+.sel-logo{
+  width: 20px;
+}
+.home-card-title{
+  color: var(--text-color);
+}
+.icon-all-data-light{
+  filter: invert(0.5) sepia(1) saturate(5) hue-rotate(175deg);
+}
+.icon-all-data-dark{
+  filter: invert(0);
 }

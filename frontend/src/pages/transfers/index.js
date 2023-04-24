@@ -11,8 +11,8 @@ export default function Transfers() {
 	const [currentPage, setCurrentPage] = useState(searchParams.get("p"));
 	const [sizePage, setSizePage] = useState(searchParams.get("size"));
 	const { transfer_aggregate } = query(useQuery(TOTAL_TRANSFER));
-	let start = sizePage;
-	let end = currentPage;
+	const start = sizePage;
+	const end = currentPage;
 
 	const transfers = query(
 		useQuery(QUERY_TRANSFERS, {

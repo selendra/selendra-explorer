@@ -17,7 +17,6 @@ import { useQuery } from "@apollo/client";
 import { useGraphQL } from "../context/useApp";
 import { filterCount } from "../utils/chainInfo";
 import sel_icon from "../assets/SEL-coin-transparent.png";
-import { balanceFormat } from "../utils";
 
 export default function Home() {
 	const { query } = useGraphQL();
@@ -76,8 +75,6 @@ export default function Home() {
 		}),
 	);
 
-	console.log(balanceFormat(6006285500000000000000000));
-
 	return (
 		<div>
 			<div className="home-container">
@@ -111,13 +108,13 @@ export default function Home() {
 			<div className="home-info">
 				<Row gutter={[16, { xs: 8, sm: 16, md: 24, lg: 32 }]}>
 					<Col xs={24} md={24} lg={12} xl={12}>
-						<p>Latest Blocks</p>
+						<p className="home-card-title">Latest Blocks</p>
 						<div className="home-table">
 							{blocks.block ? <BlocksTable short data={blocks} /> : blocks}
 						</div>
 					</Col>
 					<Col xs={24} md={24} lg={12} xl={12}>
-						<p>Accounts</p>
+						<p className="home-card-title">Accounts</p>
 						<div className="home-table">
 							{accounts.account ? (
 								<AccountsTable short accounts={accounts} />
@@ -129,7 +126,7 @@ export default function Home() {
 				</Row>
 			</div>
 			<div className="home-info">
-				<p>Latest Transactions</p>
+				<p className="home-card-title">Latest Transactions</p>
 				<div className="home-table">
 					{transfers.transfer ? (
 						<TransferTable short data={transfers} />

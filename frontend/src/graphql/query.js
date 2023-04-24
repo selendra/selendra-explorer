@@ -35,22 +35,38 @@ const TOTAL_ISSUANCE = gql`
   }
 `;
 
+// const QUERY_ACCOUNT_BY_ADDRESS = gql`
+//   query ($address: String!) {
+//     account_by_pk(address: $address) {
+//       address
+//       voting_balance
+//       vested_balance
+//       timestamp
+//       free_balance
+//       evm_nonce
+//       evm_address
+//       available_balance
+//       block_id
+//       reserved_balance
+//       locked_balance
+//       nonce
+//       active
+//     }
+//   }
+// `;
+
 const QUERY_ACCOUNT_BY_ADDRESS = gql`
-  query ($address: String!) {
-    account_by_pk(address: $address) {
-      address
-      voting_balance
-      vested_balance
+   query ($account_id: String!) {
+     account_by_pk(account_id: $account_id) {
+      account_id
       timestamp
       free_balance
-      evm_nonce
-      evm_address
-      available_balance
-      block_id
-      reserved_balance
       locked_balance
+      reserved_balance
       nonce
-      active
+      available_balance
+      block_height
+      total_balance
     }
   }
 `;
@@ -144,38 +160,31 @@ const QUERY_EXTRINSIC = gql`
       order_by: $orderBy
     ) {
       args
-      block_id
-      docs
+      block_number
+      doc
       error_message
       hash
-      id
-      index
-      inherent_data
+      extrinsic_index
       method
       section
-      signed_data
+      is_signed
       signer
-      status
+      success
       timestamp
-      type
+      fee_info
+      fee_details
     }
   }
 `;
 
 const QUERY_STAKING = gql`
-  query (
-    $limit: Int
-    $offset: Int
-    $orderBy: [staking_order_by!]
-    $where: staking_bool_exp
-  ) {
-    staking(limit: $limit, offset: $offset, order_by: $orderBy, where: $where) {
+  query ($limit: Int, $offset: Int, $where: staking_reward_bool_exp, $orderBy: [staking_reward_order_by!]) {
+    staking_reward(limit: $limit, offset: $offset, where: $where, order_by: $orderBy) {
+      event_index
       amount
-      event_id
-      id
-      signer
-      timestamp
-      type
+      account_id
+      validator_stash_address
+      block_number
     }
   }
 `;
@@ -208,116 +217,112 @@ const QUERY_TRANSFERS = gql`
 `;
 
 const QUERY_EVENTS = gql`
-  query (
-    $offset: Int
-    $limit: Int
-    $orderBy: [event_order_by!]
-    $where: event_bool_exp
-  ) {
-    event(offset: $offset, limit: $limit, order_by: $orderBy, where: $where) {
-      block_id
+  query ($limit: Int, $offset: Int, $orderBy: [event_order_by!]) {
+    event(limit: $limit, offset: $offset, order_by: $orderBy) {
+      block_number
       data
-      extrinsic_id
-      id
-      index
+      event_index
       method
-      phase
       section
       timestamp
+      types
+      phase
+      doc
     }
   }
+  
 `;
 
 const QUERY_TRANSFER_BY_PK = gql`
-  query ($transferByPkId: bigint!) {
-    transfer_by_pk(id: $transferByPkId) {
+  query ($blockNumber: bigint!, $extrinsicIndex: Int!) {
+    transfer_by_pk(block_number: $blockNumber, extrinsic_index: $extrinsicIndex) {
       amount
-      block_id
-      denom
+      block_number
+      destination
       error_message
-      extrinsic_id
+      extrinsic_index
       fee_amount
-      from_address
-      from_evm_address
-      id
-      nft_id
+      hash
+      method
+      section
+      source
       success
       timestamp
-      to_address
-      to_evm_address
-      token_address
-      type
-      extrinsic {
-        hash
-      }
     }
   }
 `;
 
 const QUERY_BLOCK_BY_PK = gql`
-  query ($blockByPkId: bigint!) {
-    block_by_pk(id: $blockByPkId) {
-      author
-      crawler_timestamp
-      extrinsic_root
+  query ($blockNumber: bigint!) {
+    block_by_pk(block_number: $blockNumber) {
+      extrinsics_root
       finalized
-      hash
-      id
-      parent_hash
       state_root
+      block_hash
+      block_author
+      block_author_name
+      parent_hash
+      current_index
+      block_number
       timestamp
       extrinsics {
-        block_id
+        block_number
         hash
-        index
-        section
+        signer
+        success
         timestamp
-        status
         method
+        section
+        extrinsic_index
+        is_signed
       }
       logs {
-        block_id
         data
+        block_number
         engine
-        index
+        log_index
         timestamp
         type
       }
       events {
-        block_id
-        index
+        block_number
+        event_index
         method
         section
         timestamp
+        types
       }
       transfers {
-        success
         amount
-        from_address
-        to_address
-      }
+        fee_amount
+        block_number
+        destination
+        hash
+        method
+        section
+        source
+        success
+        timestamp
+      }   
     }
   }
 `;
 
 const QUERY_EXTRINSIC_BY_PK = gql`
-  query ($extrinsicByPkId: bigint!) {
-    extrinsic_by_pk(id: $extrinsicByPkId) {
+  query ($blockNumber: bigint!, $extrinsicIndex: Int!) {
+    extrinsic_by_pk(block_number: $blockNumber, extrinsic_index: $extrinsicIndex) {
       args
-      block_id
-      docs
+      block_number
+      doc
       error_message
       hash
-      id
-      index
-      inherent_data
+      extrinsic_index
       method
       section
-      signed_data
       signer
-      status
+      success
       timestamp
-      type
+      is_signed
     }
   }
 `;
@@ -341,21 +346,43 @@ const QUERY_VALIDATOR_BY_PK = gql`
   }
 `;
 
+// const QUERY_VALIDATOR = gql`
+//   query ($limit: Int, $offset: Int, $orderBy: [validator_order_by!]) {
+//     validator(limit: $limit, offset: $offset, order_by: $orderBy) {
+//       stash_address
+//       name
+//       total_stake
+//       verified_identity
+//       rank
+//       nominators
+//       active_eras
+//       self_stake
+//       total_rating
+//       performance
+//       commission
+//       block_id
+//     }
+//   }
+// `;
+
 const QUERY_VALIDATOR = gql`
-  query ($limit: Int, $offset: Int, $orderBy: [validator_order_by!]) {
-    validator(limit: $limit, offset: $offset, order_by: $orderBy) {
-      stash_address
-      name
-      total_stake
-      verified_identity
-      rank
-      nominators
+  query ($limit: Int, $offset: Int, $orderBy: [ranking_order_by!]) {
+    ranking(limit: $limit, offset: $offset, order_by: $orderBy) {
+      active
       active_eras
+      other_stake
+      nominations
+      nominators
+      total_stake
       self_stake
-      total_rating
+      rank
+      name
       performance
+      verified_identity
+      stash_address
+      block_height
+      total_rating
       commission
-      block_id
     }
   }
 `;
