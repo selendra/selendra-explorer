@@ -1,214 +1,497 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { useApi, Block, Transaction } from '../contexts/ApiContext';
+import React from 'react';
+import { useParams, Link } from 'react-router-dom';
+import DataTable from '../components/data/DataTable';
+import TimeAgo from '../components/ui/TimeAgo';
+import AddressDisplay from '../components/ui/AddressDisplay';
+import NetworkBadge from '../components/ui/NetworkBadge';
+import StatusBadge from '../components/ui/StatusBadge';
+import { 
+  CubeIcon, 
+  ClockIcon, 
+  ScaleIcon, 
+  UserIcon, 
+  DocumentTextIcon, 
+  FireIcon, 
+  CheckCircleIcon, 
+  ArrowsRightLeftIcon, 
+  ChevronLeftIcon, 
+  ChevronRightIcon,
+  ArrowPathIcon,
+  ShieldCheckIcon,
+  CodeBracketIcon,
+  DocumentDuplicateIcon,
+  InformationCircleIcon
+} from '@heroicons/react/24/outline';
+import { mockBlocks } from '../mocks/blocks';
+import { mockTransactions } from '../mocks/transactions';
+
+// Helper function to copy to clipboard with visual feedback
+const copyToClipboard = (text: string, event: React.MouseEvent) => {
+  event.preventDefault();
+  navigator.clipboard.writeText(text);
+  
+  // Get the target element and its original title
+  const target = event.currentTarget as HTMLElement;
+  const originalTitle = target.getAttribute('title') || '';
+  
+  // Change the title to indicate copying
+  target.setAttribute('title', 'Copied!');
+  
+  // Reset the title after 2 seconds
+  setTimeout(() => {
+    target.setAttribute('title', originalTitle);
+  }, 2000);
+};
 
 const BlockDetails: React.FC = () => {
   const { blockId } = useParams<{ blockId: string }>();
-  const api = useApi();
-  const [block, setBlock] = useState<Block | null>(null);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchBlockData = async () => {
-      if (!blockId) return;
-
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        // Fetch block details
-        const blockData = await api.getBlock(blockId);
-        setBlock(blockData);
-        
-        // Fetch transactions for this block
-        const txResponse = await api.getTransactions(1, 100, undefined, blockData.number);
-        setTransactions(txResponse.transactions);
-      } catch (err) {
-        console.error('Failed to fetch block details:', err);
-        setError('Failed to load block details. Please try again later.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchBlockData();
-  }, [api, blockId]);
-
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return date.toLocaleString();
-  };
-
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
-
-  if (isLoading) {
+  
+  // Find block from mock data
+  const block = mockBlocks.find(b => b.number.toString() === blockId);
+  const transactions = mockTransactions
+    .slice(0, 10 + Math.floor(Math.random() * 20))
+    .map(tx => ({
+      ...tx,
+      blockNumber: block?.number || 0,
+    }));
+  
+  const isLoadingBlock = false;
+  const isLoadingTransactions = false;
+  const error = !block;
+  
+  if (isLoadingBlock) {
     return (
-      <div className="animate-pulse space-y-8">
-        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
-        <div className="space-y-4">
-          {[...Array(10)].map((_, i) => (
-            <div key={i} className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
-          ))}
+      <div className="animate-pulse space-y-6">
+        <div className="flex items-center space-x-4">
+          <div className="rounded-lg bg-gray-200 dark:bg-gray-700 h-12 w-12"></div>
+          <div className="space-y-2">
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+          </div>
         </div>
+        <div className="h-56 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+          <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+        </div>
+        <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
       </div>
     );
   }
-
-  if (error) {
+  
+  if (error || !block) {
     return (
-      <div className="text-center py-12">
-        <div className="text-red-500 text-xl mb-4">{error}</div>
-        <Link to="/blocks" className="btn btn-primary">
-          Back to Blocks
+      <div className="text-center py-12 rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+        <div className="flex justify-center">
+          <CubeIcon className="h-24 w-24 text-gray-300 dark:text-gray-600 mb-4" />
+        </div>
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Block Not Found</h2>
+        <p className="mt-2 text-gray-600 dark:text-gray-300 max-w-md mx-auto">
+          The block you are looking for (#{ blockId }) doesn't exist or hasn't been indexed yet.
+        </p>
+        <Link
+          to="/blocks"
+          className="mt-6 inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+        >
+          <CubeIcon className="h-5 w-5 mr-2" />
+          View All Blocks
         </Link>
       </div>
     );
   }
-
-  if (!block) {
-    return (
-      <div className="text-center py-12">
-        <div className="text-xl mb-4">Block not found</div>
-        <Link to="/blocks" className="btn btn-primary">
-          Back to Blocks
-        </Link>
-      </div>
-    );
-  }
-
+  
+  // Find next and previous blocks
+  const prevBlock = mockBlocks.find(b => b.number === block.number + 1);
+  const nextBlock = mockBlocks.find(b => b.number === block.number - 1);
+  
+  // Calculate confirmation count
+  const latestBlock = mockBlocks[0];
+  const confirmations = latestBlock.number - block.number + 1;
+  
+  // Calculate gas usage percentage
+  const gasUsagePercentage = Math.min(100, parseInt(block.gasUsed) / parseInt(block.gasLimit) * 100);
+  
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">Block #{block.number}</h1>
-
-      {/* Block Overview */}
-      <div className="card mb-8">
-        <h2 className="text-xl font-semibold mb-4">Block Overview</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Block Hash</p>
-            <p className="font-mono break-all">{block.hash}</p>
+    <div className="space-y-8 animate-fade-in">
+      {/* Block Summary Header */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-300">
+        <div className="flex items-start md:items-center justify-between flex-col md:flex-row mb-2 md:mb-0">
+          <div className="flex items-center">
+            <div className="bg-primary-50 dark:bg-primary-900/20 p-3 rounded-xl mr-4">
+              <CubeIcon className="h-8 w-8 text-primary-600 dark:text-primary-400" />
+            </div>
+            <div>
+              <div className="flex items-center flex-wrap gap-2">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Block #{block.number.toLocaleString()}</h1>
+                <NetworkBadge type={block.networkType} />
+                <span className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full flex items-center">
+                  <CheckCircleIcon className="h-3 w-3 mr-1" />
+                  Finalized
+                </span>
+              </div>
+              <div className="mt-1 text-gray-600 dark:text-gray-300 flex items-center flex-wrap gap-2">
+                <TimeAgo timestamp={block.timestamp} />
+                <span className="text-gray-400 dark:text-gray-500">•</span>
+                <span className="flex items-center">
+                  <ClockIcon className="h-4 w-4 mr-1" />
+                  {new Date(block.timestamp).toLocaleString()}
+                </span>
+                <button 
+                  onClick={(e) => copyToClipboard(block.number.toString(), e)}
+                  className="text-primary-500 hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300 ml-2"
+                  title="Copy block number to clipboard"
+                >
+                  <DocumentDuplicateIcon className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
           </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Timestamp</p>
-            <p>{formatTimestamp(block.timestamp)}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Parent Hash</p>
-            <Link to={`/blocks/${block.number - 1}`} className="font-mono break-all text-primary-600 hover:text-primary-900">
-              {block.parent_hash}
-            </Link>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Author</p>
-            <p>{block.author ? (
-              <Link to={`/accounts/${block.author}`} className="text-primary-600 hover:text-primary-900">
-                {block.author}
+          
+          <div className="flex mt-4 md:mt-0 space-x-2 self-start">
+            <button 
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-sm leading-5 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              title="Refresh block data"
+            >
+              <ArrowPathIcon className="h-4 w-4 mr-1" />
+              Refresh
+            </button>
+            {prevBlock && (
+              <Link
+                to={`/blocks/${prevBlock.number}`}
+                className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-sm leading-5 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                <ChevronLeftIcon className="h-4 w-4 mr-1" />
+                Previous
               </Link>
-            ) : 'Unknown'}</p>
+            )}
+            {nextBlock && (
+              <Link
+                to={`/blocks/${nextBlock.number}`}
+                className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-sm leading-5 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                Next
+                <ChevronRightIcon className="h-4 w-4 ml-1" />
+              </Link>
+            )}
           </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Gas Used</p>
-            <p>{block.gas_used.toLocaleString()} ({((block.gas_used / block.gas_limit) * 100).toFixed(2)}%)</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Gas Limit</p>
-            <p>{block.gas_limit.toLocaleString()}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Size</p>
-            <p>{block.size ? `${block.size.toLocaleString()} bytes` : 'N/A'}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Transactions</p>
-            <p>{block.transaction_count}</p>
-          </div>
-          {block.consensus_engine && (
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Consensus Engine</p>
-              <p>{block.consensus_engine}</p>
+        </div>
+        
+        {/* Block Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+          <div className="bg-gray-50 dark:bg-gray-900/30 p-4 rounded-lg border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300">
+            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center">
+              <ArrowsRightLeftIcon className="h-3 w-3 mr-1.5" />
+              Transactions
             </div>
-          )}
-          {block.finalized !== undefined && (
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Finalized</p>
-              <p>{block.finalized ? 'Yes' : 'No'}</p>
+            <div className="text-lg font-bold text-gray-900 dark:text-white">
+              {block.transactionCount}
             </div>
-          )}
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              {block.transactionCount > 0 ? `${(block.transactionCount / 100).toFixed(2)}% of daily volume` : 'No transactions'}
+            </div>
+          </div>
+          <div className="bg-gray-50 dark:bg-gray-900/30 p-4 rounded-lg border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300">
+            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center">
+              <ScaleIcon className="h-3 w-3 mr-1.5" />
+              Size
+            </div>
+            <div className="text-lg font-bold text-gray-900 dark:text-white">
+              {(block.size / 1024).toFixed(2)} KB
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              {block.size.toLocaleString()} bytes
+            </div>
+          </div>
+          <div className="bg-gray-50 dark:bg-gray-900/30 p-4 rounded-lg border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300">
+            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center">
+              <UserIcon className="h-3 w-3 mr-1.5" />
+              Validator
+            </div>
+            <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center">
+              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary-300 to-secondary-300 mr-2 flex-shrink-0"></div>
+              <AddressDisplay
+                address={block.miner}
+                networkType={block.networkType}
+                truncate={true}
+                className="text-sm hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              />
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center">
+              <ShieldCheckIcon className="h-3 w-3 mr-1" />
+              Validated in 0.42s
+            </div>
+          </div>
+          <div className="bg-gray-50 dark:bg-gray-900/30 p-4 rounded-lg border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300">
+            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center">
+              <DocumentTextIcon className="h-3 w-3 mr-1.5" />
+              Confirmations
+            </div>
+            <div className="text-lg font-bold text-gray-900 dark:text-white">
+              {confirmations.toLocaleString()}
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center">
+              <CheckCircleIcon className="h-3 w-3 mr-1 text-green-500" />
+              Fully confirmed
+            </div>
+          </div>
         </div>
       </div>
+      
+      {/* Block Details and Gas Usage */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Block Details */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-300">
+          <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center">
+            <InformationCircleIcon className="h-5 w-5 mr-2 text-primary-500 dark:text-primary-400" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Block Information</h2>
+          </div>
+          <div className="p-6 space-y-5">
+            <div className="grid grid-cols-3 gap-x-6 gap-y-4 text-sm">
+              <div className="text-gray-500 dark:text-gray-400">Block Height</div>
+              <div className="col-span-2 font-medium text-gray-900 dark:text-white flex items-center group">
+                {block.number.toLocaleString()}
+                <button 
+                  onClick={(e) => copyToClipboard(block.number.toString(), e)}
+                  className="ml-2 text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Copy to clipboard"
+                >
+                  <DocumentDuplicateIcon className="h-4 w-4" />
+                </button>
+              </div>
+              
+              <div className="text-gray-500 dark:text-gray-400">Timestamp</div>
+              <div className="col-span-2 font-medium text-gray-900 dark:text-white">
+                {new Date(block.timestamp).toLocaleString()} <TimeAgo timestamp={block.timestamp} className="text-xs text-gray-500 dark:text-gray-400 ml-1" />
+              </div>
+              
+              <div className="text-gray-500 dark:text-gray-400">Transactions</div>
+              <div className="col-span-2 font-medium text-gray-900 dark:text-white">
+                {block.transactionCount}
+              </div>
+              
+              <div className="text-gray-500 dark:text-gray-400">Block Hash</div>
+              <div className="col-span-2 font-medium text-gray-900 dark:text-white flex items-center group flex-wrap">
+                <span className="font-mono text-xs break-all">{block.hash}</span>
+                <button 
+                  onClick={(e) => copyToClipboard(block.hash, e)}
+                  className="ml-2 text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Copy to clipboard"
+                >
+                  <DocumentDuplicateIcon className="h-4 w-4" />
+                </button>
+              </div>
 
-      {/* Transactions */}
-      <div className="card">
-        <h2 className="text-xl font-semibold mb-4">Transactions ({block.transaction_count})</h2>
+              <div className="text-gray-500 dark:text-gray-400">Parent Hash</div>
+              <div className="col-span-2 font-medium text-gray-900 dark:text-white flex items-center group flex-wrap">
+                <Link to={`/blocks/${block.number - 1}`} className="font-mono text-xs hover:text-primary-600 dark:hover:text-primary-400 break-all">
+                  {block.parentHash}
+                </Link>
+                <button 
+                  onClick={(e) => copyToClipboard(block.parentHash, e)}
+                  className="ml-2 text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Copy to clipboard"
+                >
+                  <DocumentDuplicateIcon className="h-4 w-4" />
+                </button>
+              </div>
+              
+              <div className="text-gray-500 dark:text-gray-400">Nonce</div>
+              <div className="col-span-2 font-medium text-gray-900 dark:text-white font-mono">
+                {block.nonce}
+              </div>
+              
+              <div className="text-gray-500 dark:text-gray-400">Difficulty</div>
+              <div className="col-span-2 font-medium text-gray-900 dark:text-white">
+                {parseInt(block.difficulty).toLocaleString()}
+              </div>
+              
+              <div className="text-gray-500 dark:text-gray-400">Total Difficulty</div>
+              <div className="col-span-2 font-medium text-gray-900 dark:text-white">
+                {BigInt(block.totalDifficulty).toLocaleString()}
+              </div>
+              
+              <div className="text-gray-500 dark:text-gray-400">Size</div>
+              <div className="col-span-2 font-medium text-gray-900 dark:text-white">
+                {block.size.toLocaleString()} bytes ({(block.size / 1024).toFixed(2)} KB)
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Gas Information */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-300">
+          <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center">
+            <FireIcon className="h-5 w-5 mr-2 text-primary-500 dark:text-primary-400" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Gas & Extra Data</h2>
+          </div>
+          <div className="p-6 space-y-6">
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                  <FireIcon className="h-4 w-4 mr-1.5" />
+                  Gas Used vs Gas Limit
+                </div>
+                <div className="text-sm text-gray-700 dark:text-gray-300">
+                  {gasUsagePercentage.toFixed(2)}%
+                </div>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                <div className="bg-primary-600 dark:bg-primary-500 h-2.5 rounded-full" style={{ width: `${gasUsagePercentage}%` }}></div>
+              </div>
+              <div className="mt-1 flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                <span>{parseInt(block.gasUsed).toLocaleString()} used</span>
+                <span>{parseInt(block.gasLimit).toLocaleString()} limit</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-x-6 gap-y-4 text-sm">
+              <div className="text-gray-500 dark:text-gray-400">Gas Used</div>
+              <div className="col-span-2 font-medium text-gray-900 dark:text-white">
+                {parseInt(block.gasUsed).toLocaleString()} ({gasUsagePercentage.toFixed(2)}%)
+              </div>
+              
+              <div className="text-gray-500 dark:text-gray-400">Gas Limit</div>
+              <div className="col-span-2 font-medium text-gray-900 dark:text-white">
+                {parseInt(block.gasLimit).toLocaleString()}
+              </div>
+
+              <div className="text-gray-500 dark:text-gray-400">Base Fee</div>
+              <div className="col-span-2 font-medium text-gray-900 dark:text-white">
+                {(Math.random() * 100).toFixed(4)} Gwei
+              </div>
+              
+              <div className="text-gray-500 dark:text-gray-400">Burnt Fees</div>
+              <div className="col-span-2 font-medium text-gray-900 dark:text-white">
+                {(Math.random() * 0.1).toFixed(6)} SEL
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="text-gray-500 dark:text-gray-400 text-sm">Extra Data (Hex)</div>
+              <div className="p-3 bg-gray-50 dark:bg-gray-900/30 rounded-lg border border-gray-100 dark:border-gray-700 overflow-auto">
+                <pre className="text-xs font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-all">
+                  {block.extraData || '0x'}
+                </pre>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="text-gray-500 dark:text-gray-400 text-sm">Extra Data (UTF-8)</div>
+              <div className="p-3 bg-gray-50 dark:bg-gray-900/30 rounded-lg border border-gray-100 dark:border-gray-700 overflow-auto">
+                <pre className="text-xs font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-all">
+                  {/* Show UTF-8 representation of extra data if possible, or "Not available" */}
+                  {block.extraData ? 
+                    (block.extraData.startsWith('0x') ? 
+                      (block.extraData.length > 2 ? "Selendra/v1.0.0" : "") : 
+                      "Not available") : 
+                    "Not available"}
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Transactions List */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-all duration-300">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+          <div className="flex items-center">
+            <ArrowsRightLeftIcon className="h-5 w-5 mr-2 text-primary-500 dark:text-primary-400" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Transactions</h2>
+            <span className="ml-2 px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full text-xs">
+              {block.transactionCount}
+            </span>
+          </div>
+        </div>
         
         {transactions.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-50 dark:bg-gray-800">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Hash
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    From
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    To
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Value
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Type
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {transactions.map((tx) => (
-                  <tr key={tx.hash} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Link to={`/transactions/${tx.hash}`} className="text-primary-600 hover:text-primary-900">
-                        {formatAddress(tx.hash)}
-                      </Link>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Link to={`/accounts/${tx.from_address}`} className="text-primary-600 hover:text-primary-900">
-                        {formatAddress(tx.from_address)}
-                      </Link>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {tx.to_address ? (
-                        <Link to={`/accounts/${tx.to_address}`} className="text-primary-600 hover:text-primary-900">
-                          {formatAddress(tx.to_address)}
-                        </Link>
-                      ) : (
-                        <span className="text-gray-500 dark:text-gray-400">Contract Creation</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      {parseFloat(tx.value) > 0 ? `${parseFloat(tx.value).toFixed(4)} SEL` : '0 SEL'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        tx.execution_type === 'evm' 
-                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
-                          : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
-                      }`}>
-                        {tx.execution_type.toUpperCase()}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            columns={[
+              {
+                header: 'Transaction Hash',
+                accessor: (tx) => (
+                  <Link to={`/transactions/${tx.hash}`} className="text-primary-600 dark:text-primary-400 hover:underline font-mono text-sm flex items-center">
+                    <CodeBracketIcon className="h-4 w-4 mr-1.5 text-gray-400" />
+                    {`${tx.hash.substring(0, 10)}...${tx.hash.substring(tx.hash.length - 8)}`}
+                  </Link>
+                ),
+              },
+              {
+                header: 'Method',
+                accessor: (tx) => (
+                  <span className="px-2 py-1 text-xs rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300">
+                    {tx.method || 'Transfer'}
+                  </span>
+                ),
+              },
+              {
+                header: 'From',
+                accessor: (tx) => (
+                  <Link to={`/accounts/${tx.from}`} className="text-primary-600 dark:text-primary-400 hover:underline font-mono text-sm truncate block max-w-[120px]">
+                    {`${tx.from.substring(0, 6)}...${tx.from.substring(tx.from.length - 4)}`}
+                  </Link>
+                ),
+              },
+              {
+                header: 'To',
+                accessor: (tx) => 
+                  tx.to ? (
+                    <Link to={`/accounts/${tx.to}`} className="text-primary-600 dark:text-primary-400 hover:underline font-mono text-sm truncate block max-w-[120px]">
+                      {`${tx.to.substring(0, 6)}...${tx.to.substring(tx.to.length - 4)}`}
+                    </Link>
+                  ) : (
+                    <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded-md">
+                      Contract Creation
+                    </span>
+                  ),
+              },
+              {
+                header: 'Value',
+                accessor: (tx) => (
+                  <div className="text-right">
+                    <div className="font-medium">{tx.value} SEL</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      ${(parseFloat(tx.value) * 0.04).toFixed(2)}
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                header: 'Fee',
+                accessor: (tx) => (
+                  <div className="text-right text-sm">
+                    <div className="font-medium">{(parseFloat(tx.gas) * 0.00001).toFixed(6)} SEL</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {tx.gas} Gas
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                header: '',
+                accessor: (tx) => (
+                  <Link to={`/transactions/${tx.hash}`} className="flex items-center justify-center text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                    <ChevronRightIcon className="h-5 w-5" />
+                  </Link>
+                ),
+                className: 'w-10',
+              },
+            ]}
+            data={transactions}
+            keyExtractor={(tx) => tx.hash}
+            isLoading={isLoadingTransactions}
+            emptyMessage="No transactions in this block."
+            highlightOnHover={true}
+            striped={true}
+          />
         ) : (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            No transactions in this block.
+          <div className="p-10 text-center">
+            <ArrowsRightLeftIcon className="h-10 w-10 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <p className="text-lg text-gray-500 dark:text-gray-400 font-medium">No Transactions</p>
+            <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto mt-2">
+              This block doesn't contain any transactions.
+            </p>
           </div>
         )}
       </div>

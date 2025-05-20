@@ -1,437 +1,235 @@
-import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
-import { useApi, Contract, Transaction } from "../contexts/ApiContext";
+import React, { useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { useContract, useTransactions } from '../contexts/ApiContext';
+import DataTable from '../components/data/DataTable';
+import Pagination from '../components/ui/Pagination';
+import TimeAgo from '../components/ui/TimeAgo';
+import AddressDisplay from '../components/ui/AddressDisplay';
+import NetworkBadge from '../components/ui/NetworkBadge';
+import StatusBadge from '../components/ui/StatusBadge';
 
 const ContractDetails: React.FC = () => {
   const { address } = useParams<{ address: string }>();
-  const api = useApi();
-  const [contract, setContract] = useState<Contract | null>(null);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<
-    "code" | "transactions" | "read" | "write"
-  >("code");
-
-  useEffect(() => {
-    const fetchContractData = async () => {
-      if (!address) return;
-
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        // Fetch contract details
-        const contractData = await api.getContract(address);
-        setContract(contractData);
-
-        // Fetch transactions for this contract
-        const txResponse = await api.getTransactions(1, 10, address);
-        setTransactions(txResponse.transactions);
-      } catch (err) {
-        console.error("Failed to fetch contract details:", err);
-        setError("Failed to load contract details. Please try again later.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchContractData();
-  }, [api, address]);
-
-  const formatAddress = (addr: string) => {
-    if (!addr) return "";
-    if (addr.length <= 12) return addr;
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+  const { data: contract, isLoading: isLoadingContract, error } = useContract(address || '');
+  
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const { data: transactionsData, isLoading: isLoadingTransactions } = useTransactions(page, pageSize, address);
+  
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return date.toLocaleString();
-  };
-
-  if (isLoading) {
+  
+  const totalPages = transactionsData ? Math.ceil(transactionsData.totalCount / pageSize) : 0;
+  
+  if (isLoadingContract) {
     return (
-      <div className="animate-pulse space-y-8">
+      <div className="animate-pulse space-y-4">
         <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
-        <div className="space-y-4">
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              className="h-16 bg-gray-200 dark:bg-gray-700 rounded"
-            ></div>
-          ))}
-        </div>
+        <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+        <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded"></div>
       </div>
     );
   }
-
-  if (error) {
+  
+  if (error || !contract) {
     return (
       <div className="text-center py-12">
-        <div className="text-red-500 text-xl mb-4">{error}</div>
-        <Link to="/" className="btn btn-primary">
-          Back to Home
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Contract Not Found</h2>
+        <p className="mt-2 text-gray-600 dark:text-gray-300">
+          The contract you are looking for doesn't exist or has been removed.
+        </p>
+        <Link
+          to="/contracts"
+          className="mt-6 inline-block px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+        >
+          View All Contracts
         </Link>
       </div>
     );
   }
-
-  if (!contract) {
-    return (
-      <div className="text-center py-12">
-        <div className="text-xl mb-4">Contract not found</div>
-        <Link to="/" className="btn btn-primary">
-          Back to Home
-        </Link>
-      </div>
-    );
-  }
-
+  
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Contract Details</h1>
-
+      <div className="mb-6">
+        <div className="flex items-center space-x-2">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            {contract.name || 'Contract'}
+          </h1>
+          <NetworkBadge type={contract.networkType} />
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+            contract.verified
+              ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
+              : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+          }`}>
+            {contract.verified ? 'Verified' : 'Unverified'}
+          </span>
+        </div>
+        <div className="mt-1 text-gray-600 dark:text-gray-300">
+          {contract.contractType || 'Smart Contract'}
+        </div>
+      </div>
+      
       {/* Contract Overview */}
       <div className="card mb-8">
-        <h2 className="text-xl font-semibold mb-4">Contract Overview</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Contract Overview</h2>
+        
+        <div className="space-y-4">
           <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-              Address
-            </p>
-            <p className="font-mono break-all">{contract.address}</p>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Address</div>
+            <div className="font-mono text-sm break-all">{contract.address}</div>
           </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-              Balance
-            </p>
-            <p className="text-xl font-semibold">
-              {parseFloat(contract.balance) > 0
-                ? `${parseFloat(contract.balance).toFixed(8)} SEL`
-                : "0 SEL"}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-              Contract Type
-            </p>
-            <p>
-              <span
-                className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  contract.contract_type === "evm"
-                    ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                    : "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
-                }`}
-              >
-                {contract.contract_type.toUpperCase()}
-              </span>
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-              Creator
-            </p>
-            <Link
-              to={`/accounts/${contract.creator_address}`}
-              className="text-primary-600 hover:text-primary-900 break-all"
-            >
-              {formatAddress(contract.creator_address)}
-            </Link>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-              Creation Transaction
-            </p>
-            <Link
-              to={`/transactions/${contract.creator_transaction_hash}`}
-              className="text-primary-600 hover:text-primary-900 break-all"
-            >
-              {formatAddress(contract.creator_transaction_hash)}
-            </Link>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-              Verification Status
-            </p>
-            <p>
-              {contract.verified ? (
-                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                  Verified
-                </span>
-              ) : (
-                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                  Not Verified
-                </span>
-              )}
-            </p>
-          </div>
-          {contract.name && (
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                Name
-              </p>
-              <p>{contract.name}</p>
+              <div className="text-sm text-gray-500 dark:text-gray-400">Creator</div>
+              <AddressDisplay
+                address={contract.creator}
+                networkType={contract.networkType}
+                truncate={false}
+                className="text-sm"
+              />
             </div>
-          )}
-          {contract.compiler_version && (
+            
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                Compiler Version
-              </p>
-              <p>{contract.compiler_version}</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
-        <ul className="flex flex-wrap -mb-px">
-          <li className="mr-2">
-            <button
-              className={`inline-block p-4 border-b-2 rounded-t-lg ${
-                activeTab === "code"
-                  ? "text-primary-600 border-primary-600"
-                  : "border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-              }`}
-              onClick={() => setActiveTab("code")}
-            >
-              Code
-            </button>
-          </li>
-          <li className="mr-2">
-            <button
-              className={`inline-block p-4 border-b-2 rounded-t-lg ${
-                activeTab === "transactions"
-                  ? "text-primary-600 border-primary-600"
-                  : "border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-              }`}
-              onClick={() => setActiveTab("transactions")}
-            >
-              Transactions
-            </button>
-          </li>
-          <li className="mr-2">
-            <button
-              className={`inline-block p-4 border-b-2 rounded-t-lg ${
-                activeTab === "read"
-                  ? "text-primary-600 border-primary-600"
-                  : "border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-              }`}
-              onClick={() => setActiveTab("read")}
-            >
-              Read Contract
-            </button>
-          </li>
-          <li className="mr-2">
-            <button
-              className={`inline-block p-4 border-b-2 rounded-t-lg ${
-                activeTab === "write"
-                  ? "text-primary-600 border-primary-600"
-                  : "border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-              }`}
-              onClick={() => setActiveTab("write")}
-            >
-              Write Contract
-            </button>
-          </li>
-        </ul>
-      </div>
-
-      {/* Tab Content */}
-      {activeTab === "code" && (
-        <div className="card">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Contract Code</h2>
-            {!contract.verified && (
-              <Link
-                to={`/contracts/${contract.address}/verify`}
-                className="btn btn-sm btn-primary"
-              >
-                Verify Contract
+              <div className="text-sm text-gray-500 dark:text-gray-400">Creation Transaction</div>
+              <Link to={`/transactions/${contract.creationTransaction}`} className="text-primary-600 dark:text-primary-400 hover:underline font-mono text-sm">
+                {`${contract.creationTransaction.substring(0, 8)}...${contract.creationTransaction.substring(contract.creationTransaction.length - 6)}`}
               </Link>
-            )}
-          </div>
-
-          {contract.verified ? (
+            </div>
+            
             <div>
-              {contract.abi && (
-                <div className="mb-6">
-                  <h3 className="text-lg font-medium mb-2">ABI</h3>
-                  <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-md overflow-x-auto">
-                    <pre className="text-sm font-mono break-all whitespace-pre-wrap">
-                      {contract.abi}
-                    </pre>
-                  </div>
-                </div>
-              )}
-
-              <div>
-                <h3 className="text-lg font-medium mb-2">Bytecode</h3>
-                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-md overflow-x-auto">
-                  <pre className="text-sm font-mono break-all whitespace-pre-wrap">
-                    {contract.bytecode}
-                  </pre>
-                </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">Created At</div>
+              <div className="font-medium">
+                <TimeAgo timestamp={contract.createdAt} /> ({new Date(contract.createdAt).toLocaleString()})
               </div>
             </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <p className="mb-4">
-                This contract is not verified. Verify the contract to see the
-                source code.
-              </p>
-              <Link
-                to={`/contracts/${contract.address}/verify`}
-                className="btn btn-primary"
-              >
-                Verify Contract
-              </Link>
+            
+            {contract.implementationAddress && (
+              <div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">Implementation Address (Proxy)</div>
+                <AddressDisplay
+                  address={contract.implementationAddress}
+                  networkType={contract.networkType}
+                  truncate={false}
+                  className="text-sm"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      {/* Contract Source Code */}
+      {contract.verified && contract.sourceCode && (
+        <div className="card mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Source Code</h2>
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              Verified at: {contract.verifiedAt ? new Date(contract.verifiedAt).toLocaleString() : 'Unknown'}
             </div>
-          )}
+          </div>
+          
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md overflow-x-auto">
+            <pre className="font-mono text-xs text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
+              {contract.sourceCode}
+            </pre>
+          </div>
         </div>
       )}
-
-      {activeTab === "transactions" && (
-        <div className="card">
-          <h2 className="text-xl font-semibold mb-4">Transactions</h2>
-          {transactions.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-800">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                    >
-                      Hash
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                    >
-                      Block
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                    >
-                      From
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                    >
-                      Value
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                    >
-                      Timestamp
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {transactions.map((tx) => (
-                    <tr
-                      key={tx.hash}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700"
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Link
-                          to={`/transactions/${tx.hash}`}
-                          className="text-primary-600 hover:text-primary-900"
-                        >
-                          {formatAddress(tx.hash)}
-                        </Link>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Link
-                          to={`/blocks/${tx.block_number}`}
-                          className="text-primary-600 hover:text-primary-900"
-                        >
-                          {tx.block_number}
-                        </Link>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Link
-                          to={`/accounts/${tx.from_address}`}
-                          className="text-primary-600 hover:text-primary-900"
-                        >
-                          {formatAddress(tx.from_address)}
-                        </Link>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {parseFloat(tx.value) > 0
-                          ? `${parseFloat(tx.value).toFixed(8)} SEL`
-                          : "0 SEL"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {formatTimestamp(tx.created_at)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              No transactions found for this contract.
-            </div>
-          )}
+      
+      {/* Contract ABI */}
+      {contract.verified && contract.abi && (
+        <div className="card mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Contract ABI</h2>
+          
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md overflow-x-auto">
+            <pre className="font-mono text-xs text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
+              {JSON.stringify(contract.abi, null, 2)}
+            </pre>
+          </div>
         </div>
       )}
-
-      {activeTab === "read" && (
-        <div className="card">
-          <h2 className="text-xl font-semibold mb-4">Read Contract</h2>
-          {contract.verified && contract.abi ? (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              Contract read functionality will be available soon.
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <p className="mb-4">
-                This contract is not verified. Verify the contract to interact
-                with it.
-              </p>
-              <Link
-                to={`/contracts/${contract.address}/verify`}
-                className="btn btn-primary"
-              >
-                Verify Contract
-              </Link>
-            </div>
-          )}
+      
+      {/* Contract Bytecode */}
+      {contract.bytecode && (
+        <div className="card mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Bytecode</h2>
+          
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md overflow-x-auto">
+            <pre className="font-mono text-xs text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-all">
+              {contract.bytecode}
+            </pre>
+          </div>
         </div>
       )}
-
-      {activeTab === "write" && (
-        <div className="card">
-          <h2 className="text-xl font-semibold mb-4">Write Contract</h2>
-          {contract.verified && contract.abi ? (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              Contract write functionality will be available soon. Connect your
-              wallet to interact with this contract.
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <p className="mb-4">
-                This contract is not verified. Verify the contract to interact
-                with it.
-              </p>
-              <Link
-                to={`/contracts/${contract.address}/verify`}
-                className="btn btn-primary"
-              >
-                Verify Contract
-              </Link>
-            </div>
-          )}
-        </div>
-      )}
+      
+      {/* Transactions */}
+      <div className="card">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          Transactions
+        </h2>
+        
+        <DataTable
+          columns={[
+            {
+              header: 'Hash',
+              accessor: (tx) => (
+                <Link to={`/transactions/${tx.hash}`} className="text-primary-600 dark:text-primary-400 hover:underline font-mono">
+                  {`${tx.hash.substring(0, 8)}...${tx.hash.substring(tx.hash.length - 6)}`}
+                </Link>
+              ),
+            },
+            {
+              header: 'Block',
+              accessor: (tx) => (
+                <Link to={`/blocks/${tx.blockNumber}`} className="text-primary-600 dark:text-primary-400 hover:underline">
+                  {tx.blockNumber.toLocaleString()}
+                </Link>
+              ),
+            },
+            {
+              header: 'Age',
+              accessor: (tx) => <TimeAgo timestamp={tx.timestamp} />,
+            },
+            {
+              header: 'From',
+              accessor: (tx) => (
+                <AddressDisplay
+                  address={tx.from}
+                  networkType={tx.networkType}
+                  truncate={true}
+                  className="text-sm"
+                />
+              ),
+            },
+            {
+              header: 'Value',
+              accessor: (tx) => `${tx.value} SEL`,
+            },
+            {
+              header: 'Status',
+              accessor: (tx) => <StatusBadge status={tx.status} />,
+              className: 'text-center',
+            },
+          ]}
+          data={transactionsData?.items || []}
+          keyExtractor={(tx) => tx.id}
+          isLoading={isLoadingTransactions}
+          emptyMessage="No transactions found for this contract."
+        />
+        
+        {transactionsData && (
+          <div className="mt-6">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

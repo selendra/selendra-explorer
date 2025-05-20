@@ -4,13 +4,16 @@ import { Link } from 'react-router-dom';
 const NotFound: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center py-16">
-      <h1 className="text-6xl font-bold text-primary-600 mb-4">404</h1>
-      <h2 className="text-2xl font-semibold mb-6">Page Not Found</h2>
-      <p className="text-gray-600 dark:text-gray-400 mb-8 text-center max-w-md">
-        The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+      <h1 className="text-6xl font-bold text-primary-600 dark:text-primary-400">404</h1>
+      <h2 className="mt-4 text-2xl font-semibold text-gray-900 dark:text-white">Page Not Found</h2>
+      <p className="mt-2 text-gray-600 dark:text-gray-300">
+        The page you are looking for doesn't exist or has been moved.
       </p>
-      <Link to="/" className="btn btn-primary">
-        Go to Homepage
+      <Link
+        to="/"
+        className="mt-8 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+      >
+        Go back home
       </Link>
     </div>
   );

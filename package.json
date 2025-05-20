@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "framer-motion": "^12.12.1",
+    "react-copy-to-clipboard": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/react-copy-to-clipboard": "^5.0.7"
+  }
+}
