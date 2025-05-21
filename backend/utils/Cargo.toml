@@ -1,0 +1,11 @@
+[package]
+name = "utils"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ethers = { workspace = true }
+hex = { workspace = true }
+
+model = { workspace = true }
+custom-error = { workspace = true }
