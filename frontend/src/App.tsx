@@ -2,6 +2,8 @@ import * as React from "react";
 import { createBrowserRouter, RouterProvider, Route, createRoutesFromElements } from "react-router-dom";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ApiProvider } from "./contexts/ApiContext";
+import { WalletProvider } from "./contexts/WalletContext";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // Layout
 import Layout from "./components/layout/Layout";
@@ -22,6 +24,8 @@ import Validators from "./pages/Validators";
 import ValidatorDetails from "./pages/ValidatorDetails";
 // Use lazy loading for Staking component
 const Staking = React.lazy(() => import("./pages/Staking"));
+// Use lazy loading for Wallet component
+const WalletPage = React.lazy(() => import("./pages/WalletPage"));
 import Search from "./pages/Search";
 import NotFound from "./pages/NotFound";
 import Extrinsics from "./pages/Extrinsics";
@@ -61,6 +65,11 @@ const router = createBrowserRouter(
           <Staking />
         </React.Suspense>
       } />
+      <Route path="wallet" element={
+        <React.Suspense fallback={<PageLoader />}>
+          <WalletPage />
+        </React.Suspense>
+      } />
       <Route path="extrinsics" element={<Extrinsics />} />
       <Route path="extrinsics/:hash" element={<ExtrinsicDetails />} />
       <Route path="charts" element={<Charts />} />
@@ -76,13 +85,17 @@ const router = createBrowserRouter(
 
 function App() {
   return (
-    <ApiProvider>
-      <ThemeProvider>
-        <React.Suspense fallback={<PageLoader />}>
-          <RouterProvider router={router} />
-        </React.Suspense>
-      </ThemeProvider>
-    </ApiProvider>
+    <ErrorBoundary>
+      <ApiProvider>
+        <ThemeProvider>
+          <WalletProvider>
+            <React.Suspense fallback={<PageLoader />}>
+              <RouterProvider router={router} />
+            </React.Suspense>
+          </WalletProvider>
+        </ThemeProvider>
+      </ApiProvider>
+    </ErrorBoundary>
   );
 }
 
