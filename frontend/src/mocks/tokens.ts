@@ -9,16 +9,33 @@ const tokenData = [
   { name: 'Dai Stablecoin', symbol: 'DAI' },
   { name: 'Wrapped Ether', symbol: 'WETH' },
   { name: 'Wrapped Bitcoin', symbol: 'WBTC' },
-  { name: 'Chainlink', symbol: 'LINK' },
-  { name: 'Uniswap', symbol: 'UNI' },
-  { name: 'Aave', symbol: 'AAVE' },
-  { name: 'Compound', symbol: 'COMP' },
+  { name: 'Wrapped Selendra', symbol: 'WSEL' },
+  { name: 'Bitcoin', symbol: 'BTC' },
+  { name: 'Ethereum', symbol: 'ETH' },
+  { name: 'Polygon', symbol: 'MATIC' },
+  { name: 'Binance Coin', symbol: 'BNB' },
+  { name: 'Polkadot', symbol: 'DOT' },
+  { name: 'Kusama', symbol: 'KSM' },
   { name: 'Selendra NFT', symbol: 'SELNFT' },
   { name: 'Crypto Punks', symbol: 'PUNK' },
-  { name: 'Bored Ape', symbol: 'BAYC' },
-  { name: 'Azuki', symbol: 'AZUKI' },
-  { name: 'Doodles', symbol: 'DOODLE' },
 ];
+
+// Map symbols to their local logo files
+const logoMap: Record<string, string> = {
+  'SEL': '/tokens/sel.png',
+  'USDT': '/tokens/usdt.png',
+  'USDC': '/tokens/usdc.png',
+  'DAI': '/tokens/dai.png',
+  'WSEL': '/tokens/wsel.png',
+  'BTC': '/tokens/btc.png',
+  'ETH': '/tokens/eth.png',
+  'MATIC': '/tokens/matic.png',
+  'BNB': '/tokens/bnb.png',
+  'DOT': '/tokens/dot.png',
+  'KSM': '/tokens/ksm.png',
+  // Default for other tokens without specific logos
+  'DEFAULT': '/logo-monochrome.png'
+};
 
 // Generate a random token
 export const generateMockToken = (
@@ -50,6 +67,12 @@ export const generateMockToken = (
   // Random date within the last year
   const createdAt = new Date(Date.now() - getRandomInt(1, 365) * 24 * 60 * 60 * 1000).toISOString();
   
+  // Add price and market cap data for ERC20 tokens
+  const price = type === 'erc20' ? (Math.random() * 100).toFixed(2) : undefined;
+  const priceChange24h = type === 'erc20' ? (Math.random() * 20 - 10) : undefined;
+  const marketCap = type === 'erc20' && price ? (parseInt(price) * parseInt((Math.random() * 1000000000).toFixed(0))).toString() : undefined;
+  const holders = getRandomInt(10, 10000);
+  
   return {
     id: `token-${index}`,
     address: getRandomAddress(networkType),
@@ -61,13 +84,18 @@ export const generateMockToken = (
       : type === 'erc721' 
         ? getRandomInt(1000, 10000).toString()
         : getRandomInt(1, 100).toString(),
-    type,
+    type: type,
+    tokenType: type,
     networkType,
     creator: getRandomAddress(networkType),
     createdAt,
-    holderCount: getRandomInt(10, 10000),
+    holderCount: holders,
     transferCount: getRandomInt(100, 100000),
-    logoUrl: `https://example.com/logos/${symbol.toLowerCase()}.png`,
+    logoUrl: logoMap[symbol] || logoMap['DEFAULT'],
+    price,
+    priceChange24h,
+    marketCap,
+    holders,
   };
 };
 

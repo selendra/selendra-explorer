@@ -101,7 +101,8 @@ const AccountDetails: React.FC = () => {
             </div>
             
             <div className="mt-4 md:mt-0 flex flex-col items-start md:items-end">
-              <div className="text-2xl font-bold bg-gradient-to-r from-[#8C30F5] to-[#0CCBD6] bg-clip-text text-transparent">
+              <div className="text-2xl font-bold bg-gradient-to-r from-[#8C30F5] to-[#0CCBD6] bg-clip-text text-transparent flex items-center">
+                <img src="/sel/coin.png" alt="SEL" className="w-6 h-6 mr-2" />
                 {account.balance} SEL
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -211,7 +212,10 @@ const AccountDetails: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">Balance</div>
-                  <div className="text-lg font-semibold text-gray-900 dark:text-white">{account.balance} SEL</div>
+                  <div className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                    <img src="/sel/coin.png" alt="SEL" className="w-5 h-5 mr-2" />
+                    {account.balance} SEL
+                  </div>
                 </div>
               </div>
             </div>
@@ -272,7 +276,8 @@ const AccountDetails: React.FC = () => {
                 
                 <div>
                   <dt className="text-sm text-gray-500 dark:text-gray-400">Balance</dt>
-                  <dd className="mt-1 text-sm text-gray-900 dark:text-white">
+                  <dd className="mt-1 text-sm text-gray-900 dark:text-white flex items-center">
+                    <img src="/sel/coin.png" alt="SEL" className="w-4 h-4 mr-1.5" />
                     {account.balance} SEL (≈ ${(parseFloat(account.balance) * 0.01).toFixed(2)} USD)
                   </dd>
                 </div>
@@ -392,7 +397,12 @@ const AccountDetails: React.FC = () => {
                 },
                 {
                   header: 'Value',
-                  accessor: (tx) => `${tx.value} SEL`,
+                  accessor: (tx) => (
+                    <div className="flex items-center">
+                      <img src="/sel/coin.png" alt="SEL" className="w-4 h-4 mr-1.5" />
+                      <span>{tx.value} SEL</span>
+                    </div>
+                  ),
                 },
                 {
                   header: 'Status',
@@ -474,7 +484,12 @@ const AccountDetails: React.FC = () => {
               },
               {
                 header: 'Value',
-                accessor: (tx) => `${tx.value} SEL`,
+                accessor: (tx) => (
+                  <div className="flex items-center">
+                    <img src="/sel/coin.png" alt="SEL" className="w-4 h-4 mr-1.5" />
+                    <span>{tx.value} SEL</span>
+                  </div>
+                ),
               },
               {
                 header: 'Status',

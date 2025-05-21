@@ -11,8 +11,7 @@ import {
   ChevronRightIcon, 
   IdentificationIcon, 
   DocumentDuplicateIcon,
-  ArrowsRightLeftIcon,
-  CurrencyDollarIcon
+  ArrowsRightLeftIcon
 } from '@heroicons/react/24/outline';
 
 const Accounts: React.FC = () => {
@@ -164,7 +163,7 @@ const Accounts: React.FC = () => {
               accessor: (account) => (
                 <div className="font-medium">
                   <div className="text-primary-600 dark:text-primary-400 flex items-center">
-                    <CurrencyDollarIcon className="h-4 w-4 mr-1" />
+                    <img src="/sel/coin.png" alt="SEL" className="w-4 h-4 mr-2" />
                     {account.balance} SEL
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">

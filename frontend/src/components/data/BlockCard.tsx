@@ -12,6 +12,9 @@ import {
   ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 
+/**
+ * Card component for displaying block details
+ */
 interface BlockCardProps {
   block: Block;
   className?: string;

@@ -1,5 +1,6 @@
 /* 
   App.css - Core styling for Selendra Explorer 
+  Only keep necessary animation and critical styles not covered by Tailwind
 */
 
 #root {

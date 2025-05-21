@@ -4,7 +4,6 @@ import { useTokens } from '../contexts/ApiContext';
 import DataTable from '../components/data/DataTable';
 import Pagination from '../components/ui/Pagination';
 import TimeAgo from '../components/ui/TimeAgo';
-import AddressDisplay from '../components/ui/AddressDisplay';
 import NetworkBadge from '../components/ui/NetworkBadge';
 import { 
   CurrencyDollarIcon, 
@@ -17,25 +16,6 @@ import {
   PresentationChartLineIcon,
   CubeIcon
 } from '@heroicons/react/24/outline';
-
-// Define Token type to match the API response
-interface Token {
-  id: string;
-  address: string;
-  name: string;
-  symbol: string;
-  logoUrl?: string;
-  type: string;
-  tokenType?: 'erc20' | 'erc721' | 'erc1155' | 'substrate_asset';
-  networkType: 'evm' | 'wasm';
-  totalSupply: string;
-  decimals: number;
-  createdAt: string;
-  price?: string;
-  priceChange24h?: number;
-  marketCap?: string;
-  holders?: number;
-}
 
 const TokenTypeButtons = ({ selected, onChange }: { selected: string | undefined, onChange: (type: string | undefined) => void }) => {
   const types = [
@@ -291,9 +271,9 @@ const Tokens: React.FC = () => {
               accessor: (token) => (
                 token.price ? (
                   <div className="font-medium">
-                    <div className="text-gray-900 dark:text-white">${parseFloat(token.price).toFixed(token.price < 1 ? 4 : 2)}</div>
+                    <div className="text-gray-900 dark:text-white">${parseFloat(token.price).toFixed(parseFloat(token.price) < 1 ? 4 : 2)}</div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center">
-                      {token.priceChange24h > 0 ? (
+                      {token.priceChange24h && token.priceChange24h > 0 ? (
                         <span className="text-green-600 dark:text-green-400 flex items-center">
                           <CubeIcon className="h-3 w-3 mr-1" />
                           +{token.priceChange24h}%

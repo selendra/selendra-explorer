@@ -7,7 +7,6 @@ import {
   ArrowsRightLeftIcon,
   ChevronRightIcon,
   ClockIcon,
-  CurrencyDollarIcon,
   CircleStackIcon,
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
@@ -15,7 +14,9 @@ import { mockBlocks } from "../mocks/blocks";
 import { mockTransactions } from "../mocks/transactions";
 import { mockNetworkStats } from "../mocks/networkStats";
 
-// Mock data for the chart
+/**
+ * Generates chart data for homepage activity chart
+ */
 const generateChartData = () => {
   const labels = Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`);
   const transactionData = Array.from(
@@ -34,7 +35,7 @@ const generateChartData = () => {
         label: "Transactions",
         data: transactionData,
         borderColor: "#8C30F5", // Selendra primary purple
-        backgroundColor: "rgba(140, 48, 245, 0.2)", // Selendra primary purple with opacity
+        backgroundColor: "rgba(140, 48, 245, 0.2)", // With opacity
         tension: 0.4,
         pointRadius: 0,
         pointHoverRadius: 6,
@@ -43,7 +44,7 @@ const generateChartData = () => {
         label: "Blocks",
         data: blockData,
         borderColor: "#0CCBD6", // Selendra accent teal
-        backgroundColor: "rgba(12, 203, 214, 0.2)", // Selendra accent teal with opacity
+        backgroundColor: "rgba(12, 203, 214, 0.2)", // With opacity
         tension: 0.4,
         pointRadius: 0,
         pointHoverRadius: 6,
@@ -53,14 +54,20 @@ const generateChartData = () => {
 };
 
 const Home: React.FC = () => {
-  const blocksData = {
-    items: mockBlocks.slice(0, 15),
-    totalCount: mockBlocks.length,
-  };
-  const transactionsData = {
-    items: mockTransactions.slice(0, 15),
-    totalCount: mockTransactions.length,
-  };
+  const blocksData = React.useMemo(
+    () => ({
+      items: mockBlocks.slice(0, 15),
+      totalCount: mockBlocks.length,
+    }),
+    []
+  );
+  const transactionsData = React.useMemo(
+    () => ({
+      items: mockTransactions.slice(0, 15),
+      totalCount: mockTransactions.length,
+    }),
+    []
+  );
   const isLoadingBlocks = false;
   const isLoadingTransactions = false;
   const networkStats = mockNetworkStats;
@@ -68,14 +75,14 @@ const Home: React.FC = () => {
   // Mocked total supply since it's not in the NetworkStats type
   const totalSupply = "601,091,728.63";
 
-  const chartData = generateChartData();
+  const chartData = React.useMemo(() => generateChartData(), []);
 
   return (
     <div className="container mx-auto space-y-8 sm:space-y-12 pt-6 px-4 sm:px-6 lg:px-8">
       {/* Network Stats Cards */}
       <div>
         <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white flex items-center">
-          <InformationCircleIcon className="h-7 w-7 mr-3 text-[#8C30F5] dark:text-[#9D50FF]" />
+          <InformationCircleIcon className="h-7 w-7 mr-3 text-[#be8df5] dark:text-[#9D50FF]" />
           Network Overview
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -85,7 +92,7 @@ const Home: React.FC = () => {
               {totalSupply}
             </p>
             <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mb-4">
-              <CurrencyDollarIcon className="h-5 w-5 mr-1.5 text-[#8C30F5] dark:text-[#9D50FF]" />
+              <img src="/sel/coin.png" alt="SEL" className="h-6 w-6 mr-1.5" />
               <span className="font-medium">SEL Supply</span>
             </div>
             <div className="bg-gray-50 dark:bg-gray-900/50 rounded-md p-4 space-y-3">
@@ -266,7 +273,7 @@ const Home: React.FC = () => {
         {/* Latest Blocks */}
         <section>
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
                 <CubeIcon className="h-5 w-5 mr-2 text-[#8C30F5] dark:text-[#9D50FF]" />
                 Latest Blocks
@@ -282,28 +289,28 @@ const Home: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-800">
-                  <tr>
+                  <tr className="h-10">
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                      className="px-6 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                     >
                       Block
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                      className="px-6 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                     >
                       Age
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                      className="px-6 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                     >
                       Txns
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                      className="px-6 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                     >
                       Validator
                     </th>
@@ -314,17 +321,17 @@ const Home: React.FC = () => {
                     ? Array(15)
                         .fill(0)
                         .map((_, i) => (
-                          <tr key={i} className="animate-pulse">
-                            <td className="px-6 py-4 whitespace-nowrap">
+                          <tr key={i} className="animate-pulse h-10">
+                            <td className="px-6 py-2 whitespace-nowrap">
                               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-6 py-2 whitespace-nowrap">
                               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-6 py-2 whitespace-nowrap">
                               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-12"></div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-6 py-2 whitespace-nowrap">
                               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
                             </td>
                           </tr>
@@ -332,9 +339,9 @@ const Home: React.FC = () => {
                     : blocksData.items.map((block) => (
                         <tr
                           key={block.hash}
-                          className="hover:bg-gray-50 dark:hover:bg-gray-750"
+                          className="hover:bg-gray-50 dark:hover:bg-gray-750 h-10"
                         >
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-6 py-2 whitespace-nowrap">
                             <Link
                               to={`/blocks/${block.number}`}
                               className="text-[#8C30F5] dark:text-[#9D50FF] font-medium hover:underline"
@@ -342,13 +349,13 @@ const Home: React.FC = () => {
                               {block.number}
                             </Link>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                          <td className="px-6 py-2 whitespace-nowrap text-gray-500 dark:text-gray-400">
                             {block.timestamp}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                          <td className="px-6 py-2 whitespace-nowrap text-gray-500 dark:text-gray-400">
                             {block.transactionCount}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-6 py-2 whitespace-nowrap">
                             <Link
                               to={`/validators/${block.miner}`}
                               className="text-gray-900 dark:text-gray-100 hover:text-[#8C30F5] dark:hover:text-[#9D50FF]"
@@ -368,7 +375,7 @@ const Home: React.FC = () => {
         {/* Latest Transactions */}
         <section>
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
                 <ArrowsRightLeftIcon className="h-5 w-5 mr-2 text-[#0CCBD6] dark:text-[#0EDAE6]" />
                 Latest Transactions
@@ -384,34 +391,34 @@ const Home: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-800">
-                  <tr>
+                  <tr className="h-10">
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                      className="px-6 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                     >
                       Txn Hash
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                      className="px-6 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                     >
                       Age
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                      className="px-6 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                     >
                       From
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                      className="px-6 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                     >
                       To
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                      className="px-6 py-2.5 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                     >
                       Value
                     </th>
@@ -422,20 +429,20 @@ const Home: React.FC = () => {
                     ? Array(15)
                         .fill(0)
                         .map((_, i) => (
-                          <tr key={i} className="animate-pulse">
-                            <td className="px-6 py-4 whitespace-nowrap">
+                          <tr key={i} className="animate-pulse h-10">
+                            <td className="px-6 py-2 whitespace-nowrap">
                               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-6 py-2 whitespace-nowrap">
                               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-6 py-2 whitespace-nowrap">
                               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-6 py-2 whitespace-nowrap">
                               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                            <td className="px-6 py-2 whitespace-nowrap">
                               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 ml-auto"></div>
                             </td>
                           </tr>
@@ -443,9 +450,9 @@ const Home: React.FC = () => {
                     : transactionsData.items.map((tx) => (
                         <tr
                           key={tx.hash}
-                          className="hover:bg-gray-50 dark:hover:bg-gray-750"
+                          className="hover:bg-gray-50 dark:hover:bg-gray-750 h-10"
                         >
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-6 py-2 whitespace-nowrap">
                             <Link
                               to={`/transactions/${tx.hash}`}
                               className="text-[#0CCBD6] dark:text-[#0EDAE6] font-medium hover:underline"
@@ -453,10 +460,10 @@ const Home: React.FC = () => {
                               {tx.hash.slice(0, 8)}...{tx.hash.slice(-6)}
                             </Link>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                          <td className="px-6 py-2 whitespace-nowrap text-gray-500 dark:text-gray-400">
                             {tx.timestamp}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-6 py-2 whitespace-nowrap">
                             <Link
                               to={`/accounts/${tx.from}`}
                               className="text-gray-900 dark:text-gray-100 hover:text-[#8C30F5] dark:hover:text-[#9D50FF]"
@@ -464,7 +471,7 @@ const Home: React.FC = () => {
                               {tx.from.slice(0, 8)}...{tx.from.slice(-6)}
                             </Link>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-6 py-2 whitespace-nowrap">
                             {tx.to && (
                               <Link
                                 to={`/accounts/${tx.to}`}
@@ -479,7 +486,7 @@ const Home: React.FC = () => {
                               </span>
                             )}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right text-gray-900 dark:text-gray-100">
+                          <td className="px-6 py-2 whitespace-nowrap text-right text-gray-900 dark:text-gray-100">
                             {tx.value} SEL
                           </td>
                         </tr>
