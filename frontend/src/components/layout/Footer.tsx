@@ -24,16 +24,16 @@ const Footer: React.FC = () => {
           <div className="mb-6 md:mb-0">
             <Link to="/" className="flex items-center">
               <img
-                src="/explorer-logo.png"
+                src="/sel/logo.png"
                 alt="Selendra Logo"
-                className="h-10 w-10 mr-2"
+                className="h-16 w-16 mr-2"
               />
               <span className="text-2xl font-extrabold bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
                 Selendra Explorer
               </span>
             </Link>
             <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 max-w-md">
-              The comprehensive blockchain explorer for Selendra network,
+              The block explorer for Selendra network,
               supporting both EVM and Wasm smart contracts.
             </p>
           </div>
