@@ -13,37 +13,53 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let query = BlockStateQuery::new(Arc::clone(&provider), block_id);
 
-    // Example 1: Get network information
-    println!("\n=== Network Information ===");
-    match query.network_info().await {
-        Ok(network_info) => {
-            println!("Network info: {:?}", network_info.chain_id);
-        }
-        Err(e) => {
-            println!("Error getting network info: {}", e);
-        }
-    }
+    // // Example 1: Get network information
+    // println!("\n=== Network Information ===");
+    // match query.network_info().await {
+    //     Ok(network_info) => {
+    //         println!("Network info: {:?}", network_info.chain_id);
+    //     }
+    //     Err(e) => {
+    //         println!("Error getting network info: {}", e);
+    //     }
+    // }
 
-    // Example 2: Get block information
-    match query.block_info().await {
-        Ok(block_info) => {
-            println!("Block {}: {:?}", block_number, block_info.hash);
-        }
-        Err(e) => {
-            println!("Error getting block info: {}", e);
-        }
-    }
+    // // Example 2: Get block information
+    // match query.block_info().await {
+    //     Ok(block_info) => {
+    //         println!("Block {}: {:?}", block_number, block_info.hash);
+    //     }
+    //     Err(e) => {
+    //         println!("Error getting block info: {}", e);
+    //     }
+    // }
 
-    // Example 3: Get transaction by hash
-    println!("\n=== Transaction by Hash ===");
+    // // Example 3: Get transaction by hash
+    // println!("\n=== Transaction by Hash ===");
+    // let tx_hash = "0x0a614e77e9941508da970444c135f1c6bb999bcd63432e3cf8c1da0ee8b04f21";
+    // match query.transaction_by_hash(&tx_hash).await {
+    //     Ok(tx_info) => {
+    //         println!("Transaction: {:?}", tx_info.hash);
+    //         let method = query.analyze_transaction_method(&tx_info).await;
+    //         println!("Transaction: Method{:?}", method);
+    //     }
+    //     Err(e) => {
+    //         println!("Error getting transaction: {}", e);
+    //     }
+    // }
+
+
     let transations_hash = query.transactions_hash_in_block().await?;
-    let tx_hash = format!("{:#x}", transations_hash[0]); // Replace with real hash
-    match query.transaction_by_hash(&tx_hash).await {
-        Ok(tx_info) => {
-            println!("Transaction: {:?}", tx_info);
-        }
-        Err(e) => {
-            println!("Error getting transaction: {}", e);
+    for hash in transations_hash.iter() {
+        let tx_hash = format!("{:#x}", hash);
+        match query.transaction_by_hash(&tx_hash).await {
+            Ok(tx_info) => {
+                let method = query.get_transaction_method(&tx_info).await;
+                println!("Transaction: Method{:?}", method);
+            }
+            Err(e) => {
+                println!("Error getting transaction: {}", e);
+            }
         }
     }
 

@@ -152,7 +152,7 @@ const TokenDetails: React.FC = () => {
             height={300}
           />
           <div className="mt-2 text-center text-sm text-gray-500 dark:text-gray-400">
-            Note: This is simulated data for demonstration purposes.
+            Note: This is simulated data for demonstration methods.
           </div>
         </div>
       )}
