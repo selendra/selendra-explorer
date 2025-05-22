@@ -1,44 +1,23 @@
 use std::sync::Arc;
 
 use custom_error::ServiceError;
-use ethers::{providers::{Http, Middleware, Provider}, types::BlockId};
-use model::{block::EvmBlockInfo, netwiork::EvmNetworkInfo};
+use ethers::{providers::{Http, Middleware, Provider}, types::{BlockId, H256}};
+use model::{block::EvmBlockInfo, netwiork::EvmNetworkInfo, transaction::{TransactionStatus, EvmTransactionInfo}};
 
 pub struct BlockStateQuery {
     pub provider: Arc<Provider<Http>>,
+    pub block_id: BlockId,
 }
 
 impl BlockStateQuery {
-    pub fn new(provider: Arc<Provider<Http>>) -> Self {
-        Self { provider }
+    pub fn new(provider: Arc<Provider<Http>>, block_id: BlockId) -> Self {
+        Self { 
+            provider,
+            block_id
+        }
     }
 
-    pub async fn evm_block_info(&self, block_id: &BlockId) -> Result<EvmBlockInfo, ServiceError> {
-        let block = self
-            .provider
-            .get_block(*block_id)
-            .await?
-            .ok_or(ServiceError::BlockNotFound)?;
-
-        let block_info = EvmBlockInfo {
-            number: block.number
-                .ok_or_else(|| ServiceError::InvalidBlockData("Missing block number".to_string()))?
-                .as_u64(),
-            hash: block.hash.map(|h| format!("{:#x}", h)),
-            parent_hash: format!("{:#x}", block.parent_hash),
-            timestamp: block.timestamp.to_string(),
-            gas_used: block.gas_used.as_u64(),
-            gas_limit: block.gas_limit.as_u64(),
-            base_fee_per_gas: block.base_fee_per_gas.map(|fee| fee.as_u64()),
-            miner: format!("{:#x}", block.author.unwrap_or_default()),
-            extra_data: format!("0x{}", hex::encode(&block.extra_data)),
-            transactions_count: block.transactions.len(),
-        };
-
-        Ok(block_info)
-    }
-
-    pub async fn evm_network_info(&self) -> Result<EvmNetworkInfo, ServiceError> {
+    pub async fn network_info(&self) -> Result<EvmNetworkInfo, ServiceError> {
         let chain_id = self.provider.get_chainid().await?.as_u64();
         let gas_price = self.provider.get_gas_price().await?.as_u64();
         let latest_block = self.provider.get_block_number().await?.as_u64();
@@ -57,5 +36,104 @@ impl BlockStateQuery {
             latest_block_number: latest_block,
             syncing: false,
         })
+    }
+
+    pub async fn block_info(&self) -> Result<EvmBlockInfo, ServiceError> {
+        let block_id = self.block_id;
+        let block = self
+            .provider
+            .get_block(block_id)
+            .await?
+            .ok_or(ServiceError::BlockNotFound)?;
+
+        let block_info = EvmBlockInfo {
+            number: block.number
+                .ok_or_else(|| ServiceError::InvalidBlockData("Missing block number".to_string()))?
+                .as_u64(),
+            hash: block.hash.map(|h| format!("{:#x}", h)),
+            parent_hash: format!("{:#x}", block.parent_hash),
+            timestamp: block.timestamp.to_string(),
+            gas_used: block.gas_used.as_u64(),
+            gas_limit: block.gas_limit.as_u64(),
+            base_fee_per_gas: block.base_fee_per_gas.map(|fee| fee.as_u64()),
+            validate: format!("{:#x}", block.author.unwrap_or_default()),
+            extra_data: format!("0x{}", hex::encode(&block.extra_data)),
+            transactions_count: block.transactions.len(),
+            size: block.size.map(|s| s.as_usize()),
+            nonce: block.nonce.map(|n| format!("{:#x}", n)),
+        };
+
+        Ok(block_info)
+    }
+
+    pub async fn transactions_hash_in_block(&self)-> Result<Vec<H256>, ServiceError>  {
+        let block_id = self.block_id;
+        let block = self
+            .provider
+            .get_block(block_id)
+            .await?
+            .ok_or(ServiceError::BlockNotFound)?;
+
+        Ok(block.transactions)
+    }
+
+    pub async fn transaction_by_hash(&self, tx_hash: &str) -> Result<EvmTransactionInfo, ServiceError> {
+         // Parse the transaction hash
+         let hash: H256 = tx_hash
+         .parse()
+         .map_err(|_| ServiceError::InvalidTransactionHash(tx_hash.to_string()))?;
+
+        // Get transaction details
+        let tx = self
+            .provider
+            .get_transaction(hash)
+            .await?
+            .ok_or_else(|| ServiceError::TransactionNotFound(tx_hash.to_string()))?;
+
+    
+        let receipt = self
+            .provider
+            .get_transaction_receipt(tx.hash)
+            .await?
+        .ok_or_else(|| ServiceError::TransactionReceiptNotFound(tx.hash.to_string()))?;
+
+        let timestamp = if let Some(block_num) = tx.block_number {
+            match self.provider.get_block(block_num).await? {
+                Some(block) => Some(block.timestamp.to_string()),
+                None => None,
+            }
+        } else {
+            None
+        };
+
+        let status = match receipt.status {
+            Some(status) if status.as_u64() == 1 => TransactionStatus::Success,
+            Some(_) => TransactionStatus::Failed,
+            None => TransactionStatus::Pending,
+        };
+
+        let gas_used = receipt.gas_used.unwrap_or_default();
+        let effective_gas_price = receipt.effective_gas_price.unwrap_or_default();
+        let transaction_fee = gas_used * effective_gas_price;
+
+        let transaction_info = EvmTransactionInfo {
+            hash: format!("{:#x}", tx.hash),
+            block_number: tx.block_number.map(|bn| bn.as_u64()).unwrap_or(0),
+            status: status, // Assume success if in block
+            timestamp: timestamp,
+            from: format!("{:#x}", tx.from),
+            to: tx.to.map(|addr| format!("{:#x}", addr)),
+            value: tx.value.to_string(),
+            gas_price: tx.gas_price.map_or(0, |gp| gp.as_u64()),
+            gas_limit: tx.gas.as_u64(),
+            gas_used: gas_used.as_u64(),
+            transaction_fee: transaction_fee.as_u64(),
+            nonce: tx.nonce.as_u64(),
+            transaction_index: tx.transaction_index.map(|idx| idx.as_u64() as u16),
+            transaction_type: tx.transaction_type.map(|t| t.as_u64() as u8),
+            input_data: format!("0x{}", hex::encode(&tx.input)),
+        };
+
+        Ok(transaction_info)
     }
 }

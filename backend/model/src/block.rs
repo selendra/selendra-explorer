@@ -10,7 +10,9 @@ pub struct EvmBlockInfo {
     pub gas_used: u64,
     pub gas_limit: u64,
     pub base_fee_per_gas: Option<u64>,
-    pub miner: String,
+    pub validate: String,
     pub extra_data: String,
     pub transactions_count: usize,
+    pub size: Option<usize>,
+    pub nonce: Option<String>,
 }
