@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
 use custom_error::ServiceError;
-use ethers::{providers::{Http, Middleware, Provider}, types::{BlockId, H256}};
-use model::{block::EvmBlockInfo, netwiork::EvmNetworkInfo, transaction::{TransactionStatus, EvmTransactionInfo}};
+use ethers::{providers::{Http, Middleware, Provider}, types::{BlockId, Transaction, TransactionReceipt, H256}};
+use model::{block::EvmBlockInfo, netwiork::EvmNetworkInfo, transaction::{EvmTransactionInfo, TransactionFee, TransactionStatus}};
 
 pub struct BlockStateQuery {
     pub provider: Arc<Provider<Http>>,
@@ -112,9 +112,7 @@ impl BlockStateQuery {
             None => TransactionStatus::Pending,
         };
 
-        let gas_used = receipt.gas_used.unwrap_or_default();
-        let effective_gas_price = receipt.effective_gas_price.unwrap_or_default();
-        let transaction_fee = gas_used * effective_gas_price;
+        let transaction_fee = self.calculate_transaction_fee(&tx, &receipt)?;
 
         let transaction_info = EvmTransactionInfo {
             hash: format!("{:#x}", tx.hash),
@@ -124,10 +122,7 @@ impl BlockStateQuery {
             from: format!("{:#x}", tx.from),
             to: tx.to.map(|addr| format!("{:#x}", addr)),
             value: tx.value.to_string(),
-            gas_price: tx.gas_price.map_or(0, |gp| gp.as_u64()),
-            gas_limit: tx.gas.as_u64(),
-            gas_used: gas_used.as_u64(),
-            transaction_fee: transaction_fee.as_u64(),
+            transaction_fee: transaction_fee,
             nonce: tx.nonce.as_u64(),
             transaction_index: tx.transaction_index.map(|idx| idx.as_u64() as u16),
             transaction_type: tx.transaction_type.map(|t| t.as_u64() as u8),
@@ -135,5 +130,38 @@ impl BlockStateQuery {
         };
 
         Ok(transaction_info)
+    }
+
+    fn calculate_transaction_fee(
+        &self,
+        tx_info: &Transaction,
+        receipt: &TransactionReceipt,
+    ) -> Result<TransactionFee, ServiceError> {
+        let gas_used = if let Some(gas) = receipt.gas_used {
+            gas.as_u64()
+        } else {
+            0
+        };
+
+        let effective_gas_price = receipt.effective_gas_price.as_ref()
+                .and_then(|price| Some(price.as_u64()))
+                .or_else(|| tx_info.gas_price.map(|price| price.as_u64()));
+        
+
+        let total_fee = if let Some(gas_price) = effective_gas_price {
+            gas_used * gas_price
+        } else {
+            0
+        };
+
+        Ok(TransactionFee {
+            gas_used,
+            gas_limit: tx_info.gas.as_u64(),
+            gas_price: effective_gas_price,
+            max_fee_per_gas: tx_info.max_fee_per_gas.map(|fee| fee.as_u64()),
+            max_priority_fee_per_gas: tx_info.max_priority_fee_per_gas.map(|fee| fee.as_u64()),
+            total_fee,
+            total_fee_eth: format!("{:.6}", total_fee as f64 / 1e18), // Convert wei to ETH
+        })
     }
 }
