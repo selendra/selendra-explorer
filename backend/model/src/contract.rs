@@ -36,3 +36,13 @@ pub struct NftMetadata {
     pub name: Option<String>,
     pub symbol: Option<String>,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EvmContract {
+    pub address: String,
+    pub contract_type: ContractType,
+    pub name: Option<String>,
+    pub symbol: Option<String>,
+    pub decimals: Option<u8>,
+    pub total_supply: Option<String>,
+}
