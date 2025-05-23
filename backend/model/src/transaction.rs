@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::method::TransactionMethod;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TransactionStatus {
     Success,
@@ -26,6 +28,7 @@ pub struct EvmTransactionInfo {
     pub nonce: u64,
     pub input_data: String,
     pub transaction_type: Option<u8>,
+    pub trasation_method: Option<TransactionMethod>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -133,6 +133,7 @@ impl BlockStateQuery {
             transaction_index: tx.transaction_index.map(|idx| idx.as_u64() as u16),
             transaction_type: tx.transaction_type.map(|t| t.as_u64() as u8),
             input_data: format!("0x{}", hex::encode(&tx.input)),
+            trasation_method: None,
         };
 
         Ok(transaction_info)

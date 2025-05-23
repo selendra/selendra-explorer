@@ -2745,7 +2745,9 @@ dependencies = [
 name = "service"
 version = "0.1.0"
 dependencies = [
+ "custom-error",
  "ethers",
+ "model",
  "tokio",
  "utils",
 ]
