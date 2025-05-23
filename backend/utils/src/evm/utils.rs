@@ -12,10 +12,11 @@ pub fn calculate_transaction_fee(
         0
     };
 
-    let effective_gas_price = receipt.effective_gas_price.as_ref()
-            .and_then(|price| Some(price.as_u64()))
-            .or_else(|| tx_info.gas_price.map(|price| price.as_u64()));
-    
+    let effective_gas_price = receipt
+        .effective_gas_price
+        .as_ref()
+        .and_then(|price| Some(price.as_u64()))
+        .or_else(|| tx_info.gas_price.map(|price| price.as_u64()));
 
     let total_fee = if let Some(gas_price) = effective_gas_price {
         gas_used * gas_price

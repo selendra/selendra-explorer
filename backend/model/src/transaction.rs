@@ -8,8 +8,8 @@ pub enum TransactionStatus {
 }
 
 // transaction_type
-// `0`   | Legacy transaction               | Pre-EIP-2718  
-// `1`   | Access List transaction          | EIP-2930           
+// `0`   | Legacy transaction               | Pre-EIP-2718
+// `1`   | Access List transaction          | EIP-2930
 // `2`   | EIP-1559 dynamic fee transaction | EIP-1559 (London upgrade)
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -25,7 +25,7 @@ pub struct EvmTransactionInfo {
     pub transaction_fee: TransactionFee,
     pub nonce: u64,
     pub input_data: String,
-    pub transaction_type: Option<u8>,  
+    pub transaction_type: Option<u8>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

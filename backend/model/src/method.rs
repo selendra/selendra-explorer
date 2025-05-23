@@ -12,7 +12,7 @@ pub struct FunctionInfo {
 pub enum TransactionMethod {
     // Basic transfers
     SimpleTransfer,
-    
+
     // Contract interactions
     ContractCreation,
     ContractCall {
@@ -20,7 +20,7 @@ pub enum TransactionMethod {
         function_name: Option<String>,
         function_signature: Option<String>,
     },
-    
+
     // DeFi operations
     TokenTransfer {
         token_address: String,
@@ -39,7 +39,7 @@ pub enum TransactionMethod {
         action: StakingAction,
         protocol: String,
     },
-    
+
     // NFT operations
     NftTransfer {
         collection_address: String,
@@ -49,7 +49,7 @@ pub enum TransactionMethod {
         collection_address: String,
         token_id: Option<String>,
     },
-    
+
     // Other methods
     GovernanceAction {
         action_type: GovernanceAction,
@@ -58,7 +58,6 @@ pub enum TransactionMethod {
     MultisigOperation,
     DataStorage,
     Unknown,
-    
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -73,7 +72,6 @@ pub enum StakingAction {
     Unstake,
     ClaimRewards,
 }
-
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum GovernanceAction {

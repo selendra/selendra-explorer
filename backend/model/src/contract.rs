@@ -1,3 +1,4 @@
+use ethers::types::U256;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -19,4 +20,19 @@ pub enum ContractType {
     Proxy,
     Oracle,
     Unknown,
+}
+
+// Helper structs for metadata
+#[derive(Debug)]
+pub struct TokenMetadata {
+    pub name: Option<String>,
+    pub symbol: Option<String>,
+    pub decimals: Option<u8>,
+    pub total_supply: Option<U256>,
+}
+
+#[derive(Debug)]
+pub struct NftMetadata {
+    pub name: Option<String>,
+    pub symbol: Option<String>,
 }
