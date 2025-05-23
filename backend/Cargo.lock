@@ -3406,6 +3406,7 @@ dependencies = [
  "ethers",
  "hex",
  "model",
+ "serde",
 ]
 
 [[package]]

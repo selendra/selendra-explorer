@@ -1,5 +1,6 @@
 pub mod method;
 pub mod utils;
+pub mod signature_lookup;
 
 use std::sync::Arc;
 use custom_error::ServiceError;

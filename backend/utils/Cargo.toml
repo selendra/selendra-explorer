@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 ethers = { workspace = true }
 hex = { workspace = true }
+serde = { workspace = true }
 
 model = { workspace = true }
 custom-error = { workspace = true }

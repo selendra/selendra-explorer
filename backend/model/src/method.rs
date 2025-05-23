@@ -50,9 +50,14 @@ pub enum TransactionMethod {
     },
     
     // Other methods
+    GovernanceAction {
+        action_type: GovernanceAction,
+        proposal_id: Option<String>,
+    },
     MultisigOperation,
     DataStorage,
     Unknown,
+    
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -64,6 +69,7 @@ pub enum ContractType {
     LendingProtocol,
     Multisig,
     Proxy,
+    Oracle,
     Unknown,
 }
 
@@ -81,3 +87,11 @@ pub enum StakingAction {
 }
 
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum GovernanceAction {
+    Propose,
+    Vote,
+    Execute,
+    Queue,
+    Cancel,
+}
