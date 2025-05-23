@@ -1,44 +1,106 @@
-import { type ReactNode, type FC } from "react";
+import { type ReactNode, type FC, useState, useEffect } from "react";
+import { useLocation, Outlet } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import SearchBar from "../ui/SearchBar";
-import { useLocation } from "react-router-dom";
 import Hero from "./Hero";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface LayoutProps {
-  children: ReactNode;
+  children?: ReactNode; // Make children optional
   showHero?: boolean;
 }
 
-const Layout: FC<LayoutProps> = ({ children, showHero = true }) => {
+const Layout: FC<LayoutProps> = ({ showHero = true }) => {
   const location = useLocation();
   const isHomePage = location.pathname === "/";
+  const [isPageLoaded, setIsPageLoaded] = useState(false);
 
-  // This is for the smaller search hero on SUB-PAGES
+  // Set page as loaded after a short delay to allow for smooth animations
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPageLoaded(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // This is for the smaller search hero on sub-pages
   const shouldShowSubPageSearchHero = showHero && !isHomePage;
 
+  // Page transition variants
+  const pageVariants = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1, transition: { duration: 0.3 } },
+    exit: { opacity: 0, transition: { duration: 0.2 } },
+  };
+
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
       <Header />
 
       {isHomePage && (
-        <Hero title="Explore Selendra Universe" subtitle="The comprehensive blockchain explorer for Selendra network, supporting both EVM and Wasm smart contracts." />
+        <Hero
+          title="Explore Selendra Network"
+          // subtitle="EVM and Wasm Block Explorer"
+        />
       )}
 
       {shouldShowSubPageSearchHero && (
-        <div className="bg-gradient-to-br from-primary-500/10 via-white to-secondary-500/10 dark:from-primary-600/15 dark:via-gray-900 dark:to-secondary-600/15 shadow-md py-4 sm:py-5">
-          <div className="container mx-auto">
-            <div className="max-w-3xl px-4 sm:px-0 mx-auto">
-              <SearchBar className="shadow-lg" />
+        <div className="bg-gradient-to-r from-secondary-50/50 via-white to-primary-50/50 dark:from-secondary-900/20 dark:via-gray-900 dark:to-primary-900/20 shadow-sm py-4 sm:py-5 border-b border-gray-200 dark:border-gray-800">
+          <div className="container mx-auto px-4">
+            <div className="max-w-2xl mx-auto">
+              <SearchBar placeholder="Search by Address / Txn Hash / Block / Token..." />
+
+              {/* Current page breadcrumb */}
+              <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-center px-1">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary-400 dark:bg-primary-500 mr-1.5 opacity-70"></span>
+                <span>
+                  {location.pathname
+                    .split("/")
+                    .filter(Boolean)
+                    .map((segment, index, array) => {
+                      // Capitalize and replace hyphens with spaces
+                      const formattedSegment = segment
+                        .split("-")
+                        .map(
+                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ");
+
+                      return index === array.length - 1 ? (
+                        <span
+                          key={segment}
+                          className="font-medium text-gray-700 dark:text-gray-300"
+                        >
+                          {formattedSegment}
+                        </span>
+                      ) : (
+                        <span key={segment}>{formattedSegment} / </span>
+                      );
+                    })}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      <main className={`flex-grow ${!isHomePage ? 'container mx-auto' : ''} py-6 sm:py-8 lg:py-10`}>
-        {children}
-      </main>
-      
+      <AnimatePresence mode="wait">
+        <motion.main
+          key={location.pathname}
+          initial="initial"
+          animate={isPageLoaded ? "animate" : "initial"}
+          exit="exit"
+          variants={pageVariants}
+          className={`flex-grow ${
+            !isHomePage ? "container mx-auto px-4 sm:px-6" : ""
+          } py-6 sm:py-8 lg:py-10`}
+        >
+          <Outlet />
+        </motion.main>
+      </AnimatePresence>
+
       <Footer />
     </div>
   );

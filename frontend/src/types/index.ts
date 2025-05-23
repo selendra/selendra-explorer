@@ -1,5 +1,5 @@
 // Common Types
-export type NetworkType = 'evm' | 'wasm';
+export type NetworkType = "evm" | "wasm"; // TODO: Consolidate with NetworkType enum in common.ts
 
 // Block Types
 export interface Block {
@@ -22,8 +22,12 @@ export interface Block {
 }
 
 // Transaction Types
-export type TransactionStatus = 'success' | 'failed' | 'pending';
-export type TransactionType = 'transfer' | 'contract_call' | 'contract_creation' | 'extrinsic';
+export type TransactionStatus = "success" | "failed" | "pending";
+export type TransactionType =
+  | "transfer"
+  | "contract_call"
+  | "contract_creation"
+  | "extrinsic";
 
 export interface Transaction {
   id: string;
@@ -42,7 +46,7 @@ export interface Transaction {
   transactionType: TransactionType;
   networkType: NetworkType;
   input?: string;
-  decodedInput?: any;
+  decodedInput?: Record<string, unknown>;
   logs?: TransactionLog[];
   events?: TransactionEvent[];
   fee?: string;
@@ -67,11 +71,11 @@ export interface TransactionEvent {
   section: string;
   method: string;
   phase: string;
-  data: any;
+  data: Record<string, unknown>;
 }
 
 // Account Types
-export type AccountType = 'eoa' | 'contract_evm' | 'contract_wasm' | 'system';
+export type AccountType = "eoa" | "contract_evm" | "contract_wasm" | "system";
 
 export interface Account {
   id: string;
@@ -107,14 +111,14 @@ export interface Contract {
   verified: boolean;
   verifiedAt?: string;
   sourceCode?: string;
-  abi?: any;
+  abi?: Array<Record<string, unknown>>;
   bytecode?: string;
   implementationAddress?: string;
   contractType?: string;
 }
 
 // Token Types
-export type TokenType = 'erc20' | 'erc721' | 'erc1155' | 'substrate_asset';
+export type TokenType = "erc20" | "erc721" | "erc1155" | "substrate_asset";
 
 export interface Token {
   id: string;
@@ -124,12 +128,17 @@ export interface Token {
   decimals: number;
   totalSupply: string;
   type: TokenType;
+  tokenType?: TokenType;
   networkType: NetworkType;
   creator: string;
   createdAt: string;
-  holderCount: number;
-  transferCount: number;
+  holderCount?: number;
+  transferCount?: number;
   logoUrl?: string;
+  price?: string;
+  priceChange24h?: number;
+  marketCap?: string;
+  holders?: number;
 }
 
 // Validator Types
@@ -142,7 +151,7 @@ export interface Validator {
   commission: string;
   delegatorCount: number;
   uptime: number;
-  status: 'active' | 'waiting' | 'inactive';
+  status: "active" | "waiting" | "inactive";
   blocksProduced: number;
   rewardPoints: number;
 }
@@ -157,7 +166,13 @@ export interface PaginatedResponse<T> {
 }
 
 export interface SearchResult {
-  type: 'block' | 'transaction' | 'account' | 'contract' | 'token' | 'validator';
+  type:
+    | "block"
+    | "transaction"
+    | "account"
+    | "contract"
+    | "token"
+    | "validator";
   id: string;
   title: string;
   subtitle: string;

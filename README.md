@@ -2,7 +2,7 @@
 
 A comprehensive blockchain explorer for the Selendra network, supporting both EVM and WebAssembly (Wasm) smart contracts.
 
-![Selendra Explorer](frontend/public/explorer-logo.png)
+![Selendra Explorer](frontend/public/sel/coin.png)
 
 ## Overview
 

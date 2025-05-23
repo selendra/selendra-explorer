@@ -1,5 +1,9 @@
 import type { NetworkType } from "../types/index";
 
+/**
+ * Optimized helper functions for generating mock data
+ */
+
 // Generate a random hash (0x + 64 hex characters)
 export const generateRandomHash = (): string => {
   return (
@@ -41,14 +45,12 @@ export const getRandomInt = (min: number, max: number): number => {
 
 // Generate a random value (for token amounts, transaction values, etc.)
 export const getRandomValue = (): string => {
-  // 80% chance of small value, 15% chance of medium value, 5% chance of large value
   const rand = Math.random();
-
   if (rand < 0.8) {
     // Small value: 0.001 - 10
     return (Math.random() * 10 + 0.001).toFixed(getRandomInt(3, 6));
   } else if (rand < 0.95) {
-    // Medium value: 10 - 1000
+    // Medium value: A0 - 1000
     return (Math.random() * 990 + 10).toFixed(getRandomInt(2, 4));
   } else {
     // Large value: 1000 - 100000
