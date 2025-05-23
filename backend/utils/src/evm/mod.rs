@@ -1,6 +1,7 @@
 pub mod method;
 pub mod utils;
 pub mod signature_lookup;
+pub mod account;
 
 use std::sync::Arc;
 use custom_error::ServiceError;
@@ -8,6 +9,7 @@ use ethers::{providers::{Http, Middleware, Provider}, types::{BlockId, H256}};
 use method::Method;
 use model::{block::EvmBlockInfo, method::TransactionMethod, netwiork::EvmNetworkInfo, transaction::{EvmTransactionInfo, TransactionStatus}};
 use utils::calculate_transaction_fee;
+use account::AccountQuery;
 
 pub struct BlockStateQuery {
     pub provider: Arc<Provider<Http>>,
@@ -140,5 +142,11 @@ impl BlockStateQuery {
         };
 
         Ok(transaction_info)
+    }
+
+    // New account query methods
+    pub async fn query_account(&self, address: &str) -> Result<model::account::EvmAccountInfo, ServiceError> {
+        let account_query = AccountQuery::new(self.provider.clone());
+        account_query.query_account(address).await
     }
 }

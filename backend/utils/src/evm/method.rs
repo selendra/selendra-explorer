@@ -2,8 +2,7 @@ use std::sync::Arc;
 use custom_error::ServiceError;
 use ethers::providers::{Http, Middleware, Provider};
 use model::{
-    method::{ContractType, GovernanceAction, LiquidityAction, StakingAction, TransactionMethod}, 
-    transaction::EvmTransactionInfo
+    contract::ContractType, method::{GovernanceAction, LiquidityAction, StakingAction, TransactionMethod}, transaction::EvmTransactionInfo
 };
 
 use super::signature_lookup::{SignatureCategory, SignatureLookupService};
@@ -96,7 +95,7 @@ impl Method {
                         }
                         _ => {
                             TransactionMethod::ContractCall {
-                                contract_type: Some(ContractType::ERC20Token),
+                                contract_type: Some(ContractType::ERC20),
                                 function_name: Some(sig_info.name.clone()),
                                 function_signature: Some(function_sig.to_string()),
                             }
@@ -212,7 +211,7 @@ impl Method {
                             }
                             _ => {
                                 TransactionMethod::ContractCall {
-                                    contract_type: Some(ContractType::ERC721NFT),
+                                    contract_type: Some(ContractType::ERC721),
                                     function_name: Some(sig_info.name.clone()),
                                     function_signature: Some(function_sig.to_string()),
                                 }

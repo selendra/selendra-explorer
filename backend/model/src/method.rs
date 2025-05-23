@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+use crate::contract::ContractType;
 
 #[derive(Debug, Clone)]
 pub struct FunctionInfo {
@@ -58,19 +59,6 @@ pub enum TransactionMethod {
     DataStorage,
     Unknown,
     
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum ContractType {
-    ERC20Token,
-    ERC721NFT,
-    ERC1155MultiToken,
-    DEX,
-    LendingProtocol,
-    Multisig,
-    Proxy,
-    Oracle,
-    Unknown,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
