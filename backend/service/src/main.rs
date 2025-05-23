@@ -18,7 +18,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let block_processor = BlockProcessingService::new(Arc::clone(&provider));
 
     let block_number: u64 = 22534498;
-    
+
     match block_processor.process_block(block_number).await {
         Ok(_success) => {
             println!("\n🎉 Block processing completed successfully!");
