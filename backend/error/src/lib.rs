@@ -14,4 +14,6 @@ pub enum ServiceError {
     TransactionReceiptNotFound(String),
     #[error("Invalid transaction hash: {0}")]
     InvalidTransactionHash(String),
+    #[error("Substrate error: {0}")]
+    SubstrateError(String),
 }
