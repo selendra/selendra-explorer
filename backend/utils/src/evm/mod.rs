@@ -11,10 +11,7 @@ use ethers::{
 };
 use method::Method;
 use model::{
-    block::EvmBlockInfo,
-    method::TransactionMethod,
-    netwiork::EvmNetworkInfo,
-    transaction::{EvmTransactionInfo, TransactionStatus},
+    block::EvmBlockInfo, contract::ContractCreationInfo, method::TransactionMethod, netwiork::EvmNetworkInfo, transaction::{EvmTransactionInfo, TransactionStatus}
 };
 use std::sync::Arc;
 use utils::calculate_transaction_fee;
@@ -165,5 +162,13 @@ impl BlockStateQuery {
             .ok_or(ServiceError::BlockNotFound)?;
 
         Ok(block.transactions)
+    }
+
+    pub async fn get_contract_creation_info(
+        &self,
+        tx_hash: &str,
+    ) -> Result<Option<ContractCreationInfo>, ServiceError> {
+        let account_query = AccountQuery::new(self.provider.clone());
+        account_query.get_contract_creation_info(tx_hash).await
     }
 }

@@ -1,12 +1,12 @@
 use custom_error::ServiceError;
 use ethers::{
     providers::{Http, Middleware, Provider},
-    types::{Address, Bytes, TransactionRequest, U256},
+    types::{Address, Bytes, TransactionRequest, H256, U256},
     utils::keccak256,
 };
 use model::{
     account::EvmAccountInfo,
-    contract::{ContractType, EvmContractTypeInfo, NftMetadata, TokenMetadata},
+    contract::{ContractCreationInfo, ContractType, EvmContractTypeInfo, NftMetadata, TokenMetadata},
 };
 use std::sync::Arc;
 
@@ -45,6 +45,58 @@ impl AccountQuery {
             contract_type: contract_info,
         })
     }
+
+       /// Extract contract creation info from a transaction hash
+    pub async fn get_contract_creation_info(
+        &self,
+        tx_hash: &str,
+    ) -> Result<Option<ContractCreationInfo>, ServiceError> {
+        let hash: H256 = tx_hash
+            .parse()
+            .map_err(|_| ServiceError::InvalidTransactionHash(tx_hash.to_string()))?;
+
+        // Get transaction details
+        let tx = self
+            .provider
+            .get_transaction(hash)
+            .await?
+            .ok_or_else(|| ServiceError::TransactionNotFound(tx_hash.to_string()))?;
+
+        // Get transaction receipt
+        let receipt = self
+            .provider
+            .get_transaction_receipt(hash)
+            .await?
+            .ok_or_else(|| ServiceError::TransactionReceiptNotFound(tx_hash.to_string()))?;
+
+        // Check if this is a contract creation (to field is None and receipt has contract address)
+        if tx.to.is_some() || receipt.contract_address.is_none() {
+            return Ok(None);
+        }
+
+        let contract_address = receipt.contract_address.unwrap();
+        let creator_address = tx.from;
+
+        // Get block timestamp
+        let timestamp = if let Some(block_num) = tx.block_number {
+            match self.provider.get_block(block_num).await? {
+                Some(block) => block.timestamp.to_string(),
+                None => "0".to_string(),
+            }
+        } else {
+            "0".to_string()
+        };
+
+        Ok(Some(ContractCreationInfo {
+            contract_address: format!("{:#x}", contract_address),
+            creator_address: format!("{:#x}", creator_address),
+            transaction_hash: format!("{:#x}", hash),
+            block_number: tx.block_number.map(|bn| bn.as_u64()).unwrap_or(0),
+            timestamp,
+            creation_bytecode: format!("0x{}", hex::encode(&tx.input)),
+        }))
+    }
+
 
     /// Main contract type detection method
     async fn detect_contract_type(

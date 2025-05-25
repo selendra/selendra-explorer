@@ -74,6 +74,8 @@ impl BlockProcessingService {
         };
 
         if let Some(contract) = account_info.contract_type {
+            let creator_info = query.get_contract_creation_info(&account_info.address).await?;
+            
             // todo: save to database 
             let _contract = EvmContract {
                 address: account_info.address,
@@ -82,6 +84,8 @@ impl BlockProcessingService {
                 symbol: contract.symbol,
                 decimals: contract.decimals,
                 total_supply: contract.total_supply,
+                is_verified: None,
+                creator_info
             };
         }
         Ok(())
