@@ -17,7 +17,7 @@ pub enum TransactionStatus {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EvmTransactionInfo {
     pub hash: String,
-    pub block_number: u64,
+    pub block_number: u32,
     pub transaction_index: Option<u16>, // position in the block
     pub status: TransactionStatus,
     pub timestamp: Option<String>,
@@ -25,7 +25,7 @@ pub struct EvmTransactionInfo {
     pub to: Option<String>,
     pub value: String, // In wei as string to avoid precision loss
     pub transaction_fee: TransactionFee,
-    pub nonce: u64,
+    pub nonce: u32,
     pub input_data: String,
     pub transaction_type: Option<u8>,
     pub trasation_method: Option<TransactionMethod>,
@@ -33,11 +33,11 @@ pub struct EvmTransactionInfo {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TransactionFee {
-    pub gas_used: u64,
-    pub gas_limit: u64,
-    pub gas_price: Option<u64>,
-    pub max_fee_per_gas: Option<u64>,
-    pub max_priority_fee_per_gas: Option<u64>,
-    pub total_fee: u64,
+    pub gas_used: u32,
+    pub gas_limit: u32,
+    pub gas_price: Option<u32>,
+    pub max_fee_per_gas: Option<u32>,
+    pub max_priority_fee_per_gas: Option<u32>,
+    pub total_fee: u32,
     pub total_fee_eth: String,
 }

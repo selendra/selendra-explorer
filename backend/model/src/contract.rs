@@ -56,7 +56,7 @@ pub struct ContractCreationInfo {
     pub contract_address: String,
     pub creator_address: String,
     pub transaction_hash: String,
-    pub block_number: u64,
+    pub block_number: u32,
     pub timestamp: String,
     pub creation_bytecode: String,
 }

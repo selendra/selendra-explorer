@@ -1,0 +1,12 @@
+[package]
+name = "evm-service"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ethers = { workspace = true }
+tokio = { workspace = true }
+
+utils = { workspace = true }
+model = { workspace = true }
+custom-error = { workspace = true }

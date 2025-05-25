@@ -40,7 +40,7 @@ impl AccountQuery {
             address: format!("{:#x}", addr),
             balance: balance.to_string(),
             balance_token: format!("{:.6}", balance.as_u128() as f64 / 1e18),
-            nonce: nonce.as_u64(),
+            nonce: nonce.as_u32(),
             is_contract,
             contract_type: contract_info,
         })
@@ -91,7 +91,7 @@ impl AccountQuery {
             contract_address: format!("{:#x}", contract_address),
             creator_address: format!("{:#x}", creator_address),
             transaction_hash: format!("{:#x}", hash),
-            block_number: tx.block_number.map(|bn| bn.as_u64()).unwrap_or(0),
+            block_number: tx.block_number.map(|bn| bn.as_u32()).unwrap_or(0),
             timestamp,
             creation_bytecode: format!("0x{}", hex::encode(&tx.input)),
         }))
