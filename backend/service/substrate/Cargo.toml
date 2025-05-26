@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 tokio = { workspace = true }
-subxt = { workspace = true }
+substrate-api-client = { workspace = true }
 
 utils = { workspace = true }
 model = { workspace = true }

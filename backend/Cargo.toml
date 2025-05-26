@@ -20,7 +20,9 @@ ethers = "2.0.14"
 serde = "1.0.219"
 serde_json = "1.0.140"
 tokio = { version = "1.45.0", features = ["full"] }
-subxt = "0.42.1"
+substrate-api-client = "1.17.0"
+codec = { package = "parity-scale-codec", version = "3.7", default-features = false, features = ["derive"] }
+
 
 # local dependencies
 utils = { path = "utils"}

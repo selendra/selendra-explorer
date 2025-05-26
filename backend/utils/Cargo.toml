@@ -7,9 +7,10 @@ edition = "2024"
 ethers = { workspace = true }
 hex = { workspace = true }
 serde = { workspace = true }
+tokio = { workspace = true }
 serde_json = { workspace = true }
-subxt = { workspace = true }
-
+substrate-api-client = { workspace = true }
+codec = { workspace = true, features = ["std"] }
 
 model = { workspace = true }
 custom-error = { workspace = true }
