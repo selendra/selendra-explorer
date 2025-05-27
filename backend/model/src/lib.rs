@@ -6,3 +6,4 @@ pub mod netwiork;
 pub mod transaction;
 pub mod extrinsic;
 pub mod event;
+pub mod validator;

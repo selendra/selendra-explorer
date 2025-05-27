@@ -5780,7 +5780,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.4.15",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -8514,13 +8514,17 @@ dependencies = [
  "custom-error",
  "ethers",
  "frame-system 4.0.0-dev",
+ "futures",
  "hex",
  "model",
  "pallet-balances 4.0.0-dev",
+ "pallet-staking",
  "parity-scale-codec",
  "selendra-runtime",
  "serde",
  "serde_json",
+ "sp-core 21.0.0",
+ "sp-runtime 24.0.0",
  "substrate-api-client",
  "tokio",
 ]

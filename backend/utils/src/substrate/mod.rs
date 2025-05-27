@@ -1,8 +1,9 @@
 mod extrinsic;
 mod event;
+mod validator;
 
 use custom_error::ServiceError;
-use model::{event::EventsResponse, extrinsic::ExtrinsicDetails};
+use model::{event::EventsResponse, extrinsic::ExtrinsicDetails, validator::ActiveValidator};
 use substrate_api_client::{ac_primitives::{BlakeTwo256, Block, DefaultRuntimeConfig, Header, OpaqueExtrinsic, H256}, rpc::JsonrpseeClient, Api, GetChainInfo, GetStorage};
 pub struct SubstrtaeBlockQuery {
     pub api: Api<DefaultRuntimeConfig, JsonrpseeClient>,
@@ -43,19 +44,23 @@ impl SubstrtaeBlockQuery {
             Ok(None) => return Err(ServiceError::SubstrateError(format!("Block not found"))),
             Err(e) => return Err(ServiceError::SubstrateError(format!("Error getting block: {:?}", e))),
         };
-        println!("Block detail: {:?}", block);
+        // println!("Block detail: {:?}", block);
 
-        let timestamp = self.get_block_timestamp().await?;
-        println!("timestamp: {:?}", timestamp);
+        let _timestamp = self.get_block_timestamp().await?;
+        // println!("timestamp: {:?}", _timestamp);
 
-        let finalize = self.check_block_finalization_status().await?;
-        println!("is finalize: {:?}", finalize);
+        let _finalize = self.check_block_finalization_status().await?;
+        // println!("is finalize: {:?}", _finalize);
 
-        let extrinsics = self.get_extrinsics(block).await?;
-        println!("extrinsics data: {:?}", extrinsics);
+        let _extrinsics = self.get_extrinsics(block).await?;
+        // println!("extrinsics data: {:?}", _extrinsics);
 
-        let event = self.block_event().await?;
-        println!("event data: {:?}", event);
+        let _event = self.block_event().await?;
+        // println!("event data: {:?}", _event);
+
+        let validator = self.active_validaora().await?;
+        println!("validator data: {:?}", validator);
+
         Ok(())
     }
 
@@ -96,6 +101,11 @@ impl SubstrtaeBlockQuery {
     async fn block_event(&self) -> Result<EventsResponse, ServiceError>{
         let event = event::EventInfo::new(self.api.clone(), self.block_hash);
         event.get_events().await
+    }
+
+    pub async fn active_validaora(&self) -> Result<Vec<ActiveValidator>, ServiceError>{
+        let validator = validator::ValidatorInfo::new(self.api.clone(), self.block_hash);
+        validator.get_all_validators().await
     }
     
 }
