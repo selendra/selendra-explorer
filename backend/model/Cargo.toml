@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 serde = { workspace = true }
 ethers = { workspace = true }
+substrate-api-client = { workspace = true }

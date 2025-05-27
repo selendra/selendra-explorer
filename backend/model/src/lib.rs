@@ -5,3 +5,4 @@ pub mod method;
 pub mod netwiork;
 pub mod transaction;
 pub mod extrinsic;
+pub mod event;

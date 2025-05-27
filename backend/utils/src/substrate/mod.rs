@@ -1,7 +1,8 @@
-pub mod extrinsic;
+mod extrinsic;
+mod event;
 
 use custom_error::ServiceError;
-use model::extrinsic::ExtrinsicDetails;
+use model::{event::EventsResponse, extrinsic::ExtrinsicDetails};
 use substrate_api_client::{ac_primitives::{BlakeTwo256, Block, DefaultRuntimeConfig, Header, OpaqueExtrinsic, H256}, rpc::JsonrpseeClient, Api, GetChainInfo, GetStorage};
 pub struct SubstrtaeBlockQuery {
     pub api: Api<DefaultRuntimeConfig, JsonrpseeClient>,
@@ -52,6 +53,9 @@ impl SubstrtaeBlockQuery {
 
         let extrinsics = self.get_extrinsics(block).await?;
         println!("extrinsics data: {:?}", extrinsics);
+
+        let event = self.block_event().await?;
+        println!("event data: {:?}", event);
         Ok(())
     }
 
@@ -87,6 +91,11 @@ impl SubstrtaeBlockQuery {
     async fn get_extrinsics(&self, block: Block<Header<u32, BlakeTwo256>, OpaqueExtrinsic>) -> Result<Vec<ExtrinsicDetails>, ServiceError> {
         let extrinsic = extrinsic::ExtrinsicInfo::new(block);
         extrinsic.get_extrinsics().await
+    }
+
+    async fn block_event(&self) -> Result<EventsResponse, ServiceError>{
+        let event = event::EventInfo::new(self.api.clone(), self.block_hash);
+        event.get_events().await
     }
     
 }

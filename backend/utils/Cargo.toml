@@ -11,6 +11,9 @@ tokio = { workspace = true }
 serde_json = { workspace = true }
 substrate-api-client = { workspace = true }
 codec = { workspace = true, features = ["std"] }
+selendra-runtime = { workspace = true }
+frame-system = { workspace = true }
+pallet-balances = { workspace = true }
 
 model = { workspace = true }
 custom-error = { workspace = true }
