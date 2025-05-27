@@ -24,5 +24,7 @@ pub struct ActiveEra {
     pub era: u32,
     pub start_time: u64,
     pub start_session: u32,
+    pub current_session: u32,
     pub end_session: u32,
+    pub total_stake: u128
 }

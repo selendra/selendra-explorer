@@ -3,7 +3,7 @@ mod event;
 mod validator;
 
 use custom_error::ServiceError;
-use model::{event::EventsResponse, extrinsic::ExtrinsicDetails, validator::ActiveValidator};
+use model::{event::EventsResponse, extrinsic::ExtrinsicDetails, validator::{ActiveEra, ActiveValidator}};
 use substrate_api_client::{ac_primitives::{BlakeTwo256, Block, DefaultRuntimeConfig, Header, OpaqueExtrinsic, H256}, rpc::JsonrpseeClient, Api, GetChainInfo, GetStorage};
 pub struct SubstrtaeBlockQuery {
     pub api: Api<DefaultRuntimeConfig, JsonrpseeClient>,
@@ -58,8 +58,11 @@ impl SubstrtaeBlockQuery {
         let _event = self.block_event().await?;
         // println!("event data: {:?}", _event);
 
-        let validator = self.active_validaora().await?;
-        println!("validator data: {:?}", validator);
+        let _validator = self.active_validaora().await?;
+        // println!("validator data: {:?}", _validator);
+
+        let _era_info = self.current_era().await?;
+        println!("validator data: {:?}", _era_info);
 
         Ok(())
     }
@@ -106,6 +109,11 @@ impl SubstrtaeBlockQuery {
     pub async fn active_validaora(&self) -> Result<Vec<ActiveValidator>, ServiceError>{
         let validator = validator::ValidatorInfo::new(self.api.clone(), self.block_hash);
         validator.get_all_validators().await
+    }
+
+    pub async fn current_era(&self) -> Result<ActiveEra, ServiceError>{
+        let validator = validator::ValidatorInfo::new(self.api.clone(), self.block_hash);
+        validator.get_current_era().await
     }
     
 }
