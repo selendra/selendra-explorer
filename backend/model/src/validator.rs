@@ -5,6 +5,7 @@ pub struct ActiveValidator {
     pub account_id: String,
     pub prefs: ValidatorPrefs,
     pub validator_type: ValidatorType,
+    pub staking_info: StakingInfo,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -27,4 +28,11 @@ pub struct ActiveEra {
     pub current_session: u32,
     pub end_session: u32,
     pub total_stake: u128
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StakingInfo {
+	pub total: u128,
+	pub own: u128,
+	pub nominator_count: u32,
 }

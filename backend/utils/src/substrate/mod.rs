@@ -113,7 +113,7 @@ impl SubstrtaeBlockQuery {
 
     pub async fn current_era(&self) -> Result<ActiveEra, ServiceError>{
         let validator = validator::ValidatorInfo::new(self.api.clone(), self.block_hash);
-        validator.get_current_era().await
+        validator.current_era_info().await
     }
     
 }
