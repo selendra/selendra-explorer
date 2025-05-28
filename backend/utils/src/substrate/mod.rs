@@ -74,16 +74,16 @@ impl SubstrtaeBlockQuery {
         // println!("is finalize: {:?}", _finalize);
 
         let _extrinsics = self.get_extrinsics(block).await?;
-        // println!("extrinsics data: {:?}", _extrinsics);
+        println!("extrinsics data: {:?}", _extrinsics);
 
         let _event = self.block_event().await?;
-        // println!("event data: {:?}", _event);
+        println!("event data: {:?}", _event);
 
         let _validator = self.active_validaora().await?;
         // println!("validator data: {:?}", _validator);
 
         let _era_info = self.current_era().await?;
-        println!("validator data: {:?}", _era_info);
+        // println!("validator data: {:?}", _era_info);
 
         Ok(())
     }

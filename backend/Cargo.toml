@@ -31,8 +31,6 @@ pallet-staking = { git = "https://github.com/Cardinal-Cryptography/polkadot-sdk.
 sp-core = { git = "https://github.com/Cardinal-Cryptography/polkadot-sdk.git", branch = "aleph-v1.6.0", default-features = false }
 sp-runtime = { git = "https://github.com/Cardinal-Cryptography/polkadot-sdk.git", branch = "aleph-v1.6.0", default-features = false }
 
-
-
 # local dependencies
 utils = { path = "utils"}
 model = { path = "model"}

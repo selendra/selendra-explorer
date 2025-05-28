@@ -49,9 +49,10 @@ impl BlockProcessingService {
         transaction_info.trasation_method = Some(transaction_method);
 
         println!("🎯 Fetching account information...");
-        self.process_account(query, &transaction_info.from).await?;
+        self.process_account(query, tx_hash, &transaction_info.from)
+            .await?;
         if let Some(to) = &transaction_info.to {
-            self.process_account(query, to).await?;
+            self.process_account(query, tx_hash, to).await?;
         }
 
         Ok(())
@@ -60,6 +61,7 @@ impl BlockProcessingService {
     async fn process_account(
         &self,
         query: &BlockStateQuery,
+        tx_hash: &str,
         address: &str,
     ) -> Result<(), ServiceError> {
         println!("👥 processing {} account...", address);
@@ -74,9 +76,7 @@ impl BlockProcessingService {
         };
 
         if let Some(contract) = account_info.contract_type {
-            let creator_info = query
-                .get_contract_creation_info(&account_info.address)
-                .await?;
+            let creator_info = query.get_contract_creation_info(&tx_hash).await?;
 
             // todo: save to database
             let _contract = EvmContract {

@@ -1,6 +1,6 @@
 use codec::{Decode, Encode};
 use custom_error::ServiceError;
-use futures::future::try_join_all; // For concurrent processing
+use futures::future::try_join_all;
 use model::validator::{ActiveEra, ActiveValidator, StakingInfo, ValidatorPrefs, ValidatorType};
 use sp_core::crypto::Ss58Codec;
 use sp_runtime::AccountId32;
@@ -25,18 +25,20 @@ pub struct PagedExposureMetadata {
     pub nominator_count: u32,
 }
 
+#[derive(Eq, Clone, PartialEq, Decode, Encode, Debug)]
+pub struct EraValidators<AccountId> {
+    pub reserved: Vec<AccountId>,
+    pub non_reserved: Vec<AccountId>,
+}
+
 pub struct ValidatorInfo {
     pub api: Api<DefaultRuntimeConfig, JsonrpseeClient>,
     pub block_hash: Option<H256>,
 }
 
-#[derive(Eq, Clone, PartialEq, Decode, Encode, Debug)]
-pub struct EraValidators<AccountId> {
-    /// Validators that are chosen to be in committee every single session.
-    pub reserved: Vec<AccountId>,
-    /// Validators that can be banned out from the committee, under the circumstances
-    pub non_reserved: Vec<AccountId>,
-}
+// Constants for better maintainability
+const SESSIONS_PER_ERA: u32 = 96;
+const COMMISSION_DENOMINATOR: f64 = 10_000_000.0;
 
 impl ValidatorInfo {
     pub fn new(api: Api<DefaultRuntimeConfig, JsonrpseeClient>, block_hash: Option<H256>) -> Self {
@@ -44,8 +46,31 @@ impl ValidatorInfo {
     }
 
     pub async fn get_all_validators(&self) -> Result<Vec<ActiveValidator>, ServiceError> {
-        let era_validators = self
-            .api
+        let era_validators = self.get_era_validators().await?;
+        let current_era = self.current_era().await?;
+
+        // Pre-allocate vector with known size
+        let total_validators = era_validators.reserved.len() + era_validators.non_reserved.len();
+        let mut futures = Vec::with_capacity(total_validators);
+
+        // Prepare futures for all validators
+        for account_id in era_validators.reserved {
+            futures.push(self.get_validator_info(account_id, ValidatorType::Reserved, current_era));
+        }
+
+        for account_id in era_validators.non_reserved {
+            futures.push(self.get_validator_info(
+                account_id,
+                ValidatorType::NonReserved,
+                current_era,
+            ));
+        }
+
+        try_join_all(futures).await
+    }
+
+    async fn get_era_validators(&self) -> Result<EraValidators<AccountId32>, ServiceError> {
+        self.api
             .get_storage::<EraValidators<AccountId32>>(
                 "Elections",
                 "CurrentEraValidators",
@@ -59,55 +84,82 @@ impl ValidatorInfo {
                 ServiceError::SubstrateError(
                     "No validators found in CurrentEraValidators".to_string(),
                 )
-            })?;
-
-        let mut futures = Vec::new();
-
-        // Prepare futures for reserved validators
-        for account_id in era_validators.reserved {
-            futures.push(self.get_validator_prefs(account_id, ValidatorType::Reserved));
-        }
-
-        // Prepare futures for non-reserved validators
-        for account_id in era_validators.non_reserved {
-            futures.push(self.get_validator_prefs(account_id, ValidatorType::NonReserved));
-        }
-
-        try_join_all(futures).await
+            })
     }
 
-    async fn get_validator_prefs(
+    async fn get_validator_info(
         &self,
         account_id: AccountId32,
         validator_type: ValidatorType,
+        current_era: u32,
     ) -> Result<ActiveValidator, ServiceError> {
-        let current_era = self.current_era().await?;
+        // Run staking info and validator prefs queries concurrently
+        let (staking_info, validator_prefs) = futures::try_join!(
+            self.get_staking_info(current_era, &account_id),
+            self.get_validator_prefs_internal(&account_id)
+        )?;
 
-        // Get the session index when a specific era started
-        let staking_info = self
-            .api
+        let prefs = validator_prefs.map_or_else(
+            || ValidatorPrefs {
+                commission: 0.0,
+                blocked: false,
+            },
+            |p| ValidatorPrefs {
+                commission: p.commission.deconstruct() as f64 / COMMISSION_DENOMINATOR,
+                blocked: p.blocked,
+            },
+        );
+
+        let staking = staking_info.map_or_else(
+            || StakingInfo {
+                total: 0,
+                own: 0,
+                nominator_count: 0,
+            },
+            |s| StakingInfo {
+                total: s.total,
+                own: s.own,
+                nominator_count: s.nominator_count,
+            },
+        );
+
+        Ok(ActiveValidator {
+            account_id: account_id.to_ss58check(),
+            prefs,
+            validator_type,
+            staking_info: staking,
+        })
+    }
+
+    async fn get_staking_info(
+        &self,
+        era: u32,
+        account_id: &AccountId32,
+    ) -> Result<Option<PagedExposureMetadata>, ServiceError> {
+        self.api
             .get_storage_double_map::<u32, AccountId32, PagedExposureMetadata>(
                 "Staking",
                 "ErasStakersOverview",
-                current_era,
+                era,
                 account_id.clone(),
                 self.block_hash,
             )
             .await
             .map_err(|e| {
                 ServiceError::SubstrateError(format!(
-                    "Failed to get era start staking_info for era {}: {:?}",
-                    current_era, e
+                    "Failed to get staking info for era {} and account {}: {:?}",
+                    era,
+                    account_id.to_ss58check(),
+                    e
                 ))
-            })?
-            .ok_or_else(|| {
-                ServiceError::SubstrateError(format!(
-                    "No staking_info found for era {}",
-                    current_era
-                ))
-            })?;
-        match self
-            .api
+            })
+    }
+
+    async fn get_validator_prefs_internal(
+        &self,
+        account_id: &AccountId32,
+    ) -> Result<Option<pallet_staking::ValidatorPrefs>, ServiceError> {
+        self.api
             .get_storage_map::<AccountId32, pallet_staking::ValidatorPrefs>(
                 "Staking",
                 "Validators",
@@ -115,73 +167,47 @@ impl ValidatorInfo {
                 self.block_hash,
             )
             .await
-        {
-            Ok(Some(prefs)) => {
-                let commission = prefs.commission.deconstruct() as f64 / 10_000_000.0;
-                let res_prefs = ValidatorPrefs {
-                    commission,
-                    blocked: prefs.blocked,
-                };
-                Ok(ActiveValidator {
-                    account_id: account_id.to_ss58check(),
-                    prefs: res_prefs,
-                    validator_type,
-                    staking_info: StakingInfo {
-                        total: staking_info.total,
-                        own: staking_info.own,
-                        nominator_count: staking_info.nominator_count,
-                    },
-                })
-            }
-            Ok(None) => Ok(ActiveValidator {
-                account_id: account_id.to_ss58check(),
-                prefs: ValidatorPrefs {
-                    commission: 0.0,
-                    blocked: false,
-                },
-                validator_type,
-                staking_info: StakingInfo {
-                    total: 0,
-                    own: 0,
-                    nominator_count: 0,
-                },
-            }),
-            Err(e) => Err(ServiceError::SubstrateError(format!(
-                "Failed to get prefs for {}: {:?}",
-                account_id.to_string(),
-                e
-            ))),
-        }
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!(
+                    "Failed to get validator prefs for {}: {:?}",
+                    account_id.to_ss58check(),
+                    e
+                ))
+            })
     }
 
     pub async fn current_era_info(&self) -> Result<ActiveEra, ServiceError> {
-        let era = self
-            .api
-            .get_storage::<ActiveEraInfo>("Staking", "ActiveEra", self.block_hash)
-            .await
-            .map_err(|e| {
-                ServiceError::SubstrateError(format!("Failed to get current active era {:?}", e))
-            })?
-            .ok_or_else(|| ServiceError::SubstrateError(format!("No era in have found")))?;
+        let active_era = self.get_active_era_info().await?;
 
-        let start_session = self.era_start_session(era.index).await?;
-        let total_stake = self.era_total_stake(era.index).await?;
-        let current_session = self.current_session().await?;
+        // Run all queries concurrently
+        let (start_session, total_stake, current_session) = futures::try_join!(
+            self.era_start_session(active_era.index),
+            self.era_total_stake(active_era.index),
+            self.current_session()
+        )?;
 
         Ok(ActiveEra {
-            era: era.index,
-            start_time: era.start.unwrap_or(0),
+            era: active_era.index,
+            start_time: active_era.start.unwrap_or(0),
             start_session,
             current_session,
             total_stake,
-            end_session: start_session + 96, // Selendra have 96 sessions per era
+            end_session: start_session + SESSIONS_PER_ERA,
         })
     }
 
+    async fn get_active_era_info(&self) -> Result<ActiveEraInfo, ServiceError> {
+        self.api
+            .get_storage::<ActiveEraInfo>("Staking", "ActiveEra", self.block_hash)
+            .await
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!("Failed to get current active era: {:?}", e))
+            })?
+            .ok_or_else(|| ServiceError::SubstrateError("No active era found".to_string()))
+    }
+
     async fn era_start_session(&self, era_index: u32) -> Result<u32, ServiceError> {
-        // Get the session index when a specific era started
-        let start_session = self
-            .api
+        self.api
             .get_storage_map::<u32, u32>(
                 "Staking",
                 "ErasStartSessionIndex",
@@ -200,56 +226,41 @@ impl ValidatorInfo {
                     "No start session found for era {}",
                     era_index
                 ))
-            })?;
-        Ok(start_session)
+            })
     }
 
     async fn era_total_stake(&self, era_index: u32) -> Result<u128, ServiceError> {
-        // Get the session index when a specific era started
-        let total_stake = self
-            .api
+        self.api
             .get_storage_map::<u32, u128>("Staking", "ErasTotalStake", era_index, self.block_hash)
             .await
             .map_err(|e| {
                 ServiceError::SubstrateError(format!(
-                    "Failed to get total stake for current era {}: {:?}",
+                    "Failed to get total stake for era {}: {:?}",
                     era_index, e
                 ))
             })?
             .ok_or_else(|| {
-                ServiceError::SubstrateError(format!(
-                    "No start staking found in current era {}",
-                    era_index
-                ))
-            })?;
-        Ok(total_stake)
+                ServiceError::SubstrateError(format!("No total stake found for era {}", era_index))
+            })
     }
 
     async fn current_session(&self) -> Result<u32, ServiceError> {
-        // Get the session index when a specific era started
-        let current_session = self
-            .api
+        self.api
             .get_storage::<u32>("Session", "CurrentIndex", self.block_hash)
             .await
             .map_err(|e| {
-                ServiceError::SubstrateError(format!("Failed to get current session {:?}", e))
+                ServiceError::SubstrateError(format!("Failed to get current session: {:?}", e))
             })?
-            .ok_or_else(|| ServiceError::SubstrateError(format!("No session in have found")))?;
-
-        Ok(current_session)
+            .ok_or_else(|| ServiceError::SubstrateError("No current session found".to_string()))
     }
 
     async fn current_era(&self) -> Result<u32, ServiceError> {
-        // Get the session index when a specific era started
-        let current_session = self
-            .api
+        self.api
             .get_storage::<u32>("Staking", "CurrentEra", self.block_hash)
             .await
             .map_err(|e| {
-                ServiceError::SubstrateError(format!("Failed to get current active era {:?}", e))
+                ServiceError::SubstrateError(format!("Failed to get current era: {:?}", e))
             })?
-            .ok_or_else(|| ServiceError::SubstrateError(format!("No era in have found")))?;
-
-        Ok(current_session)
+            .ok_or_else(|| ServiceError::SubstrateError("No current era found".to_string()))
     }
 }

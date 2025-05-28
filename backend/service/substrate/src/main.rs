@@ -14,8 +14,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let block_processor = BlockProcessingService::new(client);
 
-    // 933112;
-    let block_number: u32 = 869242;
+    // 933112, 869242;
+    let block_number: u32 = 933112;
 
     match block_processor.process_block(block_number).await {
         Ok(_success) => {
