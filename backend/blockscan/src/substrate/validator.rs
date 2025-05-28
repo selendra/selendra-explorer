@@ -1,7 +1,9 @@
+use blockscan_model::validator::{
+    ActiveEra, ActiveValidator, StakingInfo, ValidatorPrefs, ValidatorType,
+};
 use codec::{Decode, Encode};
 use custom_error::ServiceError;
 use futures::future::try_join_all;
-use blockscan_model::validator::{ActiveEra, ActiveValidator, StakingInfo, ValidatorPrefs, ValidatorType};
 use sp_core::crypto::Ss58Codec;
 use sp_runtime::AccountId32;
 use substrate_api_client::{

@@ -1,5 +1,5 @@
-use custom_error::ServiceError;
 use blockscan_model::event::{EventsResponse, FormattedEvent};
+use custom_error::ServiceError;
 use substrate_api_client::{
     Api, GetStorage,
     ac_primitives::{DefaultRuntimeConfig, H256},

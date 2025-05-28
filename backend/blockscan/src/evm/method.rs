@@ -1,10 +1,10 @@
-use custom_error::ServiceError;
-use ethers::providers::{Http, Middleware, Provider};
 use blockscan_model::{
     contract::ContractType,
     method::{GovernanceAction, LiquidityAction, StakingAction, TransactionMethod},
     transaction::EvmTransactionInfo,
 };
+use custom_error::ServiceError;
+use ethers::providers::{Http, Middleware, Provider};
 use std::sync::Arc;
 
 use super::signature_lookup::{FunctionSignature, SignatureCategory, SignatureLookupService};

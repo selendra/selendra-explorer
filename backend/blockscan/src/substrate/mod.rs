@@ -2,12 +2,12 @@ mod event;
 mod extrinsic;
 mod validator;
 
-use custom_error::ServiceError;
 use blockscan_model::{
     event::EventsResponse,
     extrinsic::ExtrinsicDetails,
     validator::{ActiveEra, ActiveValidator},
 };
+use custom_error::ServiceError;
 use substrate_api_client::{
     Api, GetChainInfo, GetStorage,
     ac_primitives::{BlakeTwo256, Block, DefaultRuntimeConfig, H256, Header, OpaqueExtrinsic},

@@ -1,14 +1,14 @@
-use custom_error::ServiceError;
-use ethers::{
-    providers::{Http, Middleware, Provider},
-    types::{Address, Bytes, H256, TransactionRequest, U64, U256},
-    utils::keccak256,
-};
 use blockscan_model::{
     account::EvmAccountInfo,
     contract::{
         ContractCreationInfo, ContractType, EvmContractTypeInfo, NftMetadata, TokenMetadata,
     },
+};
+use custom_error::ServiceError;
+use ethers::{
+    providers::{Http, Middleware, Provider},
+    types::{Address, Bytes, H256, TransactionRequest, U64, U256},
+    utils::keccak256,
 };
 use std::{collections::HashMap, sync::Arc};
 use tokio::time::{Duration, timeout};

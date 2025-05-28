@@ -1,6 +1,6 @@
+use blockscan_model::transaction::TransactionFee;
 use custom_error::ServiceError;
 use ethers::types::{Transaction, TransactionReceipt};
-use blockscan_model::transaction::TransactionFee;
 
 pub fn calculate_transaction_fee(
     tx_info: &Transaction,

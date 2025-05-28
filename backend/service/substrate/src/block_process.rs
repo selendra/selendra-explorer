@@ -1,6 +1,6 @@
+use blockscan::SubstrtaeBlockQuery;
 use custom_error::ServiceError;
 use substrate_api_client::rpc::JsonrpseeClient;
-use blockscan::SubstrtaeBlockQuery;
 
 pub struct BlockProcessingService {
     pub api: JsonrpseeClient,
