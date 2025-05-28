@@ -17,7 +17,7 @@ pub struct ValidatorPrefs {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ValidatorType {
     Reserved,
-    NonReserved 
+    NonReserved,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -27,12 +27,12 @@ pub struct ActiveEra {
     pub start_session: u32,
     pub current_session: u32,
     pub end_session: u32,
-    pub total_stake: u128
+    pub total_stake: u128,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StakingInfo {
-	pub total: u128,
-	pub own: u128,
-	pub nominator_count: u32,
+    pub total: u128,
+    pub own: u128,
+    pub nominator_count: u32,
 }

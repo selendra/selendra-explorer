@@ -3,7 +3,7 @@ use substrate_api_client::rpc::JsonrpseeClient;
 use utils::SubstrtaeBlockQuery;
 
 pub struct BlockProcessingService {
-    pub api: JsonrpseeClient
+    pub api: JsonrpseeClient,
 }
 
 impl BlockProcessingService {

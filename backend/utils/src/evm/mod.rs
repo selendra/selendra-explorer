@@ -11,7 +11,11 @@ use ethers::{
 };
 use method::Method;
 use model::{
-    block::EvmBlockInfo, contract::ContractCreationInfo, method::TransactionMethod, netwiork::EvmNetworkInfo, transaction::{EvmTransactionInfo, TransactionStatus}
+    block::EvmBlockInfo,
+    contract::ContractCreationInfo,
+    method::TransactionMethod,
+    netwiork::EvmNetworkInfo,
+    transaction::{EvmTransactionInfo, TransactionStatus},
 };
 use std::sync::Arc;
 use utils::calculate_transaction_fee;

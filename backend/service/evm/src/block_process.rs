@@ -22,7 +22,7 @@ impl BlockProcessingService {
 
         let block_id = BlockId::Number(block_number.into());
         let query = BlockStateQuery::new(Arc::clone(&self.provider), block_id);
-        
+
         println!("🎯  Fetching block information...");
         // todo: save to database
         let _block_info = query.block_info().await?;
@@ -47,7 +47,7 @@ impl BlockProcessingService {
 
         // todo: save to transaction_info database
         transaction_info.trasation_method = Some(transaction_method);
-        
+
         println!("🎯 Fetching account information...");
         self.process_account(query, &transaction_info.from).await?;
         if let Some(to) = &transaction_info.to {
@@ -65,7 +65,7 @@ impl BlockProcessingService {
         println!("👥 processing {} account...", address);
         let account_info = query.query_account(address).await?;
 
-        // todo: save to database 
+        // todo: save to database
         let _account = EvmAccount {
             address: account_info.clone().address,
             balance: account_info.balance_token,
@@ -74,9 +74,11 @@ impl BlockProcessingService {
         };
 
         if let Some(contract) = account_info.contract_type {
-            let creator_info = query.get_contract_creation_info(&account_info.address).await?;
-            
-            // todo: save to database 
+            let creator_info = query
+                .get_contract_creation_info(&account_info.address)
+                .await?;
+
+            // todo: save to database
             let _contract = EvmContract {
                 address: account_info.address,
                 contract_type: contract.contract_type,
@@ -85,7 +87,7 @@ impl BlockProcessingService {
                 decimals: contract.decimals,
                 total_supply: contract.total_supply,
                 is_verified: None,
-                creator_info
+                creator_info,
             };
         }
         Ok(())

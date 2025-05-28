@@ -16,6 +16,6 @@ pub struct EvmAccountInfo {
 pub struct EvmAccount {
     pub address: String,
     pub balance: String,
-    pub nonce:u32,
+    pub nonce: u32,
     pub is_contract: bool,
 }

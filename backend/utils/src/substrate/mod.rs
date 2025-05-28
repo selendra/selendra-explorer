@@ -1,10 +1,18 @@
-mod extrinsic;
 mod event;
+mod extrinsic;
 mod validator;
 
 use custom_error::ServiceError;
-use model::{event::EventsResponse, extrinsic::ExtrinsicDetails, validator::{ActiveEra, ActiveValidator}};
-use substrate_api_client::{ac_primitives::{BlakeTwo256, Block, DefaultRuntimeConfig, Header, OpaqueExtrinsic, H256}, rpc::JsonrpseeClient, Api, GetChainInfo, GetStorage};
+use model::{
+    event::EventsResponse,
+    extrinsic::ExtrinsicDetails,
+    validator::{ActiveEra, ActiveValidator},
+};
+use substrate_api_client::{
+    Api, GetChainInfo, GetStorage,
+    ac_primitives::{BlakeTwo256, Block, DefaultRuntimeConfig, H256, Header, OpaqueExtrinsic},
+    rpc::JsonrpseeClient,
+};
 pub struct SubstrtaeBlockQuery {
     pub api: Api<DefaultRuntimeConfig, JsonrpseeClient>,
     pub block_number: u32,
@@ -19,22 +27,30 @@ impl SubstrtaeBlockQuery {
 
         let block_hash = match api.get_block_hash(Some(block_number.into())).await {
             Ok(hash) => hash,
-            Err(e) => return Err(ServiceError::SubstrateError(format!("Error getting block hash: {:?}", e))),
+            Err(e) => {
+                return Err(ServiceError::SubstrateError(format!(
+                    "Error getting block hash: {:?}",
+                    e
+                )));
+            }
         };
         Ok(Self {
             api,
             block_number,
-            block_hash
+            block_hash,
         })
     }
 
     pub async fn fetch_latest_block(&self) -> Result<u32, ServiceError> {
         match self.api.get_block(None).await {
-            Ok(Some(block)) => {
-                Ok(block.header.number)
-            },
+            Ok(Some(block)) => Ok(block.header.number),
             Ok(None) => return Err(ServiceError::SubstrateError(format!("No blocks found"))),
-            Err(e) => return Err(ServiceError::SubstrateError(format!("Error getting latest block: {:?}", e)))
+            Err(e) => {
+                return Err(ServiceError::SubstrateError(format!(
+                    "Error getting latest block: {:?}",
+                    e
+                )));
+            }
         }
     }
 
@@ -42,7 +58,12 @@ impl SubstrtaeBlockQuery {
         let block = match self.api.get_block(self.block_hash).await {
             Ok(Some(block)) => block,
             Ok(None) => return Err(ServiceError::SubstrateError(format!("Block not found"))),
-            Err(e) => return Err(ServiceError::SubstrateError(format!("Error getting block: {:?}", e))),
+            Err(e) => {
+                return Err(ServiceError::SubstrateError(format!(
+                    "Error getting block: {:?}",
+                    e
+                )));
+            }
         };
         // println!("Block detail: {:?}", block);
 
@@ -68,52 +89,65 @@ impl SubstrtaeBlockQuery {
     }
 
     async fn get_block_timestamp(&self) -> Result<u64, ServiceError> {
-        match self.api.get_storage::<u64>("Timestamp", "Now", self.block_hash).await {
+        match self
+            .api
+            .get_storage::<u64>("Timestamp", "Now", self.block_hash)
+            .await
+        {
             Ok(Some(timestamp)) => Ok(timestamp),
-            Ok(None) => Err(ServiceError::SubstrateError("Timestamp not found".to_string())),
-            Err(e) => Err(ServiceError::SubstrateError(format!("Error getting timestamp: {:?}", e))),
+            Ok(None) => Err(ServiceError::SubstrateError(
+                "Timestamp not found".to_string(),
+            )),
+            Err(e) => Err(ServiceError::SubstrateError(format!(
+                "Error getting timestamp: {:?}",
+                e
+            ))),
         }
     }
 
     async fn check_block_finalization_status(&self) -> Result<bool, ServiceError> {
-        let finalized_head = self.api
-            .get_finalized_head()
-            .await
-            .map_err(|e| ServiceError::SubstrateError(format!("Error getting finalized head: {:?}", e)))?;
+        let finalized_head = self.api.get_finalized_head().await.map_err(|e| {
+            ServiceError::SubstrateError(format!("Error getting finalized head: {:?}", e))
+        })?;
 
         if self.block_hash == finalized_head {
             return Ok(true);
         }
-    
-        let finalized_block = self.api
+
+        let finalized_block = self
+            .api
             .get_block(finalized_head)
             .await
-            .map_err(|e| ServiceError::SubstrateError(format!("Error getting finalized block: {:?}", e)))?
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!("Error getting finalized block: {:?}", e))
+            })?
             .ok_or_else(|| ServiceError::SubstrateError("Finalized block not found".to_string()))?;
-    
+
         let finalized_block_number = finalized_block.header.number;
-    
+
         Ok(self.block_number <= finalized_block_number)
     }
 
-    async fn get_extrinsics(&self, block: Block<Header<u32, BlakeTwo256>, OpaqueExtrinsic>) -> Result<Vec<ExtrinsicDetails>, ServiceError> {
+    async fn get_extrinsics(
+        &self,
+        block: Block<Header<u32, BlakeTwo256>, OpaqueExtrinsic>,
+    ) -> Result<Vec<ExtrinsicDetails>, ServiceError> {
         let extrinsic = extrinsic::ExtrinsicInfo::new(block);
         extrinsic.get_extrinsics().await
     }
 
-    async fn block_event(&self) -> Result<EventsResponse, ServiceError>{
+    async fn block_event(&self) -> Result<EventsResponse, ServiceError> {
         let event = event::EventInfo::new(self.api.clone(), self.block_hash);
         event.get_events().await
     }
 
-    pub async fn active_validaora(&self) -> Result<Vec<ActiveValidator>, ServiceError>{
+    pub async fn active_validaora(&self) -> Result<Vec<ActiveValidator>, ServiceError> {
         let validator = validator::ValidatorInfo::new(self.api.clone(), self.block_hash);
         validator.get_all_validators().await
     }
 
-    pub async fn current_era(&self) -> Result<ActiveEra, ServiceError>{
+    pub async fn current_era(&self) -> Result<ActiveEra, ServiceError> {
         let validator = validator::ValidatorInfo::new(self.api.clone(), self.block_hash);
         validator.current_era_info().await
     }
-    
 }

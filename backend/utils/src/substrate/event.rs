@@ -1,6 +1,10 @@
 use custom_error::ServiceError;
 use model::event::{EventsResponse, FormattedEvent};
-use substrate_api_client::{ac_primitives::{DefaultRuntimeConfig, H256}, rpc::JsonrpseeClient, Api, GetStorage};
+use substrate_api_client::{
+    Api, GetStorage,
+    ac_primitives::{DefaultRuntimeConfig, H256},
+    rpc::JsonrpseeClient,
+};
 
 pub struct EventInfo {
     pub api: Api<DefaultRuntimeConfig, JsonrpseeClient>,
@@ -15,9 +19,18 @@ impl EventInfo {
     }
 
     pub async fn get_events(&self) -> Result<EventsResponse, ServiceError> {
-        let events = match self.api.get_storage::<Vec<EventRecord>>("System", "Events", self.block_hash).await {
+        let events = match self
+            .api
+            .get_storage::<Vec<EventRecord>>("System", "Events", self.block_hash)
+            .await
+        {
             Ok(events) => events,
-            Err(e) => return Err(ServiceError::SubstrateError(format!("Failed to get events: {:?}", e))),
+            Err(e) => {
+                return Err(ServiceError::SubstrateError(format!(
+                    "Failed to get events: {:?}",
+                    e
+                )));
+            }
         };
 
         if let Some(events) = events {
@@ -64,33 +77,58 @@ impl EventInfo {
         }
     }
 
-    fn format_balance_event(&self, event: &pallet_balances::pallet::Event<selendra_runtime::Runtime>) -> String {
+    fn format_balance_event(
+        &self,
+        event: &pallet_balances::pallet::Event<selendra_runtime::Runtime>,
+    ) -> String {
         match event {
-            pallet_balances::pallet::Event::Transfer { from, to, amount } => { 
-                format!("Transfer {{ from: {}, to: {}, amount: {} }}", 
-                    from.to_string(), to.to_string(), self.format_balance(*amount))
+            pallet_balances::pallet::Event::Transfer { from, to, amount } => {
+                format!(
+                    "Transfer {{ from: {}, to: {}, amount: {} }}",
+                    from.to_string(),
+                    to.to_string(),
+                    self.format_balance(*amount)
+                )
             }
             pallet_balances::pallet::Event::Withdraw { who, amount } => {
-                format!("Withdraw {{ who: {}, amount: {} }}", 
-                    who.to_string(), self.format_balance(*amount))
+                format!(
+                    "Withdraw {{ who: {}, amount: {} }}",
+                    who.to_string(),
+                    self.format_balance(*amount)
+                )
             }
-            pallet_balances::pallet::Event::Endowed { account, free_balance } => {
-                format!("Endowed {{ account: {}, balance: {} }}", 
-                    account.to_string(), self.format_balance(*free_balance))
+            pallet_balances::pallet::Event::Endowed {
+                account,
+                free_balance,
+            } => {
+                format!(
+                    "Endowed {{ account: {}, balance: {} }}",
+                    account.to_string(),
+                    self.format_balance(*free_balance)
+                )
             }
             pallet_balances::pallet::Event::Deposit { who, amount } => {
-                format!("Deposit {{ who: {}, amount: {} }}", 
-                    who.to_string(), self.format_balance(*amount))
+                format!(
+                    "Deposit {{ who: {}, amount: {} }}",
+                    who.to_string(),
+                    self.format_balance(*amount)
+                )
             }
             _ => format!("{:?}", event),
         }
     }
 
-    fn format_system_event(&self, event: &frame_system::pallet::Event<selendra_runtime::Runtime>) -> String {
+    fn format_system_event(
+        &self,
+        event: &frame_system::pallet::Event<selendra_runtime::Runtime>,
+    ) -> String {
         match event {
             frame_system::pallet::Event::ExtrinsicSuccess { dispatch_info } => {
-                format!("ExtrinsicSuccess (weight: {}, class: {:?})", 
-                    dispatch_info.weight.ref_time(), dispatch_info.class)
+                format!(
+                    "ExtrinsicSuccess (weight: {}, class: {:?})",
+                    dispatch_info.weight.ref_time(),
+                    dispatch_info.class
+                )
             }
             frame_system::pallet::Event::NewAccount { account } => {
                 format!("NewAccount {{ account: {} }}", account.to_string())

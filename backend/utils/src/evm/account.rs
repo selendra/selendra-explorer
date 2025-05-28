@@ -1,12 +1,14 @@
 use custom_error::ServiceError;
 use ethers::{
     providers::{Http, Middleware, Provider},
-    types::{Address, Bytes, TransactionRequest, H256, U256},
+    types::{Address, Bytes, H256, TransactionRequest, U256},
     utils::keccak256,
 };
 use model::{
     account::EvmAccountInfo,
-    contract::{ContractCreationInfo, ContractType, EvmContractTypeInfo, NftMetadata, TokenMetadata},
+    contract::{
+        ContractCreationInfo, ContractType, EvmContractTypeInfo, NftMetadata, TokenMetadata,
+    },
 };
 use std::sync::Arc;
 
@@ -46,7 +48,7 @@ impl AccountQuery {
         })
     }
 
-       /// Extract contract creation info from a transaction hash
+    /// Extract contract creation info from a transaction hash
     pub async fn get_contract_creation_info(
         &self,
         tx_hash: &str,
@@ -96,7 +98,6 @@ impl AccountQuery {
             creation_bytecode: format!("0x{}", hex::encode(&tx.input)),
         }))
     }
-
 
     /// Main contract type detection method
     async fn detect_contract_type(
