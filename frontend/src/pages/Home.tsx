@@ -115,7 +115,7 @@ const Home: React.FC = () => {
             </div>
           </div>
 
-          {/* Current Epoch Card */}
+          {/* Current Era Card */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-5 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300">
             <div className="flex items-baseline mb-1">
               <p className="text-2xl font-bold text-[#8C30F5] dark:text-[#9D50FF]">
@@ -127,7 +127,7 @@ const Home: React.FC = () => {
             </div>
             <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mb-2">
               <ClockIcon className="h-5 w-5 mr-1.5 text-[#8C30F5] dark:text-[#9D50FF]" />
-              <span className="font-medium">Current Epoch</span>
+              <span className="font-medium">Current Era</span>
             </div>
             <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-4">
               <div
@@ -138,10 +138,10 @@ const Home: React.FC = () => {
             <div className="bg-gray-50 dark:bg-gray-900/50 rounded-md p-4 space-y-3">
               <div>
                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                  Slot Range
+                  Session Range
                 </p>
                 <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  340848000 to 341279999
+                  1059 to 1200
                 </p>
               </div>
               <div>
@@ -357,11 +357,11 @@ const Home: React.FC = () => {
                           </td>
                           <td className="px-6 py-2 whitespace-nowrap">
                             <Link
-                              to={`/validators/${block.miner}`}
+                              to={`/validators/${block.validator}`}
                               className="text-gray-900 dark:text-gray-100 hover:text-[#8C30F5] dark:hover:text-[#9D50FF]"
                             >
-                              {block.miner.slice(0, 8)}...
-                              {block.miner.slice(-6)}
+                              {block.validator.slice(0, 8)}...
+                              {block.validator.slice(-6)}
                             </Link>
                           </td>
                         </tr>

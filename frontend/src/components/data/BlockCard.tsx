@@ -140,12 +140,12 @@ const BlockCard: FC<BlockCardProps> = ({
                     ></path>
                   </svg>
                 </span>
-                Miner
+                Validator
               </div>
               <div className="bg-gray-50 dark:bg-gray-900/50 p-2 rounded-md border border-gray-100 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors duration-200 group">
                 <div className="flex items-center justify-between">
                   <AddressDisplay
-                    address={block.miner}
+                    address={block.validator}
                     networkType={block.networkType}
                     truncate={true}
                     className="text-sm text-gray-700 dark:text-gray-300"

@@ -12,9 +12,7 @@ export interface Block {
   size: number;
   gasUsed: string;
   gasLimit: string;
-  miner: string;
-  difficulty: string;
-  totalDifficulty: string;
+  validator: string;
   networkType: NetworkType;
   extraData?: string;
   stateRoot: string;

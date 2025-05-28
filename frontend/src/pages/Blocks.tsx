@@ -71,7 +71,7 @@ const Blocks: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-all duration-300">
           <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Average Block Time</div>
           <div className="text-xl font-bold text-gray-900 dark:text-white">
-            {!isLoading ? "~6.5 seconds" : (
+            {!isLoading ? "1 seconds" : (
               <div className="h-7 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
             )}
           </div>
@@ -155,9 +155,9 @@ const Blocks: React.FC = () => {
             {
               header: 'Validator',
               accessor: (block) => (
-                <Link to={`/accounts/${block.miner}`} className="flex items-center text-primary-600 dark:text-primary-400 hover:underline font-mono group">
+                <Link to={`/accounts/${block.validator}`} className="flex items-center text-primary-600 dark:text-primary-400 hover:underline font-mono group">
                   <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary-300 to-secondary-300 mr-2 opacity-80 group-hover:opacity-100 transition-opacity"></div>
-                  {`${block.miner.substring(0, 6)}...${block.miner.substring(block.miner.length - 4)}`}
+                  {`${block.validator.substring(0, 6)}...${block.validator.substring(block.validator.length - 4)}`}
                 </Link>
               ),
             },

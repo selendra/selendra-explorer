@@ -29,13 +29,7 @@ export const generateMockBlock = (
     gasUsed:
       networkType === "evm" ? getRandomInt(21000, 10000000).toString() : "0",
     gasLimit: networkType === "evm" ? "30000000" : "0",
-    miner: getRandomAddress(networkType),
-    difficulty:
-      networkType === "evm" ? getRandomInt(1000000, 3000000).toString() : "0",
-    totalDifficulty:
-      networkType === "evm"
-        ? getRandomInt(100000000, 300000000).toString()
-        : "0",
+    validator: getRandomAddress(networkType),
     networkType,
     extraData:
       networkType === "evm"
