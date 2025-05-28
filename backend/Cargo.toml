@@ -6,7 +6,7 @@ members = [
     "model", 
     "service/evm",
     "service/substrate",
-    "utils",
+    "blockscan",
 ]
 
 [profile.release]
@@ -32,6 +32,6 @@ sp-core = { git = "https://github.com/Cardinal-Cryptography/polkadot-sdk.git", b
 sp-runtime = { git = "https://github.com/Cardinal-Cryptography/polkadot-sdk.git", branch = "aleph-v1.6.0", default-features = false }
 
 # local dependencies
-utils = { path = "utils"}
+blockscan = { path = "blockscan"}
 model = { path = "model"}
 custom-error = { path = "error" }

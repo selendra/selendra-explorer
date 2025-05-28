@@ -6,7 +6,7 @@ use ethers::{
     types::BlockId,
 };
 use model::{account::EvmAccount, contract::EvmContract};
-use utils::BlockStateQuery;
+use blockscan::BlockStateQuery;
 
 pub struct BlockProcessingService {
     pub provider: Arc<Provider<Http>>,

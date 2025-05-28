@@ -7,6 +7,6 @@ edition = "2024"
 ethers = { workspace = true }
 tokio = { workspace = true }
 
-utils = { workspace = true }
+blockscan = { workspace = true }
 model = { workspace = true }
 custom-error = { workspace = true }
