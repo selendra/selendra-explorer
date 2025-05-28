@@ -1,0 +1,1 @@
+pub const EVM_BLOCK_TABLE: &'static str = "evm_blocks";

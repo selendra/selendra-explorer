@@ -1,11 +1,10 @@
 [package]
-name = "database"
+name = "models"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+serde = { workspace = true }
 surrealdb = { workspace = true }
-
-custom-error = { workspace = true }
-models = { workspace = true }
+ethers = { workspace = true }
 config = { workspace = true }

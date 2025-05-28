@@ -13,9 +13,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "https://mainnet.infura.io/v3/24a3e0a1e6474ff183c2e832a7e1a6a0",
     )?;
     let provider = Arc::new(provider);
+    let database = database::DatabaseService::new(
+        "ws://localhost:8000/rpc",
+        "root",
+        "root",
+        "test",
+        "test",
+    )
+    .await?;
 
     // Initialize block processing service
-    let block_processor = BlockProcessingService::new(Arc::clone(&provider));
+    let block_processor = BlockProcessingService::new(Arc::clone(&provider), database);
 
     let block_number: u64 = 22534498;
 

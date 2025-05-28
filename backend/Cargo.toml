@@ -8,6 +8,8 @@ members = [
     "blockscan",
     "blockscan/model",
     "database",
+    "models",
+    "config",
 ]
 
 [profile.release]
@@ -21,6 +23,7 @@ ethers = "2.0.14"
 serde = "1.0.219"
 serde_json = "1.0.140"
 futures = "0.3.31"
+surrealdb = "2.3.3"
 tokio = { version = "1.45.0", features = ["full"] }
 substrate-api-client = "1.17.0"
 codec = { package = "parity-scale-codec", version = "3.7", default-features = false, features = ["derive"] }
@@ -35,4 +38,7 @@ sp-runtime = { git = "https://github.com/Cardinal-Cryptography/polkadot-sdk.git"
 # local dependencies
 blockscan = { path = "blockscan"}
 blockscan-model = { path = "blockscan/model"}
+database = { path = "database"}
+models = { path = "models"}
+config = { path = "config"}
 custom-error = { path = "error" }

@@ -6,6 +6,10 @@ edition = "2024"
 [dependencies]
 ethers = { workspace = true }
 tokio = { workspace = true }
+surrealdb = { workspace = true }
 
 blockscan = { workspace = true }
+models = { workspace = true }
+config = { workspace = true }
+database = { workspace = true }
 custom-error = { workspace = true }

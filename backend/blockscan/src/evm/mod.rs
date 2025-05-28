@@ -69,7 +69,7 @@ impl BlockStateQuery {
                 .as_u64(),
             hash: block.hash.map(|h| format!("{:#x}", h)),
             parent_hash: format!("{:#x}", block.parent_hash),
-            timestamp: block.timestamp.to_string(),
+            timestamp: block.timestamp.as_u128(),
             gas_used: block.gas_used.as_u64(),
             gas_limit: block.gas_limit.as_u64(),
             base_fee_per_gas: block.base_fee_per_gas.map(|fee| fee.as_u64()),
@@ -77,7 +77,7 @@ impl BlockStateQuery {
             extra_data: format!("0x{}", hex::encode(&block.extra_data)),
             transactions_count: block.transactions.len(),
             size: block.size.map(|s| s.as_usize()),
-            nonce: block.nonce.map(|n| format!("{:#x}", n)),
+            nonce: block.nonce.map(|n| n.to_low_u64_be()),
         };
 
         Ok(block_info)

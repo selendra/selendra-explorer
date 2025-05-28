@@ -16,4 +16,6 @@ pub enum ServiceError {
     InvalidTransactionHash(String),
     #[error("Substrate error: {0}")]
     SubstrateError(String),
+    #[error("Surrealdb error: {0}")]
+    DatabaseError(String),
 }

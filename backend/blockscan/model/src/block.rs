@@ -6,7 +6,7 @@ pub struct EvmBlockInfo {
     pub number: u64,
     pub hash: Option<String>,
     pub parent_hash: String,
-    pub timestamp: String,
+    pub timestamp: u128,
     pub gas_used: u64,
     pub gas_limit: u64,
     pub base_fee_per_gas: Option<u64>,
@@ -14,5 +14,5 @@ pub struct EvmBlockInfo {
     pub extra_data: String,
     pub transactions_count: usize,
     pub size: Option<usize>,
-    pub nonce: Option<String>,
+    pub nonce: Option<u64>,
 }
