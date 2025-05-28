@@ -10,12 +10,8 @@ use ethers::{
     types::{BlockId, H256},
 };
 use method::Method;
-use model::{
-    block::EvmBlockInfo,
-    contract::ContractCreationInfo,
-    method::TransactionMethod,
-    netwiork::EvmNetworkInfo,
-    transaction::{EvmTransactionInfo, TransactionStatus},
+use blockscan_model::{
+    account::EvmAccountInfo, block::EvmBlockInfo, contract::ContractCreationInfo, method::TransactionMethod, netwiork::EvmNetworkInfo, transaction::{EvmTransactionInfo, TransactionStatus}
 };
 use std::sync::Arc;
 use utils::calculate_transaction_fee;
@@ -144,7 +140,7 @@ impl BlockStateQuery {
     pub async fn query_account(
         &self,
         address: &str,
-    ) -> Result<model::account::EvmAccountInfo, ServiceError> {
+    ) -> Result<EvmAccountInfo, ServiceError> {
         let account_query = AccountQuery::new(self.provider.clone());
         account_query.query_account(address).await
     }

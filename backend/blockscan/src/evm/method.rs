@@ -1,6 +1,6 @@
 use custom_error::ServiceError;
 use ethers::providers::{Http, Middleware, Provider};
-use model::{
+use blockscan_model::{
     contract::ContractType,
     method::{GovernanceAction, LiquidityAction, StakingAction, TransactionMethod},
     transaction::EvmTransactionInfo,

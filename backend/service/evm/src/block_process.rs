@@ -5,7 +5,7 @@ use ethers::{
     providers::{Http, Provider},
     types::BlockId,
 };
-use model::{account::EvmAccount, contract::EvmContract};
+// use model::{account::EvmAccount, contract::EvmContract};
 use blockscan::BlockStateQuery;
 
 pub struct BlockProcessingService {
@@ -68,26 +68,24 @@ impl BlockProcessingService {
         let account_info = query.query_account(address).await?;
 
         // todo: save to database
-        let _account = EvmAccount {
-            address: account_info.clone().address,
-            balance: account_info.balance_token,
-            nonce: account_info.nonce,
-            is_contract: account_info.is_contract,
+        let _account = {
+            account_info.clone().address;
+            account_info.balance_token;
+            account_info.nonce;
+            account_info.is_contract;
         };
 
         if let Some(contract) = account_info.contract_type {
-            let creator_info = query.get_contract_creation_info(&tx_hash).await?;
+            let _creator_info = query.get_contract_creation_info(&tx_hash).await?;
 
             // todo: save to database
-            let _contract = EvmContract {
-                address: account_info.address,
-                contract_type: contract.contract_type,
-                name: contract.name,
-                symbol: contract.symbol,
-                decimals: contract.decimals,
-                total_supply: contract.total_supply,
-                is_verified: None,
-                creator_info,
+            let _contract = {
+                account_info.address;
+                contract.contract_type;
+                contract.name;
+                contract.symbol;
+                contract.decimals;
+                contract.total_supply;
             };
         }
         Ok(())

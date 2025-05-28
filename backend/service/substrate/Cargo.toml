@@ -8,5 +8,4 @@ tokio = { workspace = true }
 substrate-api-client = { workspace = true }
 
 blockscan = { workspace = true }
-model = { workspace = true }
 custom-error = { workspace = true }

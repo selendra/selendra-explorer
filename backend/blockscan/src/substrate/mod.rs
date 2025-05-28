@@ -3,7 +3,7 @@ mod extrinsic;
 mod validator;
 
 use custom_error::ServiceError;
-use model::{
+use blockscan_model::{
     event::EventsResponse,
     extrinsic::ExtrinsicDetails,
     validator::{ActiveEra, ActiveValidator},

@@ -3,10 +3,11 @@ resolver = "2"
 
 members = [ 
     "error", 
-    "model", 
     "service/evm",
     "service/substrate",
     "blockscan",
+    "blockscan/model",
+    "database",
 ]
 
 [profile.release]
@@ -33,5 +34,5 @@ sp-runtime = { git = "https://github.com/Cardinal-Cryptography/polkadot-sdk.git"
 
 # local dependencies
 blockscan = { path = "blockscan"}
-model = { path = "model"}
+blockscan-model = { path = "blockscan/model"}
 custom-error = { path = "error" }

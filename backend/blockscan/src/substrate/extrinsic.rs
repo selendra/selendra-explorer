@@ -1,6 +1,6 @@
 use codec::Encode;
 use custom_error::ServiceError;
-use model::extrinsic::{CallInfo, ExtrinsicDetails, SignatureInfo};
+use blockscan_model::extrinsic::{CallInfo, ExtrinsicDetails, SignatureInfo};
 use substrate_api_client::ac_primitives::{BlakeTwo256, Block, Header, OpaqueExtrinsic};
 
 // Constants for better maintainability

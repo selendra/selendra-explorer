@@ -16,6 +16,3 @@ pub struct EvmBlockInfo {
     pub size: Option<usize>,
     pub nonce: Option<String>,
 }
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SubstrateBlockInfo {}

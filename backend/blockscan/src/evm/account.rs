@@ -4,7 +4,7 @@ use ethers::{
     types::{Address, Bytes, H256, TransactionRequest, U64, U256},
     utils::keccak256,
 };
-use model::{
+use blockscan_model::{
     account::EvmAccountInfo,
     contract::{
         ContractCreationInfo, ContractType, EvmContractTypeInfo, NftMetadata, TokenMetadata,
