@@ -35,7 +35,8 @@ impl<'a> EvmBlockService<'a> {
     /// Retrieves an EVM block by block number
     pub async fn get_by_number(&self, block_number: u32) -> Result<Option<EvmBlock>, ServiceError> {
         let mut result = self.db
-            .query("SELECT * FROM evm_blocks WHERE number = $block_number LIMIT 1")
+            .query("SELECT * FROM $evm_blocks WHERE number = $block_number LIMIT 1")
+            .bind(("evm_blocks", EVM_BLOCK_TABLE.to_string()))
             .bind(("block_number", block_number))
             .await
             .map_err(|e| ServiceError::DatabaseError(format!("Block number query failed: {}", e)))?;
@@ -49,7 +50,8 @@ impl<'a> EvmBlockService<'a> {
     /// Retrieves an EVM block by hash
     pub async fn get_by_hash(&self, block_hash: &str) -> Result<Option<EvmBlock>, ServiceError> {
         let mut result = self.db
-            .query("SELECT * FROM evm_blocks WHERE hash = $block_hash LIMIT 1")
+            .query("SELECT * FROM $evm_blocks WHERE hash = $block_hash LIMIT 1")
+            .bind(("evm_blocks", EVM_BLOCK_TABLE.to_string()))
             .bind(("block_hash", block_hash.to_string()))
             .await
             .map_err(|e| ServiceError::DatabaseError(format!("Block hash query failed: {}", e)))?;
@@ -60,64 +62,32 @@ impl<'a> EvmBlockService<'a> {
         Ok(block)
     }
 
-    /// Retrieves all EVM blocks with optional pagination
-    pub async fn get_all(&self, limit: Option<usize>, offset: Option<usize>) -> Result<Vec<EvmBlock>, ServiceError> {
-        let query = match (limit, offset) {
-            (Some(l), Some(o)) => format!("SELECT * FROM {} ORDER BY number DESC LIMIT {} START {}", EVM_BLOCK_TABLE, l, o),
-            (Some(l), None) => format!("SELECT * FROM {} ORDER BY number DESC LIMIT {}", EVM_BLOCK_TABLE, l),
-            (None, Some(o)) => format!("SELECT * FROM {} ORDER BY number DESC START {}", EVM_BLOCK_TABLE, o),
-            (None, None) => format!("SELECT * FROM {} ORDER BY number DESC", EVM_BLOCK_TABLE),
-        };
-
-        let mut result = self.db
-            .query(&query)
+    pub async fn get_all(
+        &self,
+        limit: u32,
+        offset: u32,
+    ) -> Result<Vec<EvmBlock>, ServiceError> {
+        let mut result = self
+            .db
+            .query("SELECT * FROM $evm_blocks ORDER BY timestamp DESC LIMIT $limit START $offset")
+            .bind(("evm_blocks", EVM_BLOCK_TABLE.to_string()))
+            .bind(("limit", limit))
+            .bind(("offset", offset))
             .await
-            .map_err(|e| ServiceError::DatabaseError(format!("Blocks retrieval failed: {}", e)))?;
+            .map_err(|e| ServiceError::DatabaseError(e.to_string()))?;
 
-        let blocks: Vec<EvmBlock> = result.take(0)
-            .map_err(|e| ServiceError::DatabaseError(format!("Blocks extraction failed: {}", e)))?;
-        
+        let blocks: Vec<EvmBlock> = result
+            .take(0)
+            .map_err(|e| ServiceError::DatabaseError(e.to_string()))?;
+
         Ok(blocks)
-    }
-
-    /// Updates an existing EVM block
-    pub async fn update(&self, block_id: &str, block_info: &EvmBlock) -> Result<Option<EvmBlock>, ServiceError> {
-        let updated: Option<EvmBlock> = self.db
-            .update((EVM_BLOCK_TABLE, block_id))
-            .content(block_info.clone())
-            .await
-            .map_err(|e| ServiceError::DatabaseError(format!("Block update failed: {}", e)))?;
-        
-        Ok(updated)
-    }
-
-    /// Deletes an EVM block by ID
-    pub async fn delete(&self, block_id: &str) -> Result<Option<EvmBlock>, ServiceError> {
-        let deleted: Option<EvmBlock> = self.db
-            .delete((EVM_BLOCK_TABLE, block_id))
-            .await
-            .map_err(|e| ServiceError::DatabaseError(format!("Block deletion failed: {}", e)))?;
-        
-        Ok(deleted)
-    }
-
-    /// Counts total number of EVM blocks
-    pub async fn count(&self) -> Result<usize, ServiceError> {
-        let mut result = self.db
-            .query("SELECT count() FROM evm_blocks GROUP ALL")
-            .await
-            .map_err(|e| ServiceError::DatabaseError(format!("Block count query failed: {}", e)))?;
-
-        let count: Option<usize> = result.take(0)
-            .map_err(|e| ServiceError::DatabaseError(format!("Block count extraction failed: {}", e)))?;
-        
-        Ok(count.unwrap_or(0))
     }
 
     /// Gets the latest block by block number
     pub async fn get_latest(&self) -> Result<Option<EvmBlock>, ServiceError> {
         let mut result = self.db
-            .query("SELECT * FROM evm_blocks ORDER BY number DESC LIMIT 1")
+            .query("SELECT * FROM $evm_blocks ORDER BY number DESC LIMIT 1")
+            .bind(("evm_blocks", EVM_BLOCK_TABLE.to_string()))
             .await
             .map_err(|e| ServiceError::DatabaseError(format!("Latest block query failed: {}", e)))?;
 
@@ -127,28 +97,15 @@ impl<'a> EvmBlockService<'a> {
         Ok(block)
     }
 
-    /// Checks if a block exists by hash
-    pub async fn exists_by_hash(&self, block_hash: &str) -> Result<bool, ServiceError> {
-        let mut result = self.db
-            .query("SELECT count() FROM evm_blocks WHERE hash = $block_hash GROUP ALL")
-            .bind(("block_hash", block_hash.to_string()))
-            .await
-            .map_err(|e| ServiceError::DatabaseError(format!("Block existence check failed: {}", e)))?;
-
-        let count: Option<usize> = result.take(0)
-            .map_err(|e| ServiceError::DatabaseError(format!("Block existence extraction failed: {}", e)))?;
-        
-        Ok(count.unwrap_or(0) > 0)
-    }
-
     pub async fn exists_by_number(&self, block_number: u32) -> Result<bool, ServiceError> {
         let mut result = self.db
-            .query("SELECT count() FROM evm_blocks WHERE number = $block_number GROUP ALL")
+            .query("SELECT VALUE count() FROM $evm_blocks WHERE number = $block_number")
+            .bind(("evm_blocks", EVM_BLOCK_TABLE.to_string()))
             .bind(("block_number", block_number))
             .await
             .map_err(|e| ServiceError::DatabaseError(format!("Block existence check failed: {}", e)))?;
 
-        let count: Option<usize> = result.take(0)
+        let count: Option<i64> = result.take(0)
             .map_err(|e| ServiceError::DatabaseError(format!("Block existence extraction failed: {}", e)))?;
         
         Ok(count.unwrap_or(0) > 0)

@@ -2,15 +2,16 @@ pub mod evm;
 pub mod substrate;
 
 use custom_error::ServiceError;
-use evm::EvmBlockService;
+use evm::{EvmBlockService, TransactionService};
 use surrealdb::{
     Surreal,
-    engine::remote::ws::{Client, Ws},
+    engine::any,
     opt::auth::Root,
 };
 
+#[derive(Clone)]
 pub struct DatabaseService {
-    pub db: Surreal<Client>,
+    pub db: Surreal<any::Any>,
 }
 
 impl DatabaseService {
@@ -21,7 +22,7 @@ impl DatabaseService {
         namespace: &str,
         database: &str,
     ) -> Result<Self, ServiceError> {
-        let db = Surreal::new::<Ws>(url)
+        let db = any::connect(url)
             .await
             .map_err(|e| ServiceError::DatabaseError(e.to_string()))?;
 
@@ -40,5 +41,9 @@ impl DatabaseService {
 
     pub fn evm_blocks(&self) -> EvmBlockService {
         EvmBlockService { db: &self.db }
+    }
+
+    pub fn transactions(&self) -> TransactionService {
+        TransactionService { db: &self.db }
     }
 }

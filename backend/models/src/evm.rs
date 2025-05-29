@@ -1,3 +1,4 @@
+use blockscan_model::{method::TransactionMethod, transaction::TransactionStatus};
 use serde::{Deserialize, Serialize};
 use surrealdb::sql::Thing;
 
@@ -5,7 +6,7 @@ use surrealdb::sql::Thing;
 pub struct EvmBlock {
     pub id: Thing,
     pub number: u32,
-    pub hash: Option<String>,
+    pub hash: String,
     pub parent_hash: String,
     pub timestamp: u128,
     pub transaction_count: u16,
@@ -19,4 +20,39 @@ pub struct EvmBlock {
     pub nonce: Option<u32>,
     pub session: u32,
     pub era: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum NetworkType {
+    Evm,
+    Subtrate,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum TransactionType {
+    Legacy = 0,
+    AccessList = 1,
+    DynamicFee = 2,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EvmTransaction {
+    pub id: Thing,
+    pub hash: String,
+    pub block_number: u64,
+    pub timestamp: u128,
+    pub from: String,
+    pub to: Option<String>,
+    pub value: u128,
+    pub gas_price:u64,
+    pub gas_limit: u64,
+    pub gas_used: u64,
+    pub nonce: u64,
+    pub status: TransactionStatus,
+    pub transaction_type: TransactionType,
+    pub network_type: NetworkType,
+    pub input: Option<String>,
+    pub fee: u64,
+    pub transaction_method: Option<TransactionMethod>,
 }

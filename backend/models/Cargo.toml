@@ -8,3 +8,4 @@ serde = { workspace = true }
 surrealdb = { workspace = true }
 ethers = { workspace = true }
 config = { workspace = true }
+blockscan-model = { workspace = true }

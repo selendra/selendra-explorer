@@ -20,10 +20,10 @@ pub struct EvmTransactionInfo {
     pub block_number: u64,
     pub transaction_index: Option<u16>, // position in the block
     pub status: TransactionStatus,
-    pub timestamp: Option<String>,
+    pub timestamp: Option<u128>,
     pub from: String,
     pub to: Option<String>,
-    pub value: String, // In wei as string to avoid precision loss
+    pub value: u128, // In wei as string to avoid precision loss
     pub transaction_fee: TransactionFee,
     pub nonce: u64,
     pub input_data: String,

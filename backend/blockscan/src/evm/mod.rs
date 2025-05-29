@@ -107,7 +107,7 @@ impl BlockStateQuery {
 
         let timestamp = if let Some(block_num) = tx.block_number {
             match self.provider.get_block(block_num).await? {
-                Some(block) => Some(block.timestamp.to_string()),
+                Some(block) => Some(block.timestamp.as_u128()),
                 None => None,
             }
         } else {
@@ -129,7 +129,7 @@ impl BlockStateQuery {
             timestamp,
             from: format!("{:#x}", tx.from),
             to: tx.to.map(|addr| format!("{:#x}", addr)),
-            value: tx.value.to_string(),
+            value: tx.value.as_u128(),
             transaction_fee,
             nonce: tx.nonce.as_u64(),
             transaction_index: tx.transaction_index.map(|idx| idx.as_u64() as u16),
