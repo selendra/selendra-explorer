@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+dotenv = { workspace = true }
 ethers = { workspace = true }
 tokio = { workspace = true }
 surrealdb = { workspace = true }

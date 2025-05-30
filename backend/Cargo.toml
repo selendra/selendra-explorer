@@ -9,7 +9,7 @@ members = [
     "blockscan/model",
     "database",
     "models",
-    "config",
+    "config", "api",
 ]
 
 [profile.release]
@@ -17,6 +17,7 @@ members = [
 panic = "unwind"
 
 [workspace.dependencies]
+tracing-subscriber = "0.3.19"
 thiserror = "2.0.12"
 hex = "0.4.3"
 ethers = "2.0.14"
@@ -26,6 +27,11 @@ futures = "0.3.31"
 surrealdb = "2.3.3"
 dotenv = "0.15.0"
 lazy_static = "1.5.0" 
+anyhow = "1.0.98"
+axum = "0.8.4"
+tracing = "0.1.41"
+tower = "0.5.2"
+tower-http = { version = "0.6.4", features = ["cors", "trace", "timeout"] }
 tokio = { version = "1.45.0", features = ["full"] }
 substrate-api-client = "1.17.0"
 codec = { package = "parity-scale-codec", version = "3.7", default-features = false, features = ["derive"] }

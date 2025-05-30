@@ -2,6 +2,7 @@ pub mod block_process;
 pub mod processing_config;
 
 use std::{sync::Arc, time::Duration};
+use dotenv::dotenv;
 use block_process::BlockProcessingService;
 use ethers::providers::{Http, Provider};
 use config::{DATABASE_NAMESPACE, DATABASE_PASSWORD, DATABASE_TABLE, DATABASE_URL, DATABASE_USERNAME, EVM_RPC_URL};
@@ -10,6 +11,7 @@ use processing_config::{ContinuousProcessor, ProcessingConfig};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("🚀 Starting Evm Processing Service");
+    dotenv().ok();
 
     let provider = Provider::<Http>::try_from(EVM_RPC_URL.as_str())?;
     let provider = Arc::new(provider);

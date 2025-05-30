@@ -1,0 +1,18 @@
+[package]
+name = "explorer-api"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tower-http = { workspace = true }
+tower = { workspace = true }
+dotenv = { workspace = true }
+anyhow = { workspace = true }
+axum = { workspace = true }
+tokio = { workspace = true }
+surrealdb = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+database = { workspace = true }
+config = { workspace = true }
