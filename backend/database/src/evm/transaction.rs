@@ -16,29 +16,19 @@ impl<'a> TransactionService<'a> {
         Ok(created)
     }
 
-    pub async fn get_latest(&self) -> Result<Option<EvmTransaction>, ServiceError> {
-        let mut result = self.db
-            .query("SELECT * FROM $transactions ORDER BY number DESC LIMIT 1")
-            .bind(("transactions", EVM_TXS_TABLE.to_string()))
-            .await
-            .map_err(|e| ServiceError::DatabaseError(format!("Latest transactions query failed: {}", e)))?;
-
-        let transactions: Option<EvmTransaction> = result.take(0)
-            .map_err(|e| ServiceError::DatabaseError(format!("Latest transactions extraction failed: {}", e)))?;
-        
-        Ok(transactions)
-    }
-
-    /// Get paginated transactions
-    pub async fn get_all(
+     /// Get paginated transactions
+     pub async fn get_all(
         &self,
         limit: u32,
         offset: u32,
     ) -> Result<Vec<EvmTransaction>, ServiceError> {
+        let query = format!(
+            "SELECT * FROM {} ORDER BY number DESC LIMIT $limit START $offset", 
+            EVM_TXS_TABLE
+        );
         let mut result = self
             .db
-            .query("SELECT * FROM $transactions ORDER BY timestamp DESC LIMIT $limit START $offset")
-            .bind(("transactions", EVM_TXS_TABLE.to_string()))
+            .query(query)
             .bind(("limit", limit))
             .bind(("offset", offset))
             .await
@@ -51,21 +41,17 @@ impl<'a> TransactionService<'a> {
         Ok(transactions)
     }
 
-    /// Check if a transaction exists by hash
-    pub async fn is_exist_by_hash(&self, hash: &str) -> Result<bool, ServiceError> {
-        let mut result = self
-            .db
-            .query("SELECT COUNT() FROM $transactions WHERE hash = $hash GROUP ALL")
-            .bind(("transactions", EVM_TXS_TABLE.to_string()))
-            .bind(("hash", hash.to_string()))
+    pub async fn get_latest(&self) -> Result<Option<EvmTransaction>, ServiceError> {
+        let query = format!("SELECT * FROM {} ORDER BY number DESC LIMIT 1", EVM_TXS_TABLE);
+        let mut result = self.db
+            .query(query)
             .await
-            .map_err(|e| ServiceError::DatabaseError(e.to_string()))?;
+            .map_err(|e| ServiceError::DatabaseError(format!("Latest transaction query failed: {}", e)))?;
 
-        let count: Option<i64> = result
-            .take((0, "count"))
-            .map_err(|e| ServiceError::DatabaseError(e.to_string()))?;
-
-        Ok(count.unwrap_or(0) > 0)
+        let transaction: Option<EvmTransaction> = result.take(0)
+            .map_err(|e| ServiceError::DatabaseError(format!("Latest transaction extraction failed: {}", e)))?;
+        
+        Ok(transaction)
     }
 
     /// Get all transactions with a specific block number
@@ -73,10 +59,10 @@ impl<'a> TransactionService<'a> {
         &self,
         block_number: u32,
     ) -> Result<Vec<EvmTransaction>, ServiceError> {
+        let query = format!("SELECT * FROM {} WHERE block_number = $block_number", EVM_TXS_TABLE);
         let mut result = self
             .db
-            .query("SELECT * FROM $transactions WHERE block_number = $block_number")
-            .bind(("transactions", EVM_TXS_TABLE.to_string()))
+            .query(query)
             .bind(("block_number", block_number))
             .await
             .map_err(|e| ServiceError::DatabaseError(e.to_string()))?;
@@ -90,10 +76,10 @@ impl<'a> TransactionService<'a> {
 
     /// Get transaction by hash
     pub async fn get_by_hash(&self, hash: &str) -> Result<Option<EvmTransaction>, ServiceError> {
+        let query = format!("SELECT * FROM {} WHERE hash = $hash LIMIT 1", EVM_TXS_TABLE);
         let mut result = self
             .db
-            .query("SELECT * FROM $transactions WHERE hash = $hash LIMIT 1")
-            .bind(("transactions", EVM_TXS_TABLE.to_string()))
+            .query(query)
             .bind(("hash", hash.to_string()))
             .await
             .map_err(|e| ServiceError::DatabaseError(e.to_string()))?;
@@ -104,4 +90,22 @@ impl<'a> TransactionService<'a> {
 
         Ok(transactions.into_iter().next())
     }
+
+     /// Check if a transaction exists by hash
+     pub async fn is_exist_by_hash(&self, hash: &str) -> Result<bool, ServiceError> {
+        let query = format!("SELECT VALUE count() FROM {} WHERE hash = $hash", EVM_TXS_TABLE);
+        let mut result = self
+            .db
+            .query(query)
+            .bind(("hash", hash.to_string()))
+            .await
+            .map_err(|e| ServiceError::DatabaseError(e.to_string()))?;
+
+        let count: Option<i64> = result
+            .take(0)
+            .map_err(|e| ServiceError::DatabaseError(e.to_string()))?;
+
+        Ok(count.unwrap_or(0) > 0)
+    }
+
 }

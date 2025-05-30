@@ -11,7 +11,9 @@ anyhow = { workspace = true }
 axum = { workspace = true }
 tokio = { workspace = true }
 surrealdb = { workspace = true }
+serde = { workspace = true }
 tracing = { workspace = true }
+models = { workspace = true }
 tracing-subscriber = { workspace = true }
 
 database = { workspace = true }

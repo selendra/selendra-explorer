@@ -114,7 +114,7 @@ impl BlockProcessingService {
             transaction_info.trasation_method = Some(transaction_method);
     
             let new_tx = EvmTransaction {
-                id: Thing::from((config::EVM_TXS_TABLE, tx_hash.as_str())),
+                id: Thing::from((config::EVM_TXS_TABLE, tx_hash.to_string().as_str())),
                 hash: transaction_info.hash,
                 block_number: transaction_info.block_number,
                 timestamp: transaction_info.timestamp.unwrap_or(0),

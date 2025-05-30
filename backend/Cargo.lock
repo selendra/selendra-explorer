@@ -2707,6 +2707,8 @@ dependencies = [
  "config",
  "database",
  "dotenv",
+ "models",
+ "serde",
  "surrealdb",
  "tokio",
  "tower",
