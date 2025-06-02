@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use custom_error::ServiceError;
 use database::DatabaseService;
-use models::evm::{EvmBlock, EvmTransaction, NetworkType, TransactionType};
+use models::evm::{AddressType, EvmAccountInfo, EvmBlock, EvmContract, EvmTransaction, NetworkType, TransactionType};
 use ethers::{
     providers::{Http, Middleware, Provider},
     types::BlockId,
@@ -111,12 +111,21 @@ impl BlockProcessingService {
             let mut transaction_info = query.transaction_by_hash(&tx_hash).await?;
             let transaction_method = query.get_transaction_method(&transaction_info).await?;
             transaction_info.trasation_method = Some(transaction_method);
+
+            let timestamp = transaction_info.timestamp.unwrap_or(0);
+
+            // Process accounts involved in the transaction
+            self.process_account(&query, &tx_hash, &transaction_info.from, timestamp)
+                .await?;
+            if let Some(to) = &transaction_info.to {
+                self.process_account(&query, &tx_hash, to, timestamp).await?;
+            }
     
             let new_tx = EvmTransaction {
                 id: Thing::from((config::EVM_TXS_TABLE, tx_hash.to_string().as_str())),
                 hash: transaction_info.hash,
                 block_number: transaction_info.block_number,
-                timestamp: transaction_info.timestamp.unwrap_or(0),
+                timestamp,
                 from: transaction_info.from,
                 to: transaction_info.to,
                 value: transaction_info.value,
@@ -159,55 +168,38 @@ impl BlockProcessingService {
         Ok(())
     }
 
-    pub async fn process_transaction(
-        &self,
-        query: &BlockStateQuery,
-        tx_hash: &str,
-    ) -> Result<(), ServiceError> {
-        let mut transaction_info = query.transaction_by_hash(tx_hash).await?;
-        let transaction_method = query.get_transaction_method(&transaction_info).await?;
-
-        // todo: save to transaction_info database
-        transaction_info.trasation_method = Some(transaction_method);
-
-        println!("🎯 Fetching account information...");
-        self.process_account(query, tx_hash, &transaction_info.from)
-            .await?;
-        if let Some(to) = &transaction_info.to {
-            self.process_account(query, tx_hash, to).await?;
-        }
-
-        Ok(())
-    }
-
     async fn process_account(
         &self,
         query: &BlockStateQuery,
         tx_hash: &str,
         address: &str,
+        timestamp: u128,
     ) -> Result<(), ServiceError> {
         println!("👥 processing {} account...", address);
         let account_info = query.query_account(address).await?;
 
-        // todo: save to database
-        let _account = {
-            account_info.clone().address;
-            account_info.balance_token;
-            account_info.nonce;
-            account_info.is_contract;
+        let _account = EvmAccountInfo {
+            address: account_info.clone().address,
+            balance_token: account_info.balance_token,
+            nonce: account_info.nonce,
+            is_contract: account_info.is_contract,
+            address_type: AddressType::H160,
+            created_at: timestamp,
+            last_activity: timestamp,
         };
 
         if let Some(contract) = account_info.contract_type {
-            let _creator_info = query.get_contract_creation_info(&tx_hash).await?;
+            let creator_info = query.get_contract_creation_info(&tx_hash).await?;
 
-            // todo: save to database
-            let _contract = {
-                account_info.address;
-                contract.contract_type;
-                contract.name;
-                contract.symbol;
-                contract.decimals;
-                contract.total_supply;
+            let _contract = EvmContract {
+                address: account_info.address,
+                contract_type: contract.contract_type,
+                name: contract.name,
+                symbol: contract.symbol,
+                decimals: contract.decimals,
+                total_supply: contract.total_supply,
+                is_verified: false,
+                creator_info,
             };
         }
         Ok(())

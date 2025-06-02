@@ -2,7 +2,7 @@ pub mod evm;
 pub mod substrate;
 
 use custom_error::ServiceError;
-use evm::{EvmBlockService, TransactionService};
+use evm::{AccountService, ContractService, EvmBlockService, TransactionService};
 use surrealdb::{
     Surreal,
     engine::any,
@@ -45,5 +45,13 @@ impl DatabaseService {
 
     pub fn transactions(&self) -> TransactionService {
         TransactionService { db: &self.db }
+    }
+
+    pub fn accounts(&self) -> AccountService {
+        AccountService { db: &self.db }
+    }
+
+    pub fn contracts(&self) -> ContractService {
+        ContractService { db: &self.db }
     }
 }

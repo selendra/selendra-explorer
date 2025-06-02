@@ -4,6 +4,8 @@ use std::env;
 
 pub const EVM_BLOCK_TABLE: &'static str = "evm_blocks";
 pub const EVM_TXS_TABLE: &'static str = "evm_transaction";
+pub const EVM_ACCOUNTS_TABLE: &'static str = "evm_accounts";
+pub const EVM_CONTRACTS_TABLE: &'static str = "evm_contracts";
 
 lazy_static! {
     pub static ref EVM_RPC_URL: String = {
