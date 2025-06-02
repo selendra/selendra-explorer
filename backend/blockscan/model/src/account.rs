@@ -5,8 +5,8 @@ use crate::contract::EvmContractTypeInfo;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EvmAccountInfo {
     pub address: String,
-    pub balance: String,
-    pub balance_token: String,
+    pub balance: u128,
+    pub balance_token: f64,
     pub nonce: u64,
     pub is_contract: bool,
     pub contract_type: Option<EvmContractTypeInfo>,
@@ -15,7 +15,7 @@ pub struct EvmAccountInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EvmAccount {
     pub address: String,
-    pub balance: String,
+    pub balance: u128,
     pub nonce: u64,
     pub is_contract: bool,
 }

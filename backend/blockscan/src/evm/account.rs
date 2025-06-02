@@ -104,7 +104,7 @@ impl AccountQuery {
 
         Ok(EvmAccountInfo {
             address: format!("{:#x}", addr),
-            balance: balance.to_string(),
+            balance: balance.as_u128(),
             balance_token: Self::format_balance_ether(balance),
             nonce: nonce.as_u64(),
             is_contract,
@@ -459,8 +459,8 @@ impl AccountQuery {
             .map_err(|_| ServiceError::InvalidTransactionHash(tx_hash.to_string()))
     }
 
-    fn format_balance_ether(balance: U256) -> String {
-        format!("{:.6}", balance.as_u128() as f64 / 1e18)
+    fn format_balance_ether(balance: U256) -> f64 {
+        balance.as_u128() as f64 / 1e18
     }
 
     fn decode_string_response(result: &Bytes) -> Result<String, ServiceError> {

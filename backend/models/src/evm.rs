@@ -65,7 +65,7 @@ pub enum AddressType {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EvmAccountInfo {
     pub address: String,
-    pub balance_token: String,
+    pub balance_token: f64,
     pub nonce: u64,
     pub is_contract: bool,
     pub address_type: AddressType,

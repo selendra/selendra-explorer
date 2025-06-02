@@ -6,7 +6,7 @@ http://localhost:3000/api
 ```
 
 ## Overview
-This API provides access to blockchain data including blocks and transactions. All endpoints return JSON responses and support standard HTTP methods.
+This API provides access to blockchain data including blocks, transactions, accounts, and contracts. All endpoints return JSON responses and support standard HTTP methods.
 
 ---
 
@@ -25,6 +25,20 @@ This API provides access to blockchain data including blocks and transactions. A
 ### NetworkType
 - `"Evm"`: Ethereum Virtual Machine compatible network
 - `"Substrate"`: Substrate-based network
+
+### AddressType
+- `"SS58"`: Substrate address format
+- `"H160"`: Ethereum address format
+
+### ContractType
+- `"ERC20"`: ERC-20 token contract
+- `"ERC721"`: ERC-721 NFT contract
+- `"ERC1155"`: ERC-1155 multi-token contract
+- `"DEX"`: Decentralized exchange contract
+- `"LendingProtocol"`: Lending protocol contract
+- `"Proxy"`: Proxy contract
+- `"Oracle"`: Oracle contract
+- `"Unknown"`: Unidentified contract type
 
 ---
 
@@ -66,6 +80,33 @@ This API provides access to blockchain data including blocks and transactions. A
 - `input`: Transaction input data (hex string, null if none)
 - `fee`: Total transaction fee paid (gas_used × gas_price)
 - `transaction_method`: Method signature for contract calls (null for transfers)
+
+### Account Fields
+- `address`: Account address (format depends on address_type)
+- `balance_token`: Account balance in token units (decimal)
+- `nonce`: Account nonce (number of transactions sent)
+- `is_contract`: Boolean indicating if address is a contract
+- `address_type`: Address format type (see AddressType enum)
+- `created_at`: Unix timestamp when account was first seen
+- `last_activity`: Unix timestamp of last account activity
+
+### Contract Fields
+- `address`: Contract address
+- `contract_type`: Type of contract (see ContractType enum)
+- `name`: Contract name (optional)
+- `symbol`: Contract symbol (optional)
+- `decimals`: Number of decimal places for tokens (optional)
+- `total_supply`: Total token supply (optional, as string)
+- `is_verified`: Boolean indicating if contract is verified
+- `creator_info`: Contract creation information (optional)
+
+### Contract Creation Info Fields
+- `contract_address`: Address of the created contract
+- `creator_address`: Address that created the contract (optional)
+- `transaction_hash`: Hash of creation transaction (optional)
+- `block_number`: Block number where contract was created
+- `timestamp`: Creation timestamp
+- `creation_bytecode`: Bytecode used to create the contract
 
 ---
 
@@ -377,6 +418,218 @@ GET /api/transactions/block/869242
 
 ---
 
+## Accounts Endpoints
+
+### Get Accounts by Balance Range
+Retrieve accounts within a specified balance range.
+
+**Endpoint:** `GET /accounts/balance`
+
+**Query Parameters:**
+- `min_balance` (integer, optional): Minimum balance in wei (default: 0)
+- `max_balance` (integer, optional): Maximum balance in wei (default: u128::MAX)
+- `limit` (integer, optional): Number of accounts to return (default: 20)
+- `offset` (integer, optional): Number of accounts to skip (default: 0)
+
+**Example Requests:**
+```
+GET /api/accounts/balance
+GET /api/accounts/balance?min_balance=1000
+GET /api/accounts/balance?max_balance=50000
+GET /api/accounts/balance?min_balance=1000&max_balance=50000&limit=10
+```
+
+**Response:**
+```json
+{
+  "accounts": [
+    {
+      "address": "0x742d35Cc6634C0532925a3b8D453211321312131",
+      "balance_token": 1.5,
+      "nonce": 42,
+      "is_contract": false,
+      "address_type": "H160",
+      "created_at": 1704067200000,
+      "last_activity": 1706610600000
+    },
+    {
+      "address": "0x8ba1f109551bD432803012645Hac136c55321321",
+      "balance_token": 0.25,
+      "nonce": 7,
+      "is_contract": true,
+      "address_type": "H160",
+      "created_at": 1704067300000,
+      "last_activity": 1706610500000
+    }
+  ],
+  "total": 1250,
+  "limit": 20,
+  "offset": 0,
+  "min_balance": 0,
+  "max_balance": 340282366920938463463374607431768211455
+}
+```
+
+---
+
+## Contracts Endpoints
+
+### Get All Contracts (Paginated)
+Retrieve a list of contracts with pagination support.
+
+**Endpoint:** `GET /contracts`
+
+**Query Parameters:**
+- `limit` (integer, optional): Number of contracts to return (default: 20)
+- `offset` (integer, optional): Number of contracts to skip (default: 0)
+
+**Example Request:**
+```
+GET /api/contracts?limit=50&offset=100
+```
+
+**Response:**
+```json
+{
+  "contracts": [
+    {
+      "address": "0x8ba1f109551bD432803012645Hac136c55321321",
+      "contract_type": "ERC20",
+      "name": "Example Token",
+      "symbol": "EXT",
+      "decimals": 18,
+      "total_supply": "1000000000000000000000000",
+      "is_verified": true,
+      "creator_info": {
+        "contract_address": "0x8ba1f109551bD432803012645Hac136c55321321",
+        "creator_address": "0x742d35Cc6634C0532925a3b8D453211321312131",
+        "transaction_hash": "0xa04c8c80ed7646c70033c00d67f11904ea7d1bfafe60583aeea1813914c9ed75",
+        "block_number": 869000,
+        "timestamp": "2024-01-30T10:30:00Z",
+        "creation_bytecode": "0x608060405234801561001057600080fd5b5..."
+      }
+    }
+  ],
+  "total": 5420,
+  "limit": 50,
+  "offset": 100
+}
+```
+
+### Get Contract by Address
+Retrieve a specific contract by its address.
+
+**Endpoint:** `GET /contracts/address/{address}`
+
+**Path Parameters:**
+- `address` (string): The contract address to retrieve
+
+**Example Request:**
+```
+GET /api/contracts/address/0x8ba1f109551bD432803012645Hac136c55321321
+```
+
+**Response:**
+```json
+{
+  "address": "0x8ba1f109551bD432803012645Hac136c55321321",
+  "contract_type": "ERC20",
+  "name": "Example Token",
+  "symbol": "EXT",
+  "decimals": 18,
+  "total_supply": "1000000000000000000000000",
+  "is_verified": true,
+  "creator_info": {
+    "contract_address": "0x8ba1f109551bD432803012645Hac136c55321321",
+    "creator_address": "0x742d35Cc6634C0532925a3b8D453211321312131",
+    "transaction_hash": "0xa04c8c80ed7646c70033c00d67f11904ea7d1bfafe60583aeea1813914c9ed75",
+    "block_number": 869000,
+    "timestamp": "2024-01-30T10:30:00Z",
+    "creation_bytecode": "0x608060405234801561001057600080fd5b5..."
+  }
+}
+```
+
+### Get Contracts by Type
+Retrieve contracts filtered by contract type.
+
+**Endpoint:** `GET /contracts/type/{contract_type}`
+
+**Path Parameters:**
+- `contract_type` (string): The contract type to filter by (case-insensitive)
+  - Valid values: `erc20`, `erc721`, `erc1155`, `dex`, `lending`, `proxy`, `oracle`, `unknown`
+
+**Example Requests:**
+```
+GET /api/contracts/type/erc20
+GET /api/contracts/type/DEX
+```
+
+**Response:**
+```json
+{
+  "contract_type": "ERC20",
+  "contracts": [
+    {
+      "address": "0x8ba1f109551bD432803012645Hac136c55321321",
+      "contract_type": "ERC20",
+      "name": "Example Token",
+      "symbol": "EXT",
+      "decimals": 18,
+      "total_supply": "1000000000000000000000000",
+      "is_verified": true,
+      "creator_info": {
+        "contract_address": "0x8ba1f109551bD432803012645Hac136c55321321",
+        "creator_address": "0x742d35Cc6634C0532925a3b8D453211321312131",
+        "transaction_hash": "0xa04c8c80ed7646c70033c00d67f11904ea7d1bfafe60583aeea1813914c9ed75",
+        "block_number": 869000,
+        "timestamp": "2024-01-30T10:30:00Z",
+        "creation_bytecode": "0x608060405234801561001057600080fd5b5..."
+      }
+    }
+  ],
+  "total": 245
+}
+```
+
+### Get Verified Contracts
+Retrieve all verified contracts.
+
+**Endpoint:** `GET /contracts/verified`
+
+**Example Request:**
+```
+GET /api/contracts/verified
+```
+
+**Response:**
+```json
+{
+  "contracts": [
+    {
+      "address": "0x8ba1f109551bD432803012645Hac136c55321321",
+      "contract_type": "ERC20",
+      "name": "Example Token",
+      "symbol": "EXT",
+      "decimals": 18,
+      "total_supply": "1000000000000000000000000",
+      "is_verified": true,
+      "creator_info": {
+        "contract_address": "0x8ba1f109551bD432803012645Hac136c55321321",
+        "creator_address": "0x742d35Cc6634C0532925a3b8D453211321312131",
+        "transaction_hash": "0xa04c8c80ed7646c70033c00d67f11904ea7d1bfafe60583aeea1813914c9ed75",
+        "block_number": 869000,
+        "timestamp": "2024-01-30T10:30:00Z",
+        "creation_bytecode": "0x608060405234801561001057600080fd5b5..."
+      }
+    }
+  ],
+  "total": 1250
+}
+```
+
+---
+
 ## Error Responses
 
 All endpoints may return the following error responses:
@@ -393,7 +646,7 @@ All endpoints may return the following error responses:
 ```json
 {
   "error": "Not Found",
-  "message": "Block/Transaction not found"
+  "message": "Block/Transaction/Account/Contract not found"
 }
 ```
 
@@ -426,6 +679,21 @@ curl -X GET "http://localhost:3000/api/blocks/hash/0xb3ccc19ca8b20e40082f4604031
 curl -X GET "http://localhost:3000/api/transactions/hash/0xa04c8c80ed7646c70033c00d67f11904ea7d1bfafe60583aeea1813914c9ed75"
 ```
 
+**Get accounts with balance >= 1000:**
+```bash
+curl -X GET "http://localhost:3000/api/accounts/balance?min_balance=1000"
+```
+
+**Get ERC20 contracts:**
+```bash
+curl -X GET "http://localhost:3000/api/contracts/type/erc20"
+```
+
+**Get verified contracts:**
+```bash
+curl -X GET "http://localhost:3000/api/contracts/verified"
+```
+
 ---
 
 ## Rate Limiting
@@ -443,3 +711,8 @@ This API may implement rate limiting. If you exceed the allowed request rate, yo
 - The `to` field in transactions can be null for contract creation transactions
 - Gas values are in wei (1 ETH = 10^18 wei)
 - The `id` field follows the format "{type}:{identifier}" for both blocks and transactions
+- Balance ranges use inclusive bounds (min_balance <= balance <= max_balance)
+- Contract type filtering is case-insensitive
+- Account balances are returned in token units (converted from wei)
+- Contract addresses follow the same format as transaction addresses
+- Creation timestamps in contract creation info are ISO 8601 formatted strings

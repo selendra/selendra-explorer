@@ -114,7 +114,6 @@ impl BlockProcessingService {
 
             let timestamp = transaction_info.timestamp.unwrap_or(0);
 
-            // Process accounts involved in the transaction
             self.process_account(&query, &tx_hash, &transaction_info.from, timestamp)
                 .await?;
             if let Some(to) = &transaction_info.to {
@@ -177,8 +176,8 @@ impl BlockProcessingService {
     ) -> Result<(), ServiceError> {
         println!("👥 processing {} account...", address);
         let account_info = query.query_account(address).await?;
-
-        let _account = EvmAccountInfo {
+    
+        let account = EvmAccountInfo {
             address: account_info.clone().address,
             balance_token: account_info.balance_token,
             nonce: account_info.nonce,
@@ -187,12 +186,25 @@ impl BlockProcessingService {
             created_at: timestamp,
             last_activity: timestamp,
         };
-
+    
+        // Check if account already exists
+        if self.db_service.accounts().is_exist_by_address(&account.address).await? {
+            self.db_service.accounts().update_last_activity(&account.address, timestamp).await?;
+            self.db_service.accounts().update_balance(&account.address, account.balance_token).await?;
+            
+            println!("✅ Updated existing account: {}", account.address);
+        } else {
+            // Save new account
+            let saved_account = self.db_service.accounts().save(&account).await?;
+            println!("✅ Saved new account: {}", saved_account.address);
+        }
+    
+        // Process contract if it exists
         if let Some(contract) = account_info.contract_type {
             let creator_info = query.get_contract_creation_info(&tx_hash).await?;
-
-            let _contract = EvmContract {
-                address: account_info.address,
+    
+            let contract_data = EvmContract {
+                address: account_info.address.clone(),
                 contract_type: contract.contract_type,
                 name: contract.name,
                 symbol: contract.symbol,
@@ -201,7 +213,16 @@ impl BlockProcessingService {
                 is_verified: false,
                 creator_info,
             };
+    
+            // Check if contract already exists
+            if !self.db_service.contracts().is_exist_by_address(&contract_data.address).await? {
+                let saved_contract = self.db_service.contracts().save(&contract_data).await?;
+                println!("🔗 Saved contract: {} ({:?})", saved_contract.address, saved_contract.contract_type);
+            } else {
+                println!("🔗 Contract already exists: {}", contract_data.address);
+            }
         }
+    
         Ok(())
     }
 }
