@@ -1,6 +1,8 @@
-use blockscan_model::{method::TransactionMethod, transaction::TransactionStatus};
+use blockscan_model::{contract::{ContractCreationInfo, ContractType}, method::TransactionMethod, transaction::TransactionStatus};
 use serde::{Deserialize, Serialize};
 use surrealdb::sql::Thing;
+
+pub use blockscan_model::account::EvmAccountInfo;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EvmBlock {
@@ -54,4 +56,17 @@ pub struct EvmTransaction {
     pub input: Option<String>,
     pub fee: u64,
     pub transaction_method: Option<TransactionMethod>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EvmContract {
+    pub address: String,
+    pub contract_type: ContractType,
+    pub name: Option<String>,
+    pub symbol: Option<String>,
+    pub decimals: Option<u8>,
+    pub total_supply: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub is_verified: Option<bool>,
+    pub creator_info: Option<ContractCreationInfo>,
 }

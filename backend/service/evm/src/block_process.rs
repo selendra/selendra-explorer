@@ -7,7 +7,6 @@ use ethers::{
     providers::{Http, Middleware, Provider},
     types::BlockId,
 };
-// use model::{account::EvmAccount, contract::EvmContract};
 use blockscan::BlockStateQuery;
 use surrealdb::sql::Thing;
 

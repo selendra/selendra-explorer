@@ -138,8 +138,8 @@ impl AccountQuery {
 
         Ok(Some(ContractCreationInfo {
             contract_address: format!("{:#x}", contract_address),
-            creator_address: format!("{:#x}", tx.from),
-            transaction_hash: format!("{:#x}", hash),
+            creator_address: Some(format!("{:#x}", tx.from)),
+            transaction_hash: Some(format!("{:#x}", hash)),
             block_number: tx.block_number.map(|bn| bn.as_u64()).unwrap_or(0),
             timestamp,
             creation_bytecode: format!("0x{}", hex::encode(&tx.input)),
