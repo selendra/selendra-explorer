@@ -23,7 +23,6 @@ pub struct EvmBlock {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
-#[serde(rename_all = "lowercase")]
 pub enum NetworkType {
     Evm,
     Subtrate,
