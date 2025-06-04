@@ -426,10 +426,10 @@ Retrieve accounts within a specified balance range.
 **Endpoint:** `GET /accounts/balance`
 
 **Query Parameters:**
-- `min_balance` (integer, optional): Minimum balance in wei (default: 0)
-- `max_balance` (integer, optional): Maximum balance in wei (default: u128::MAX)
-- `limit` (integer, optional): Number of accounts to return (default: 20)
-- `offset` (integer, optional): Number of accounts to skip (default: 0)
+- `min_balance` (float, optional): Minimum balance in wei (default: 0.0)
+- `max_balance` (float, optional): Maximum balance in wei (default: f64::MAX)
+- `limit` (float, optional): Number of accounts to return (default: 20)
+- `offset` (float, optional): Number of accounts to skip (default: 0)
 
 **Example Requests:**
 ```

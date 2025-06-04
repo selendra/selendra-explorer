@@ -43,8 +43,8 @@ impl<'a> AccountService<'a> {
 
     pub async fn get_accounts_by_balance_range(
         &self,
-        min_balance: u128,
-        max_balance: u128,
+        min_balance: f64,
+        max_balance: f64,
         limit: u32,
     ) -> Result<Vec<EvmAccountInfo>, ServiceError> {
         let query = format!(

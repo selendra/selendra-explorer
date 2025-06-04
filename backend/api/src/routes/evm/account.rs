@@ -8,9 +8,9 @@ use crate::{routes::{ApiResponse, PaginationQuery}, AppState};
 #[derive(Debug, Deserialize)]
 pub struct BalanceRangeQuery {
     #[serde(default = "default_min_balance")]
-    pub min_balance: u128,
+    pub min_balance: f64,
     #[serde(default = "default_max_balance")]
-    pub max_balance: u128,
+    pub max_balance: f64,
     #[serde(default = "default_limit")]
     pub limit: u32,
 }
@@ -19,12 +19,12 @@ fn default_limit() -> u32 {
     20
 }
 
-fn default_min_balance() -> u128 {
-    0
+fn default_min_balance() -> f64 {
+    0.0
 }
 
-fn default_max_balance() -> u128 {
-    u128::MAX
+fn default_max_balance() -> f64 {
+    f64::MAX
 }
 
 // Account API handlers
