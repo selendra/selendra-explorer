@@ -1,9 +1,9 @@
-mod block;
-mod transaction;
 mod account;
+mod block;
 mod contract;
+mod transaction;
 
-use surrealdb::{engine::any::Any, Surreal};
+use surrealdb::{Surreal, engine::any::Any};
 
 pub struct EvmBlockService<'a> {
     pub db: &'a Surreal<Any>,

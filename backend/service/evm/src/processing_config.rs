@@ -31,10 +31,7 @@ pub struct ContinuousProcessor {
 }
 
 impl ContinuousProcessor {
-    pub fn new(
-        block_processor: BlockProcessingService,
-        config: ProcessingConfig,
-    ) -> Self {
+    pub fn new(block_processor: BlockProcessingService, config: ProcessingConfig) -> Self {
         Self {
             block_processor,
             config,
@@ -51,7 +48,10 @@ impl ContinuousProcessor {
         println!("   End Block: {}", end_block);
         println!("   Latest Block: {}", latest_block);
         println!("   Batch Size: {}", self.config.batch_size);
-        println!("   Total Blocks to Process: {}", end_block - start_block + 1);
+        println!(
+            "   Total Blocks to Process: {}",
+            end_block - start_block + 1
+        );
 
         let mut current_block = start_block;
         let mut processed_count = 0;
@@ -59,15 +59,20 @@ impl ContinuousProcessor {
 
         while current_block <= end_block {
             let batch_end = std::cmp::min(current_block + self.config.batch_size - 1, end_block);
-            
-            println!("\n🔄 Processing batch: blocks {} to {}", current_block, batch_end);
-            
+
+            println!(
+                "\n🔄 Processing batch: blocks {} to {}",
+                current_block, batch_end
+            );
+
             match self.process_block_batch(current_block, batch_end).await {
                 Ok(batch_processed) => {
                     processed_count += batch_processed;
                     let progress = (processed_count as f64 / total_blocks as f64) * 100.0;
-                    println!("✅ Batch completed. Progress: {:.2}% ({}/{})", 
-                            progress, processed_count, total_blocks);
+                    println!(
+                        "✅ Batch completed. Progress: {:.2}% ({}/{})",
+                        progress, processed_count, total_blocks
+                    );
                 }
                 Err(e) => {
                     println!("❌ Batch failed: {}. Retrying...", e);
@@ -78,23 +83,27 @@ impl ContinuousProcessor {
             }
 
             current_block = batch_end + 1;
-            
+
             // Add delay between batches to avoid overwhelming the RPC
             if current_block <= end_block {
                 sleep(self.config.delay_between_batches).await;
             }
         }
-        
+
         Ok(())
     }
 
-    async fn process_block_batch(&self, start: u64, end: u64) -> Result<u64, Box<dyn std::error::Error + Send + Sync>> {
+    async fn process_block_batch(
+        &self,
+        start: u64,
+        end: u64,
+    ) -> Result<u64, Box<dyn std::error::Error + Send + Sync>> {
         let mut processed = 0;
         let mut handles = Vec::new();
 
         for block_num in start..=end {
             let block_processor = self.block_processor.clone();
-            
+
             let handle = tokio::spawn(async move {
                 Self::process_single_block_with_retry(block_processor, block_num as u32, 3).await
             });
@@ -124,7 +133,7 @@ impl ContinuousProcessor {
         max_retries: u32,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         let mut retries = 0;
-        
+
         loop {
             match Self::process_chain_info(block_processor.clone(), block_number).await {
                 Ok(_) => {
@@ -133,34 +142,40 @@ impl ContinuousProcessor {
                 Err(e) => {
                     retries += 1;
                     if retries >= max_retries {
-                        return Err(format!("Failed to process block {} after {} retries: {}", 
-                                         block_number, max_retries, e).into());
+                        return Err(format!(
+                            "Failed to process block {} after {} retries: {}",
+                            block_number, max_retries, e
+                        )
+                        .into());
                     }
-                    
-                    println!("⚠️  Retry {}/{} for block {}: {}", retries, max_retries, block_number, e);
+
+                    println!(
+                        "⚠️  Retry {}/{} for block {}: {}",
+                        retries, max_retries, block_number, e
+                    );
                     sleep(Duration::from_millis(500 * retries as u64)).await;
                 }
             }
         }
     }
 
-    pub async fn start_continuous_sync(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn start_continuous_sync(
+        &self,
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         println!("🔄 Starting continuous sync mode...");
-        
+
         loop {
             let latest_block = self.block_processor.lastest_block().await?;
             let start_block = self.config.start_block.unwrap_or(latest_block);
-            
+
             if start_block <= latest_block {
                 let mut temp_config = self.config.clone();
                 temp_config.start_block = Some(start_block);
                 temp_config.end_block = Some(latest_block);
-                
-                let temp_processor = ContinuousProcessor::new(
-                    self.block_processor.clone(),
-                    temp_config,
-                );
-                
+
+                let temp_processor =
+                    ContinuousProcessor::new(self.block_processor.clone(), temp_config);
+
                 match temp_processor.start_processing().await {
                     Ok(_) => {
                         println!("✅ Sync batch completed up to block {}", latest_block);
@@ -170,7 +185,7 @@ impl ContinuousProcessor {
                     }
                 }
             }
-            
+
             println!("💤 Waiting for new blocks...");
             sleep(Duration::from_secs(1)).await; // Wait ~1 block time for Selendra
         }
@@ -179,14 +194,14 @@ impl ContinuousProcessor {
     async fn process_chain_info(
         block_processor: BlockProcessingService,
         block_number: u32,
-    ) -> Result<(), Box<dyn std::error::Error + Send + Sync >> {
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         // Process block and transactions concurrently
         let block_result = block_processor.process_block(block_number);
         let tx_result = block_processor.process_transactions(block_number);
-        
+
         // Wait for both to complete
         tokio::try_join!(block_result, tx_result)?;
-        
+
         Ok(())
     }
 }

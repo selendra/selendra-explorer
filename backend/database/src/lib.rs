@@ -3,11 +3,7 @@ pub mod substrate;
 
 use custom_error::ServiceError;
 use evm::{AccountService, ContractService, EvmBlockService, TransactionService};
-use surrealdb::{
-    Surreal,
-    engine::any,
-    opt::auth::Root,
-};
+use surrealdb::{Surreal, engine::any, opt::auth::Root};
 
 #[derive(Clone)]
 pub struct DatabaseService {

@@ -1,12 +1,15 @@
 pub mod block_process;
 pub mod processing_config;
 
-use std::{sync::Arc, time::Duration};
-use dotenv::dotenv;
 use block_process::BlockProcessingService;
+use config::{
+    DATABASE_NAMESPACE, DATABASE_PASSWORD, DATABASE_TABLE, DATABASE_URL, DATABASE_USERNAME,
+    EVM_RPC_URL,
+};
+use dotenv::dotenv;
 use ethers::providers::{Http, Provider};
-use config::{DATABASE_NAMESPACE, DATABASE_PASSWORD, DATABASE_TABLE, DATABASE_URL, DATABASE_USERNAME, EVM_RPC_URL};
 use processing_config::{ContinuousProcessor, ProcessingConfig};
+use std::{sync::Arc, time::Duration};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -26,7 +29,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Initialize block processing service
     let block_processor = BlockProcessingService::new(Arc::clone(&provider), database);
-    
+
     //1619130  869240
     let config = ProcessingConfig {
         start_block: Some(1619130),
@@ -43,7 +46,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Err(e) => println!("❌ Processing failed: {}", e),
     }
 
-    // // start continue block sync 
+    // // start continue block sync
     // match processor.start_continuous_sync().await {
     //     Ok(_) => println!("✅ Continuous sync started successfully"),
     //     Err(e) => println!("❌ Continuous sync failed: {}", e),

@@ -2704,9 +2704,11 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "axum",
+ "blockscan",
  "config",
  "database",
  "dotenv",
+ "ethers",
  "models",
  "serde",
  "surrealdb",

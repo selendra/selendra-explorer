@@ -1,14 +1,15 @@
+pub mod handlers;
 pub mod middleware;
 pub mod routes;
 
-use database::DatabaseService;
-use middleware::create_app;
-use std::net::SocketAddr;
-use tokio::net::TcpListener;
 use config::{
     DATABASE_NAMESPACE, DATABASE_PASSWORD, DATABASE_TABLE, DATABASE_URL, DATABASE_USERNAME,
 };
+use database::DatabaseService;
 use dotenv::dotenv;
+use middleware::create_app;
+use std::net::SocketAddr;
+use tokio::net::TcpListener;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -37,7 +38,7 @@ async fn main() -> anyhow::Result<()> {
 
     // Move the log statement BEFORE axum::serve() since serve() blocks indefinitely
     println!("🚀 Server running on http://{}", addr);
-    
+
     // This call blocks indefinitely until the server shuts down
     axum::serve(listener, app.into_make_service()).await?;
 

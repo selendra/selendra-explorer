@@ -1,17 +1,13 @@
-use axum::{
-    http::Method,
-    Router,
-};
+use axum::{Router, http::Method};
 use database::DatabaseService;
+use std::{sync::Arc, time::Duration};
 use tower_http::{
     cors::{Any, CorsLayer},
-    trace::TraceLayer,
     timeout::TimeoutLayer,
+    trace::TraceLayer,
 };
-use std::{sync::Arc, time::Duration};
 
-
-use crate::{routes::create_api_routes, AppState};
+use crate::{AppState, routes::create_api_routes};
 
 pub async fn create_app(db: DatabaseService) -> Router {
     let app_state = Arc::new(AppState { db });
@@ -20,8 +16,7 @@ pub async fn create_app(db: DatabaseService) -> Router {
     let app = create_api_routes().with_state(app_state);
 
     // Apply middleware layers individually to avoid type conflicts
-    app
-        .layer(TraceLayer::new_for_http())
+    app.layer(TraceLayer::new_for_http())
         .layer(
             CorsLayer::new()
                 .allow_origin(Any)

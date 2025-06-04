@@ -1,6 +1,12 @@
-pub use blockscan_model::{contract::{ContractCreationInfo, ContractType}, method::TransactionMethod, transaction::TransactionStatus};
+pub use blockscan_model::{
+    contract::{ContractCreationInfo, ContractType},
+    method::TransactionMethod,
+    transaction::TransactionStatus,
+};
 use serde::{Deserialize, Serialize};
 use surrealdb::sql::Thing;
+
+pub use blockscan_model::netwiork::EvmNetworkInfo;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EvmBlock {
@@ -44,7 +50,7 @@ pub struct EvmTransaction {
     pub from: String,
     pub to: Option<String>,
     pub value: u128,
-    pub gas_price:u64,
+    pub gas_price: u64,
     pub gas_limit: u64,
     pub gas_used: u64,
     pub nonce: u64,

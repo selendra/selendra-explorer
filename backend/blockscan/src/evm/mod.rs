@@ -27,7 +27,8 @@ pub struct BlockStateQuery {
 }
 
 impl BlockStateQuery {
-    pub fn new(provider: Arc<Provider<Http>>, block_id: BlockId) -> Self {
+    pub fn new(provider: Arc<Provider<Http>>, block_id: Option<BlockId>) -> Self {
+        let block_id = block_id.unwrap_or(BlockId::Number(ethers::types::BlockNumber::Latest));
         Self { provider, block_id }
     }
 
@@ -55,10 +56,9 @@ impl BlockStateQuery {
     }
 
     pub async fn block_info(&self) -> Result<EvmBlockInfo, ServiceError> {
-        let block_id = self.block_id;
         let block = self
             .provider
-            .get_block(block_id)
+            .get_block(self.block_id)
             .await?
             .ok_or(ServiceError::BlockNotFound)?;
 
@@ -125,7 +125,7 @@ impl BlockStateQuery {
         let transaction_info = EvmTransactionInfo {
             hash: format!("{:#x}", tx.hash),
             block_number: tx.block_number.map(|bn| bn.as_u64()).unwrap_or(0),
-            status, // Assume success if in block
+            status,
             timestamp,
             from: format!("{:#x}", tx.from),
             to: tx.to.map(|addr| format!("{:#x}", addr)),
@@ -156,10 +156,9 @@ impl BlockStateQuery {
     }
 
     pub async fn transactions_hash_in_block(&self) -> Result<Vec<H256>, ServiceError> {
-        let block_id = self.block_id;
         let block = self
             .provider
-            .get_block(block_id)
+            .get_block(self.block_id)
             .await?
             .ok_or(ServiceError::BlockNotFound)?;
 
