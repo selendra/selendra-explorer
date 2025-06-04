@@ -27,9 +27,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Initialize block processing service
     let block_processor = BlockProcessingService::new(Arc::clone(&provider), database);
     
+    //1619130  869240
     let config = ProcessingConfig {
-        start_block: Some(869240),
-        end_block: None, // Process 12 blocks
+        start_block: Some(1619130),
+        end_block: Some(1619366),
         batch_size: 5,
         delay_between_batches: Duration::from_millis(200),
         max_retries: 3,

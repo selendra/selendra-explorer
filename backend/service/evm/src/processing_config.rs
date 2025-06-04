@@ -128,7 +128,6 @@ impl ContinuousProcessor {
         loop {
             match Self::process_chain_info(block_processor.clone(), block_number).await {
                 Ok(_) => {
-                    println!("✅ Block {} processed successfully", block_number);
                     return Ok(());
                 }
                 Err(e) => {

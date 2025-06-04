@@ -1,0 +1,85 @@
+🚀 Starting Evm Processing Service
+📊 Processing Configuration:
+   Start Block: 1619130
+   End Block: 1619366
+   Latest Block: 1622324
+   Batch Size: 5
+   Total Blocks to Process: 237
+
+🔄 Processing batch: blocks 1619130 to 1619134
+✅ Successfully saved block 1619133 with hash: "0xf0a807fc6c0a72db1f7e072a4b67798ffdd987d4aca9cf719e91425381daf041"
+✅ Successfully saved block 1619132 with hash: "0xece06d6409bfd11cba4299c0e5730b2837fe24d3103bb54d8c746215953ea583"
+✅ Successfully saved block 1619130 with hash: "0x253838feb7647f9ddfc97d6acc7211702fdb8c1073913e571d37bff73e76416e"
+✅ Successfully saved block 1619134 with hash: "0xb20df7e097cbc2f495dce60112f1f93352680e08b2ec137fbcee92ecb7adfbb1"
+✅ Successfully saved block 1619131 with hash: "0x370202e809fce0352f683af29729bb084fff1696ce780bfe92de08a500e8bf64"
+👥 processing 0x9bbb96064b135bdb638dd870ed564d6776b516ad account...
+✅ Saved new account: 0x9bbb96064b135bdb638dd870ed564d6776b516ad
+is contract false
+contract_type None
+📄 Contract creation transaction detected: 0xccc2c79e89fc5b96ec250e8bd4533e60abe9c887097e4681fd032336d4d35ccc
+📍 Contract deployed at address: 0xba1bf81884517068eebb62bfdb23b3b98d65a0cf
+👥 processing 0xba1bf81884517068eebb62bfdb23b3b98d65a0cf account...
+✅ Saved new account: 0xba1bf81884517068eebb62bfdb23b3b98d65a0cf
+is contract true
+contract_type Some(EvmContractTypeInfo { contract_type: ERC20, name: Some("Explorer"), symbol: Some("Exp"), decimals: Some(18), total_supply: Some("1000000000000000000000000") })
+🔗 Saved contract: 0xba1bf81884517068eebb62bfdb23b3b98d65a0cf (ERC20)
+🎉 Transaction 0xccc2c79e89fc5b96ec250e8bd4533e60abe9c887097e4681fd032336d4d35ccc processing completed!
+✅ Batch completed. Progress: 2.11% (5/237)
+
+🔄 Processing batch: blocks 1619135 to 1619139
+✅ Successfully saved block 1619135 with hash: "0xbc4b15fba1421ec58c600fc3808efcc6a83c8fc89b3809de0e1d76b7fb88b32b"
+✅ Successfully saved block 1619136 with hash: "0x07c3751a6e92c350329596bf878c270415c808c350425a86ef603e4ee79aa768"
+✅ Successfully saved block 1619138 with hash: "0x432ec666226b022e1671ac51f8d1016d4b9e7976e3a20799c002731e4e3cd7c5"
+✅ Successfully saved block 1619137 with hash: "0x3b2a613b77c4aaba28d2c0ce2d1b16581e0cece1f256e912b9ac00d071a6af92"
+✅ Successfully saved block 1619139 with hash: "0x0fe300113dc3aae12e35413082f98ed47f80e9c94d00661921b59fa4d6796781"
+✅ Batch completed. Progress: 4.22% (10/237)
+
+🔄 Processing batch: blocks 1619140 to 1619144
+✅ Successfully saved block 1619140 with hash: "0x33f0f536439ecffea3381f2818666bc31018613c60c863ac99f7db04ea7c2775"
+✅ Successfully saved block 1619141 with hash: "0x6e7c9cbac4f56e9c42f6a2f22bab61764804f7ce24a3f35a2ba2cf72a8968253"
+✅ Successfully saved block 1619144 with hash: "0xf5f240ad5be060474be0984bd5f4261665e8c0205cfb079a7002da7aaa92a2ff"
+✅ Successfully saved block 1619142 with hash: "0x7c6758fe66a633633fe80b437b488a0c96a4b20943d1d7b765288975f17dacba"
+✅ Successfully saved block 1619143 with hash: "0x0f4ccaf4b351813ea06c3c3901f18da8939faf5945be2a34cc20772355522cb1"
+✅ Batch completed. Progress: 6.33% (15/237)
+
+🔄 Processing batch: blocks 1619145 to 1619149
+✅ Successfully saved block 1619149 with hash: "0x5068ae657a4eb781e5551e95d34f1387c6d81ff605bcadf1898a10e6eb35cd80"
+✅ Successfully saved block 1619148 with hash: "0x20a200cf25bdb58147d7965e81c88d40db2ab41684114d6e0178b0fe1bbefca4"
+✅ Successfully saved block 1619145 with hash: "0xbfa1f0d57cc9ba6d8f09f88f2688e3bd93cb610393d7bd881788138de011e279"
+✅ Successfully saved block 1619147 with hash: "0x6269abb5f111f9f746623d12d5df55cef083c29ebfe72be05eb810610311f35f"
+✅ Successfully saved block 1619146 with hash: "0x580b66dcd61fc5969f7a13d74175aec5b5503db814a81539e8871c9f0519a6df"
+✅ Batch completed. Progress: 8.44% (20/237)
+
+🔄 Processing batch: blocks 1619150 to 1619154
+✅ Successfully saved block 1619150 with hash: "0x1f022ea1aec215d833e3051eeefede9e25070031deda3bb21f428a20d8a86812"
+✅ Successfully saved block 1619151 with hash: "0xf2f9dd01185fc3f233d8af38f927c008979841b17ce93017d2001ca489f21f18"
+✅ Successfully saved block 1619154 with hash: "0xb8b79f184a32f26e7c4d69bf4d3e1053ce162999dfcfabcafab4e6a6de173f72"
+✅ Successfully saved block 1619153 with hash: "0x209b32040f2cb96d3b9b2f1cee5175f5fa7d5be1e4768054893dab72b2ec7710"
+✅ Successfully saved block 1619152 with hash: "0x1f22255d0b2d86bc4920c18af7991b07c9fc4b72077d5812a534dbbdb95fe473"
+✅ Batch completed. Progress: 10.55% (25/237)
+
+🔄 Processing batch: blocks 1619155 to 1619159
+✅ Successfully saved block 1619155 with hash: "0xc52cf865ac96fe8777a166c420b4a9f7a6d2c1c795a0ec9be519b23342f9371f"
+✅ Successfully saved block 1619158 with hash: "0xe6187332a07043f94aa0ef42686aabae6ec409a90d0ec2874035824fb59c36ed"
+✅ Successfully saved block 1619156 with hash: "0xe47bc05a922a1893eb4e1a55a6a5a8bc95108426af09f17e2c5b64cc82b13038"
+✅ Successfully saved block 1619159 with hash: "0x9c2e6af4d3ccffc689b62b1ab37b044cdb849afb824c9a674da88fefedec5e58"
+✅ Successfully saved block 1619157 with hash: "0x6d20192407c66729eb5939383e795d517218b4b03e182dc3a4358ef7e6f98183"
+✅ Batch completed. Progress: 12.66% (30/237)
+
+🔄 Processing batch: blocks 1619160 to 1619164
+✅ Successfully saved block 1619161 with hash: "0x79639562c21a682b4bfd7243ffe0a0c0632c704bfae6af77f169b309781137f9"
+✅ Successfully saved block 1619162 with hash: "0xffc30f43f0fafd6baada91568eeac8ddf5f43fe9c6d8efbc9f773ec04e74bc51"
+✅ Successfully saved block 1619163 with hash: "0x390f416f93ca6ecdb469480b6c3605d3cca3b0069e2302dc89570250aa261637"
+✅ Successfully saved block 1619164 with hash: "0x191209bbea5710046ab08414f610325c0cdece07c08e23593889421c2046c3e5"
+✅ Successfully saved block 1619160 with hash: "0x6bcd5efd6792b914e75295c417f5759f494c0f45e10439de701ce7aab9b964cc"
+✅ Batch completed. Progress: 14.77% (35/237)
+
+🔄 Processing batch: blocks 1619165 to 1619169
+✅ Successfully saved block 1619165 with hash: "0x51ad681a9d713d28c835e915412c960f31663c7a266bda7c1be526449fbe618c"
+✅ Successfully saved block 1619168 with hash: "0x494600ce90b05444895b92d14bcecf5e48202e360614a37a6cf357ac5f1f21e0"
+✅ Successfully saved block 1619167 with hash: "0x462ce731f282337539e1d24a3581dd06310674c7245f49be63c4ae2368a954cd"
+✅ Successfully saved block 1619166 with hash: "0xafafddff07334fc07ea0bed0d40d211d562545aed63c3b32f83cac77aec61901"
+✅ Successfully saved block 1619169 with hash: "0xc5599d184713528f279d46ceae8caa9bd612c0947092069ff216e4519ff7f5d4"
+✅ Batch completed. Progress: 16.88% (40/237)
+
+🔄 Processing batch: blocks 1619170 to 1619174

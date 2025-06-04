@@ -32,16 +32,12 @@ impl BlockProcessingService {
     pub async fn process_block(&self, block_number: u32) -> Result<(), ServiceError> {
         let block_id = BlockId::Number(block_number.into());
         let query = BlockStateQuery::new(Arc::clone(&self.provider), block_id);
-
-        println!("🚀 Starting to process block {}", block_number);
-        println!("🔍 Checking if block {} already exists...", block_number);
         let evm_service = self.db_service.evm_blocks();
         if evm_service.exists_by_number(block_number).await? {
             println!("⚠️  Block {} already exists in database, skipping...", block_number);
             return Ok(());
         }
 
-        println!("🎯  Fetching block information...");
         // todo: save to database
         let block_info = match query.block_info().await {
             Ok(block) => block,
@@ -96,13 +92,11 @@ impl BlockProcessingService {
         let query = BlockStateQuery::new(Arc::clone(&self.provider), block_id);
         let tx_service = self.db_service.transactions();
         
-        println!("🎯 Fetching transactions information...");
         let tx_hashes = query.transactions_hash_in_block().await?;
         
-        for tx_hash in tx_hashes {
-            let tx_hash = format!("{:#x}", tx_hash);
+        for raw_tx_hash in tx_hashes {
+            let tx_hash = format!("{:#x}", raw_tx_hash);
             
-            println!("🔍 Checking if transaction {} already exists...", tx_hash);
             if tx_service.is_exist_by_hash(&tx_hash).await? {
                 println!("⚠️ Transaction {} already exists in database", tx_hash);
                 return Ok(())
@@ -116,8 +110,29 @@ impl BlockProcessingService {
 
             self.process_account(&query, &tx_hash, &transaction_info.from, timestamp)
                 .await?;
+
             if let Some(to) = &transaction_info.to {
                 self.process_account(&query, &tx_hash, to, timestamp).await?;
+            }
+
+            let is_contract_creation = transaction_info.to.is_none() || 
+                transaction_info.to.as_ref().map_or(false, |addr| addr.is_empty() || addr == "0x");
+
+            if is_contract_creation {
+                println!("📄 Contract creation transaction detected: {}", tx_hash);
+                
+                if let Ok(Some(receipt)) = self.provider.get_transaction_receipt(raw_tx_hash).await {
+                    // TODO: Replace 'contract_address' with the actual field name from your TransactionReceipt struct
+                    // Common field names are: contract_address, contractAddress, created_contract_address, etc.
+                    if let Some(contract_address) = receipt.contract_address {
+                        let contract_address = format!("{:#x}", contract_address);
+                        println!("📍 Contract deployed at address: {}", contract_address);
+                        
+                        // Process the contract address as an account
+                        self.process_account(&query, &tx_hash, &contract_address, timestamp)
+                            .await?;
+                    }
+                }
             }
     
             let new_tx = EvmTransaction {
@@ -192,14 +207,12 @@ impl BlockProcessingService {
             self.db_service.accounts().update_last_activity(&account.address, timestamp).await?;
             self.db_service.accounts().update_balance(&account.address, account.balance_token).await?;
             
-            println!("✅ Updated existing account: {}", account.address);
         } else {
             // Save new account
             let saved_account = self.db_service.accounts().save(&account).await?;
             println!("✅ Saved new account: {}", saved_account.address);
         }
-    
-        // Process contract if it exists
+  
         if let Some(contract) = account_info.contract_type {
             let creator_info = query.get_contract_creation_info(&tx_hash).await?;
     
