@@ -6,7 +6,7 @@ http://localhost:3000/api
 ```
 
 ## Overview
-This API provides access to blockchain data including blocks, transactions, accounts, and contracts. All endpoints return JSON responses and support standard HTTP methods.
+This API provides access to blockchain data including network information, blocks, transactions, accounts, and contracts. All endpoints return JSON responses and support standard HTTP methods.
 
 ---
 
@@ -43,6 +43,14 @@ This API provides access to blockchain data including blocks, transactions, acco
 ---
 
 ## Field Descriptions
+
+### Network Fields
+- `chain_id`: Network chain identifier (integer)
+- `gas_price`: Current base gas price in wei
+- `max_priority_fee`: Maximum priority fee per gas (optional, in wei)
+- `max_fee`: Maximum fee per gas (optional, in wei)
+- `latest_block_number`: Most recent block number
+- `syncing`: Boolean indicating if the node is currently syncing
 
 ### Block Fields
 - `id`: Unique identifier for the block (format: "block:{number}")
@@ -107,6 +115,32 @@ This API provides access to blockchain data including blocks, transactions, acco
 - `block_number`: Block number where contract was created
 - `timestamp`: Creation timestamp
 - `creation_bytecode`: Bytecode used to create the contract
+
+---
+
+## Network Endpoints
+
+### Get Network Information
+Retrieve current network status and configuration information.
+
+**Endpoint:** `GET /network`
+
+**Example Request:**
+```
+GET /api/network
+```
+
+**Response:**
+```json
+{
+  "chain_id": 1,
+  "gas_price": 20000000000,
+  "max_priority_fee": 2000000000,
+  "max_fee": 30000000000,
+  "latest_block_number": 869242,
+  "syncing": false
+}
+```
 
 ---
 
@@ -420,6 +454,66 @@ GET /api/transactions/block/869242
 
 ## Accounts Endpoints
 
+### Get All Accounts (Paginated)
+Retrieve a list of accounts with pagination support.
+
+**Endpoint:** `GET /accounts`
+
+**Query Parameters:**
+- `limit` (integer, optional): Number of accounts to return (default: 20)
+- `offset` (integer, optional): Number of accounts to skip (default: 0)
+
+**Example Request:**
+```
+GET /api/accounts?limit=50&offset=100
+```
+
+**Response:**
+```json
+{
+  "accounts": [
+    {
+      "address": "0x742d35Cc6634C0532925a3b8D453211321312131",
+      "balance_token": 1.5,
+      "nonce": 42,
+      "is_contract": false,
+      "address_type": "H160",
+      "created_at": 1704067200000,
+      "last_activity": 1706610600000
+    }
+  ],
+  "total": 12500,
+  "limit": 50,
+  "offset": 100
+}
+```
+
+### Get Account by Address
+Retrieve a specific account by its address.
+
+**Endpoint:** `GET /accounts/address/{address}`
+
+**Path Parameters:**
+- `address` (string): The account address to retrieve
+
+**Example Request:**
+```
+GET /api/accounts/address/0x742d35Cc6634C0532925a3b8D453211321312131
+```
+
+**Response:**
+```json
+{
+  "address": "0x742d35Cc6634C0532925a3b8D453211321312131",
+  "balance_token": 1.5,
+  "nonce": 42,
+  "is_contract": false,
+  "address_type": "H160",
+  "created_at": 1704067200000,
+  "last_activity": 1706610600000
+}
+```
+
 ### Get Accounts by Balance Range
 Retrieve accounts within a specified balance range.
 
@@ -650,6 +744,14 @@ All endpoints may return the following error responses:
 }
 ```
 
+### 429 Too Many Requests
+```json
+{
+  "error": "Too Many Requests",
+  "message": "Rate limit exceeded"
+}
+```
+
 ### 500 Internal Server Error
 ```json
 {
@@ -664,6 +766,11 @@ All endpoints may return the following error responses:
 
 ### cURL Examples
 
+**Get network information:**
+```bash
+curl -X GET "http://localhost:3000/api/network"
+```
+
 **Get latest 20 blocks:**
 ```bash
 curl -X GET "http://localhost:3000/api/blocks?limit=20&offset=0"
@@ -677,6 +784,16 @@ curl -X GET "http://localhost:3000/api/blocks/hash/0xb3ccc19ca8b20e40082f4604031
 **Get transaction by hash:**
 ```bash
 curl -X GET "http://localhost:3000/api/transactions/hash/0xa04c8c80ed7646c70033c00d67f11904ea7d1bfafe60583aeea1813914c9ed75"
+```
+
+**Get all accounts:**
+```bash
+curl -X GET "http://localhost:3000/api/accounts?limit=50&offset=0"
+```
+
+**Get specific account by address:**
+```bash
+curl -X GET "http://localhost:3000/api/accounts/address/0x742d35Cc6634C0532925a3b8D453211321312131"
 ```
 
 **Get accounts with balance >= 1000:**
@@ -716,3 +833,5 @@ This API may implement rate limiting. If you exceed the allowed request rate, yo
 - Account balances are returned in token units (converted from wei)
 - Contract addresses follow the same format as transaction addresses
 - Creation timestamps in contract creation info are ISO 8601 formatted strings
+- Network information reflects the current state of the EVM-compatible blockchain
+- The `syncing` field indicates whether the node is actively synchronizing with the network
