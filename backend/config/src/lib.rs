@@ -7,6 +7,9 @@ pub const EVM_TXS_TABLE: &'static str = "evm_transaction";
 pub const EVM_ACCOUNTS_TABLE: &'static str = "evm_accounts";
 pub const EVM_CONTRACTS_TABLE: &'static str = "evm_contracts";
 
+#[subxt::subxt(runtime_metadata_path = "selendra_metadata.scale")]
+pub mod selendra {}
+
 lazy_static! {
     pub static ref EVM_RPC_URL: String = {
         dotenv().ok();
@@ -22,4 +25,10 @@ lazy_static! {
         env::var("DATABASE_NAMESPACE").expect("DATABASE_NAMESPACE must be set");
     pub static ref DATABASE_TABLE: String =
         env::var("DATABASE_TABLE").expect("DATABASE_TABLE must be set");
+    pub static ref SUBSTRATE_URL: String =
+        env::var("SUBSTRATE_URL").expect("SUBSTRATE_URL must be set");
 }
+
+pub const SESSIONS_PER_ERA: u32 = 96;
+pub const BLOCKS_PER_SESSION: u32 = 900;
+pub const COMMISSION_DENOMINATOR: f64 = 10_000_000.0;

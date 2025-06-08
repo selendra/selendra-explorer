@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+subxt = { workspace = true }
 ethers = { workspace = true }
 hex = { workspace = true }
 serde = { workspace = true }
@@ -21,3 +22,4 @@ sp-core = { workspace = true }
 
 blockscan-model = { workspace = true }
 custom-error = { workspace = true }
+config = { workspace = true }

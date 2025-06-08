@@ -142,7 +142,106 @@ GET /api/network
 }
 ```
 
----
+### Get Latest Block Information
+
+Retrieve the latest block number from the blockchain.
+
+**Endpoint:** `GET /latest_block`
+
+**Example Request:**
+```
+GET /api/latest_block
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": 1962278,
+  "error": null
+}
+```
+
+**Response Fields:**
+- `success` (boolean): Indicates whether the request was successful
+- `data` (u32): The latest block number
+- `error` (null|string): Error message if the request failed, null if successful
+
+### Get total issuance Information
+
+Retrieve the total issuance amount from the blockchain.
+
+**Endpoint:** `GET /get_total_issuance`
+
+**Example Request:**
+```
+GET /api/get_total_issuance
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": 196227800000000000000000,
+  "error": null
+}
+```
+
+**Response Fields:**
+- `success` (boolean): Indicates whether the request was successful
+- `data` (u128): Total issuance amount
+- `error` (null|string): Error message if the request failed, null if successful
+
+### Get era Information
+
+Retrieve the era from the blockchain.
+
+**Endpoint:** `GET /active_era`
+
+**Example Request:**
+```
+GET /api/active_era
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": 22,
+  "error": null
+}
+```
+
+**Response Fields:**
+- `success` (boolean): Indicates whether the request was successful
+- `data` (u32): Current active Era
+- `error` (null|string): Error message if the request failed, null if successful
+
+### Get session Information
+
+Retrieve the session from the blockchain.
+
+**Endpoint:** `GET /active_seesion`
+
+**Example Request:**
+```
+GET /api/active_seesion
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": 1080,
+  "error": null
+}
+```
+
+**Response Fields:**
+- `success` (boolean): Indicates whether the request was successful
+- `data` (u32): Current active seesion 
+- `error` (null|string): Error message if the request failed, null if successful
+
 
 ## Blocks Endpoints
 

@@ -1,24 +1,17 @@
 use crate::AppState;
-use crate::handlers::evm::network::get_all_network_info;
 use axum::{Router, routing::get};
 use std::sync::Arc;
 
-use crate::handlers::evm::{
-    account::{get_account_by_address, get_accounts_by_balance_range, get_all_accounts},
-    block::{get_all_blocks, get_block_by_hash, get_block_by_number, get_latest_block},
-    contract::{
-        get_all_contracts, get_contract_by_address, get_contracts_by_type, get_verified_contracts,
-    },
-    transaction::{
-        get_all_transactions, get_latest_transaction, get_transaction_by_hash,
-        get_transactions_by_block_number,
-    },
-};
+use crate::handlers::{evm::*, substrate::*};
 
 pub fn create_api_routes() -> Router<Arc<AppState>> {
     Router::new()
         // newtwork
         .route("/api/network", get(get_all_network_info))
+        .route("/api/latest_block", get(get_substrate_latest_block))
+        .route("/api/get_total_issuance", get(get_total_issuance))
+        .route("/api/active_era", get(get_current_era))
+        .route("/api/active_seesion", get(get_current_session))
         // block
         .route("/api/blocks", get(get_all_blocks))
         .route(

@@ -6,6 +6,12 @@ pub mod contract;
 pub mod network;
 pub mod transaction;
 
+pub use account::*;
+pub use block::*;
+pub use contract::*;
+pub use network::*;
+pub use transaction::*;
+
 #[derive(Debug, Deserialize)]
 pub struct PaginationQuery {
     #[serde(default = "default_limit")]
