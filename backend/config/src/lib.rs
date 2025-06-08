@@ -31,4 +31,5 @@ lazy_static! {
 
 pub const SESSIONS_PER_ERA: u32 = 96;
 pub const BLOCKS_PER_SESSION: u32 = 900;
+pub const BLOCKS_PER_ERA: u32 = SESSIONS_PER_ERA * BLOCKS_PER_SESSION;
 pub const COMMISSION_DENOMINATOR: f64 = 10_000_000.0;

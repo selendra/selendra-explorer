@@ -142,7 +142,62 @@ GET /api/network
 }
 ```
 
----
+
+### Get Era-Session Information
+Retrieve current Era-Session information.
+
+**Endpoint:** `GET /session_era`
+
+**Example Request:**
+```
+GET /api/session_era
+```
+
+**Response:**
+```json
+{
+  "era": 22,
+  "start_at": 1749280805000,
+  "end_at": 2000000000,
+  "session": 30000000000,
+}
+```
+
+### Get Latest Block Information
+
+Retrieve the latest block number from the blockchain.
+
+**Endpoint:** `GET /latest_block`
+
+**Example Request:**
+```
+GET /api/latest_block
+```
+
+**Response:**
+```json
+{
+  "data": 1962278,
+}
+```
+
+### Get total issuance Information
+
+Retrieve the total issuance amount from the blockchain.
+
+**Endpoint:** `GET /get_total_issuance`
+
+**Example Request:**
+```
+GET /api/get_total_issuance
+```
+
+**Response:**
+```json
+{
+  "data": 196227800000000000000000,
+}
+```
 
 ## Blocks Endpoints
 

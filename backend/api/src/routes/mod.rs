@@ -10,8 +10,8 @@ pub fn create_api_routes() -> Router<Arc<AppState>> {
         .route("/api/network", get(get_all_network_info))
         .route("/api/latest_block", get(get_substrate_latest_block))
         .route("/api/get_total_issuance", get(get_total_issuance))
-        .route("/api/active_era", get(get_current_era))
-        .route("/api/active_seesion", get(get_current_session))
+        .route("/api/session_era", get(get_era_session))
+        .route("/api/get_total_staking", get(get_total_staking))
         // block
         .route("/api/blocks", get(get_all_blocks))
         .route(
