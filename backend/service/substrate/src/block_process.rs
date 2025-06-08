@@ -13,11 +13,12 @@ impl BlockProcessingService {
 
     pub async fn process_block(&self, block_number: u32) -> Result<(), ServiceError> {
         println!("🚀 Starting to process block {}", block_number);
-        let query = SubstrtaeBlockQuery::new(self.api.clone(), block_number).await?;
+        let query = SubstrtaeBlockQuery::new(self.api.clone(), Some(block_number)).await?;
 
         println!("🎯  Fetching block information...");
         query.block_info().await?;
 
         Ok(())
     }
+
 }

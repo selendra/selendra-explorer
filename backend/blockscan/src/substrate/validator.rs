@@ -2,6 +2,7 @@ use blockscan_model::validator::{
     ActiveEra, ActiveValidator, StakingInfo, ValidatorPrefs, ValidatorType,
 };
 use codec::{Decode, Encode};
+use config::{COMMISSION_DENOMINATOR, SESSIONS_PER_ERA};
 use custom_error::ServiceError;
 use futures::future::try_join_all;
 use sp_core::crypto::Ss58Codec;
@@ -37,10 +38,6 @@ pub struct ValidatorInfo {
     pub api: Api<DefaultRuntimeConfig, JsonrpseeClient>,
     pub block_hash: Option<H256>,
 }
-
-// Constants for better maintainability
-const SESSIONS_PER_ERA: u32 = 96;
-const COMMISSION_DENOMINATOR: f64 = 10_000_000.0;
 
 impl ValidatorInfo {
     pub fn new(api: Api<DefaultRuntimeConfig, JsonrpseeClient>, block_hash: Option<H256>) -> Self {

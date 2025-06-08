@@ -4,12 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-ethers = { workspace = true }
+subxt = { workspace = true }
 tower-http = { workspace = true }
 tower = { workspace = true }
 dotenv = { workspace = true }
 anyhow = { workspace = true }
-axum = { workspace = true }
+axum = { workspace = true, features = ["macros"] }
 tokio = { workspace = true }
 surrealdb = { workspace = true }
 serde = { workspace = true }
@@ -20,3 +20,4 @@ tracing-subscriber = { workspace = true }
 database = { workspace = true }
 config = { workspace = true }
 blockscan = { workspace = true }
+custom-error = { workspace = true }

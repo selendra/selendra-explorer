@@ -31,6 +31,7 @@ anyhow = "1.0.98"
 axum = "0.8.4"
 tracing = "0.1.41"
 tower = "0.5.2"
+subxt = "0.42.1"
 tower-http = { version = "0.6.4", features = ["cors", "trace", "timeout"] }
 tokio = { version = "1.45.0", features = ["full"] }
 substrate-api-client = "1.17.0"
