@@ -5,7 +5,7 @@ pub mod utils;
 
 use account::AccountQuery;
 use blockscan_model::{
-    account::EvmAccountInfo,
+    account::AccountInfo,
     block::EvmBlockInfo,
     contract::ContractCreationInfo,
     method::TransactionMethod,
@@ -142,7 +142,7 @@ impl BlockStateQuery {
     }
 
     // New account query methods
-    pub async fn query_account(&self, address: &str) -> Result<EvmAccountInfo, ServiceError> {
+    pub async fn query_account(&self, address: &str) -> Result<AccountInfo, ServiceError> {
         let account_query = AccountQuery::new(self.provider.clone());
         account_query.query_account(address).await
     }

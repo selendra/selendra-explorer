@@ -1,5 +1,5 @@
 use blockscan_model::{
-    account::EvmAccountInfo,
+    account::AccountInfo,
     contract::{
         ContractCreationInfo, ContractType, EvmContractTypeInfo, NftMetadata, TokenMetadata,
     },
@@ -85,7 +85,7 @@ impl AccountQuery {
         }
     }
 
-    pub async fn query_account(&self, address: &str) -> Result<EvmAccountInfo, ServiceError> {
+    pub async fn query_account(&self, address: &str) -> Result<AccountInfo, ServiceError> {
         let addr = self.parse_address(address)?;
 
         // Batch RPC calls for better performance
@@ -102,10 +102,11 @@ impl AccountQuery {
             None
         };
 
-        Ok(EvmAccountInfo {
+        Ok(AccountInfo {
             address: format!("{:#x}", addr),
             balance: balance.as_u128(),
             balance_token: Self::format_balance_ether(balance),
+            free_balance: Self::format_balance_ether(balance),
             nonce: nonce.as_u64(),
             is_contract,
             contract_type: contract_info,

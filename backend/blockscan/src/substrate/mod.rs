@@ -1,6 +1,7 @@
 mod event;
 mod extrinsic;
 mod validator;
+pub mod substrate_subxt;
 
 use blockscan_model::{
     event::EventsResponse,
@@ -78,7 +79,7 @@ impl SubstrtaeBlockQuery {
                 )));
             }
         };
-        // println!("Block detail: {:?}", block);
+        println!("Block detail: {:?}", block);
 
         let _timestamp = self.get_block_timestamp().await?;
         // println!("timestamp: {:?}", _timestamp);

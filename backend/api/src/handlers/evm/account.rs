@@ -3,7 +3,7 @@ use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
 };
-use models::evm::EvmAccountInfo;
+use models::AccountInfo;
 use serde::Deserialize;
 use std::sync::Arc;
 
@@ -36,7 +36,7 @@ fn default_max_balance() -> f64 {
 pub async fn get_account_by_address(
     State(state): State<Arc<AppState>>,
     Path(address): Path<String>,
-) -> Result<Json<ApiResponse<Option<EvmAccountInfo>>>, StatusCode> {
+) -> Result<Json<ApiResponse<Option<AccountInfo>>>, StatusCode> {
     let account_service = state.db.accounts();
 
     match account_service.get_by_address(&address).await {
@@ -51,7 +51,7 @@ pub async fn get_account_by_address(
 pub async fn get_all_accounts(
     State(state): State<Arc<AppState>>,
     Query(pagination): Query<PaginationQuery>,
-) -> Result<Json<ApiResponse<Vec<EvmAccountInfo>>>, StatusCode> {
+) -> Result<Json<ApiResponse<Vec<AccountInfo>>>, StatusCode> {
     let account_service = state.db.accounts(); // Assuming you have this method
 
     match account_service
@@ -69,7 +69,7 @@ pub async fn get_all_accounts(
 pub async fn get_accounts_by_balance_range(
     State(state): State<Arc<AppState>>,
     Query(balance_query): Query<BalanceRangeQuery>,
-) -> Result<Json<ApiResponse<Vec<EvmAccountInfo>>>, StatusCode> {
+) -> Result<Json<ApiResponse<Vec<AccountInfo>>>, StatusCode> {
     let account_service = state.db.accounts();
 
     match account_service

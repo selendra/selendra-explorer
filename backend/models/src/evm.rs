@@ -63,23 +63,6 @@ pub struct EvmTransaction {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum AddressType {
-    SS58,
-    H160,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct EvmAccountInfo {
-    pub address: String,
-    pub balance_token: f64,
-    pub nonce: u64,
-    pub is_contract: bool,
-    pub address_type: AddressType,
-    pub created_at: u128,
-    pub last_activity: u128,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EvmContract {
     pub address: String,
     pub contract_type: ContractType,

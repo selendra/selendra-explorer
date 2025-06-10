@@ -12,6 +12,9 @@ pub fn create_api_routes() -> Router<Arc<AppState>> {
         .route("/api/get_total_issuance", get(get_total_issuance))
         .route("/api/session_era", get(get_era_session))
         .route("/api/get_total_staking", get(get_total_staking))
+        // convert
+        .route("/api/convert/ss58_to_evm_address/{address}", get(get_evm_from_ss58))
+        .route("/api/convert/evm_to_ss58_address/{address}", get(get_ss58_from_evm))
         // block
         .route("/api/blocks", get(get_all_blocks))
         .route(
