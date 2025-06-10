@@ -200,6 +200,48 @@ GET /api/get_total_issuance
 }
 ```
 
+---
+
+## Address Conversion Endpoints
+
+### Convert SS58 to EVM Address
+Convert a Substrate SS58 address to an Ethereum-compatible H160 address.
+
+**Endpoint:** `GET /convert/ss58_to_evm_address/{address}`
+
+**Path Parameters:**
+- `address` (string): The SS58 address to convert
+
+**Example Request:**
+```
+GET /api/convert/ss58_to_evm_address/5DM7PJEFPbcYViEzFXu5GjF96JgoSJ3rb6jfXLsmXqrPVG2o
+```
+
+**Response:**
+```json
+"0x742d35Cc6634C0532925a3b8D453211321312131"
+```
+
+### Convert EVM to SS58 Address
+Convert an Ethereum-compatible H160 address to a Substrate SS58 address.
+
+**Endpoint:** `GET /convert/evm_to_ss58_address/{address}`
+
+**Path Parameters:**
+- `address` (string): The EVM address to convert (must include 0x prefix)
+
+**Example Request:**
+```
+GET /api/convert/evm_to_ss58_address/0x742d35Cc6634C0532925a3b8D453211321312131
+```
+
+**Response:**
+```json
+"5DM7PJEFPbcYViEzFXu5GjF96JgoSJ3rb6jfXLsmXqrPVG2o"
+```
+
+---
+
 ## Blocks Endpoints
 
 ### Get All Blocks (Paginated)
@@ -831,6 +873,16 @@ All endpoints may return the following error responses:
 curl -X GET "http://localhost:3000/api/network"
 ```
 
+**Convert SS58 to EVM address:**
+```bash
+curl -X GET "http://localhost:3000/api/convert/ss58_to_evm_address/5DM7PJEFPbcYViEzFXu5GjF96JgoSJ3rb6jfXLsmXqrPVG2o"
+```
+
+**Convert EVM to SS58 address:**
+```bash
+curl -X GET "http://localhost:3000/api/convert/evm_to_ss58_address/0x742d35Cc6634C0532925a3b8D453211321312131"
+```
+
 **Get latest 20 blocks:**
 ```bash
 curl -X GET "http://localhost:3000/api/blocks?limit=20&offset=0"
@@ -895,3 +947,6 @@ This API may implement rate limiting. If you exceed the allowed request rate, yo
 - Creation timestamps in contract creation info are ISO 8601 formatted strings
 - Network information reflects the current state of the EVM-compatible blockchain
 - The `syncing` field indicates whether the node is actively synchronizing with the network
+- Address conversion endpoints return the converted address as a plain string (not wrapped in JSON object)
+- SS58 addresses are used in Substrate-based networks while H160 addresses are used in Ethereum-compatible networks
+- Address conversions maintain the same underlying account but represent it in different formats
