@@ -5,11 +5,13 @@ members = [
     "error", 
     "service/evm",
     "service/substrate",
+    "service/account",
     "blockscan",
     "blockscan/model",
     "database",
     "models",
-    "config", "api",
+    "config", 
+    "api",
 ]
 
 [profile.release]

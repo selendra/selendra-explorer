@@ -1,0 +1,15 @@
+[package]
+name = "account-service"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio = { workspace = true }
+dotenv = { workspace = true }
+subxt = { workspace = true }
+sp-core = { workspace = true }
+
+models = { workspace = true }
+config = { workspace = true }
+custom-error = { workspace = true }
+database = { workspace = true }

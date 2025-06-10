@@ -7,10 +7,10 @@ use ethers::{
     providers::{Http, Middleware, Provider},
     types::BlockId,
 };
-use models::evm::{
-    AddressType, EvmAccountInfo, EvmBlock, EvmContract, EvmTransaction, NetworkType,
+use models::{AddressType, AccountInfo, evm::{
+    EvmBlock, EvmContract, EvmTransaction, NetworkType,
     TransactionType,
-};
+}};
 use surrealdb::sql::Thing;
 
 #[derive(Clone)]
@@ -222,9 +222,10 @@ impl BlockProcessingService {
         println!("👥 processing {} account...", address);
         let account_info = query.query_account(address).await?;
 
-        let account = EvmAccountInfo {
+        let account = AccountInfo {
             address: account_info.clone().address,
             balance_token: account_info.balance_token,
+            free_balance: account_info.balance_token,
             nonce: account_info.nonce,
             is_contract: account_info.is_contract,
             address_type: AddressType::H160,
@@ -241,11 +242,7 @@ impl BlockProcessingService {
         {
             self.db_service
                 .accounts()
-                .update_last_activity(&account.address, timestamp)
-                .await?;
-            self.db_service
-                .accounts()
-                .update_balance(&account.address, account.balance_token)
+                .update_account(&account.address, Some(timestamp), Some(account.balance_token), Some(account.free_balance))
                 .await?;
         } else {
             // Save new account

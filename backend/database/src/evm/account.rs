@@ -1,13 +1,13 @@
 use config::EVM_ACCOUNTS_TABLE;
 use custom_error::ServiceError;
-use models::evm::EvmAccountInfo;
+use models::AccountInfo;
 
 use super::AccountService;
 
 // Account service implementation
 impl<'a> AccountService<'a> {
-    pub async fn save(&self, account: &EvmAccountInfo) -> Result<EvmAccountInfo, ServiceError> {
-        let created: EvmAccountInfo = self
+    pub async fn save(&self, account: &AccountInfo) -> Result<AccountInfo, ServiceError> {
+        let created: AccountInfo = self
             .db
             .create(EVM_ACCOUNTS_TABLE)
             .content(account.clone())
@@ -24,7 +24,7 @@ impl<'a> AccountService<'a> {
         &self,
         limit: u32,
         offset: u32,
-    ) -> Result<Vec<EvmAccountInfo>, ServiceError> {
+    ) -> Result<Vec<AccountInfo>, ServiceError> {
         let query = format!(
             "SELECT * FROM {} ORDER BY created_at DESC LIMIT $limit START $offset",
             EVM_ACCOUNTS_TABLE
@@ -37,7 +37,7 @@ impl<'a> AccountService<'a> {
             .await
             .map_err(|e| ServiceError::DatabaseError(e.to_string()))?;
 
-        let accounts: Vec<EvmAccountInfo> = result
+        let accounts: Vec<AccountInfo> = result
             .take(0)
             .map_err(|e| ServiceError::DatabaseError(e.to_string()))?;
 
@@ -49,7 +49,7 @@ impl<'a> AccountService<'a> {
         min_balance: f64,
         max_balance: f64,
         limit: u32,
-    ) -> Result<Vec<EvmAccountInfo>, ServiceError> {
+    ) -> Result<Vec<AccountInfo>, ServiceError> {
         let query = format!(
             "SELECT * FROM {} WHERE balance_token >= $min_balance AND balance_token <= $max_balance ORDER BY balance_token DESC LIMIT $limit",
             EVM_ACCOUNTS_TABLE
@@ -65,7 +65,7 @@ impl<'a> AccountService<'a> {
                 ServiceError::DatabaseError(format!("Balance range query failed: {}", e))
             })?;
 
-        let accounts: Vec<EvmAccountInfo> = result.take(0).map_err(|e| {
+        let accounts: Vec<AccountInfo> = result.take(0).map_err(|e| {
             ServiceError::DatabaseError(format!("Balance range extraction failed: {}", e))
         })?;
 
@@ -75,7 +75,7 @@ impl<'a> AccountService<'a> {
     pub async fn get_by_address(
         &self,
         address: &str,
-    ) -> Result<Option<EvmAccountInfo>, ServiceError> {
+    ) -> Result<Option<AccountInfo>, ServiceError> {
         let query = format!(
             "SELECT * FROM {} WHERE address = $address LIMIT 1",
             EVM_ACCOUNTS_TABLE
@@ -87,57 +87,63 @@ impl<'a> AccountService<'a> {
             .await
             .map_err(|e| ServiceError::DatabaseError(e.to_string()))?;
 
-        let accounts: Vec<EvmAccountInfo> = result
+        let accounts: Vec<AccountInfo> = result
             .take(0)
             .map_err(|e| ServiceError::DatabaseError(e.to_string()))?;
 
         Ok(accounts.into_iter().next())
     }
-
-    pub async fn update_last_activity(
+    
+    pub async fn update_account(
         &self,
         address: &str,
-        timestamp: u128,
-    ) -> Result<(), ServiceError> {
+        last_activity: Option<u128>,
+        balance_token: Option<f64>,
+        free_balance: Option<f64>,
+    ) -> Result<Option<AccountInfo>, ServiceError> {
+        let mut set_clauses = Vec::new();
+        let mut bindings = vec![("address", address.to_string())];
+    
+        if let Some(timestamp) = last_activity {
+            set_clauses.push("last_activity = $timestamp");
+            bindings.push(("timestamp", timestamp.to_string()));
+        }
+    
+        if let Some(balance) = balance_token {
+            set_clauses.push("balance_token = $balance_token");
+            bindings.push(("balance_token", balance.to_string()));
+        }
+    
+        if let Some(balance) = free_balance {
+            set_clauses.push("free_balance = $free_balance");
+            bindings.push(("free_balance", balance.to_string()));
+        }
+    
+        if set_clauses.is_empty() {
+            return Err(ServiceError::DatabaseError("No fields to update".to_string()));
+        }
+    
         let query = format!(
-            "UPDATE {} SET last_activity = $timestamp WHERE address = $address",
-            EVM_ACCOUNTS_TABLE
+            "UPDATE {} SET {} WHERE address = $address RETURN *",
+            EVM_ACCOUNTS_TABLE,
+            set_clauses.join(", ")
         );
-        self.db
-            .query(query)
-            .bind(("address", address.to_string()))
-            .bind(("timestamp", timestamp))
+    
+        let mut query_builder = self.db.query(query);
+        for (key, value) in bindings {
+            query_builder = query_builder.bind((key, value));
+        }
+    
+        let mut result = query_builder
             .await
             .map_err(|e| {
-                ServiceError::DatabaseError(format!("Failed to update last activity: {}", e))
+                ServiceError::DatabaseError(format!("Account update failed: {}", e))
             })?;
-
-        Ok(())
-    }
-
-    pub async fn update_balance(
-        &self,
-        address: &str,
-        balance: f64,
-    ) -> Result<Option<EvmAccountInfo>, ServiceError> {
-        let query = format!(
-            "UPDATE {} SET balance_token = $balance WHERE address = $address",
-            EVM_ACCOUNTS_TABLE
-        );
-        let mut result = self
-            .db
-            .query(query)
-            .bind(("address", address.to_string()))
-            .bind(("balance", balance))
-            .await
-            .map_err(|e| {
-                ServiceError::DatabaseError(format!("Account balance update failed: {}", e))
-            })?;
-
-        let account: Option<EvmAccountInfo> = result.take(0).map_err(|e| {
-            ServiceError::DatabaseError(format!("Account balance update extraction failed: {}", e))
+    
+        let account: Option<AccountInfo> = result.take(0).map_err(|e| {
+            ServiceError::DatabaseError(format!("Account update extraction failed: {}", e))
         })?;
-
+    
         Ok(account)
     }
 

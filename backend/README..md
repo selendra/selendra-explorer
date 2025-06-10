@@ -92,6 +92,7 @@ This API provides access to blockchain data including network information, block
 ### Account Fields
 - `address`: Account address (format depends on address_type)
 - `balance_token`: Account balance in token units (decimal)
+- `free_balance`: Account balance in token units that transferable (decimal)
 - `nonce`: Account nonce (number of transactions sent)
 - `is_contract`: Boolean indicating if address is a contract
 - `address_type`: Address format type (see AddressType enum)
@@ -530,6 +531,7 @@ GET /api/accounts?limit=50&offset=100
     {
       "address": "0x742d35Cc6634C0532925a3b8D453211321312131",
       "balance_token": 1.5,
+      "free_balance": 1.5,
       "nonce": 42,
       "is_contract": false,
       "address_type": "H160",
@@ -561,6 +563,7 @@ GET /api/accounts/address/0x742d35Cc6634C0532925a3b8D453211321312131
 {
   "address": "0x742d35Cc6634C0532925a3b8D453211321312131",
   "balance_token": 1.5,
+  "free_balance": 1.5,
   "nonce": 42,
   "is_contract": false,
   "address_type": "H160",
@@ -593,17 +596,19 @@ GET /api/accounts/balance?min_balance=1000&max_balance=50000&limit=10
 {
   "accounts": [
     {
-      "address": "0x742d35Cc6634C0532925a3b8D453211321312131",
+      "address": "5DM7PJEFPbcYViEzFXu5GjF96JgoSJ3rb6jfXLsmXqrPVG2o",
       "balance_token": 1.5,
+      "free_balance": 0.5,
       "nonce": 42,
       "is_contract": false,
-      "address_type": "H160",
+      "address_type": "ss58",
       "created_at": 1704067200000,
       "last_activity": 1706610600000
     },
     {
       "address": "0x8ba1f109551bD432803012645Hac136c55321321",
       "balance_token": 0.25,
+      "free_balance":0.25,
       "nonce": 7,
       "is_contract": true,
       "address_type": "H160",
