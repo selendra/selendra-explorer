@@ -4,13 +4,11 @@ pub use blockscan_model::{
     transaction::TransactionStatus,
 };
 use serde::{Deserialize, Serialize};
-use surrealdb::sql::Thing;
 
 pub use blockscan_model::netwiork::EvmNetworkInfo;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EvmBlock {
-    pub id: Thing,
     pub number: u32,
     pub hash: String,
     pub parent_hash: String,
@@ -43,7 +41,6 @@ pub enum TransactionType {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EvmTransaction {
-    pub id: Thing,
     pub hash: String,
     pub block_number: u64,
     pub timestamp: u128,

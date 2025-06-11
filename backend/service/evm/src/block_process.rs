@@ -11,7 +11,6 @@ use models::{AddressType, AccountInfo, evm::{
     EvmBlock, EvmContract, EvmTransaction, NetworkType,
     TransactionType,
 }};
-use surrealdb::sql::Thing;
 
 #[derive(Clone)]
 pub struct BlockProcessingService {
@@ -61,10 +60,6 @@ impl BlockProcessingService {
         let era = session / 96;
 
         let block_save = EvmBlock {
-            id: Thing::from((
-                config::EVM_BLOCK_TABLE,
-                block_info.number.to_string().as_str(),
-            )),
             number: block_info.number as u32,
             hash: block_info.hash.unwrap_or(
                 "0x536274806b33f992898c98f2ad4fe6e190057900fcd8505083e3b765790b4bed".to_string(),
@@ -162,7 +157,6 @@ impl BlockProcessingService {
             }
 
             let new_tx = EvmTransaction {
-                id: Thing::from((config::EVM_TXS_TABLE, tx_hash.to_string().as_str())),
                 hash: transaction_info.hash,
                 block_number: transaction_info.block_number,
                 timestamp,
