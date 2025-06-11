@@ -2,15 +2,15 @@
 resolver = "2"
 
 members = [ 
-    "error", 
+    "crates/error", 
+    "crates/blockscan",
+    "crates/blockscan/model",
+    "crates/database",
+    "crates/models",
+    "crates/config",
     "service/evm",
     "service/substrate",
     "service/account",
-    "blockscan",
-    "blockscan/model",
-    "database",
-    "models",
-    "config", 
     "api",
 ]
 
@@ -47,9 +47,9 @@ sp-core = { git = "https://github.com/Cardinal-Cryptography/polkadot-sdk.git", b
 sp-runtime = { git = "https://github.com/Cardinal-Cryptography/polkadot-sdk.git", branch = "aleph-v1.6.0", default-features = false }
 
 # local dependencies
-blockscan = { path = "blockscan"}
-blockscan-model = { path = "blockscan/model"}
-database = { path = "database"}
-models = { path = "models"}
-config = { path = "config"}
-custom-error = { path = "error" }
+blockscan = { path = "crates/blockscan"}
+blockscan-model = { path = "crates/blockscan/model"}
+database = { path = "crates/database"}
+models = { path = "crates/models"}
+config = { path = "crates/config"}
+custom-error = { path = "crates/error" }

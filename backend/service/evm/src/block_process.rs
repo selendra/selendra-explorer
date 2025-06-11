@@ -8,7 +8,7 @@ use ethers::{
     types::BlockId,
 };
 use models::{AddressType, AccountInfo, evm::{
-    EvmBlock, EvmContract, EvmTransaction, NetworkType,
+    EvmBlock, EvmContract, EvmTransaction,
     TransactionType,
 }};
 
@@ -177,8 +177,6 @@ impl BlockProcessingService {
                         _ => TransactionType::Legacy,
                     })
                     .unwrap_or(TransactionType::Legacy),
-                network_type: NetworkType::Evm,
-                input: None,
                 fee: transaction_info.transaction_fee.total_fee,
                 transaction_method: transaction_info.trasation_method,
             };

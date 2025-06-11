@@ -16,7 +16,7 @@ impl BlockProcessingService {
         let query = SubstrtaeBlockQuery::new(self.api.clone(), Some(block_number)).await?;
 
         println!("🎯  Fetching block information...");
-        query.block_info().await?;
+        let _block = query.block_info().await?;
 
         Ok(())
     }

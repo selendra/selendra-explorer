@@ -26,12 +26,6 @@ pub struct EvmBlock {
     pub era: u32,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
-pub enum NetworkType {
-    Evm,
-    Subtrate,
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TransactionType {
     Legacy = 0,
@@ -53,8 +47,6 @@ pub struct EvmTransaction {
     pub nonce: u64,
     pub status: TransactionStatus,
     pub transaction_type: TransactionType,
-    pub network_type: NetworkType,
-    pub input: Option<String>,
     pub fee: u64,
     pub transaction_method: Option<TransactionMethod>,
 }

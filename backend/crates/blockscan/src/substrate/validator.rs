@@ -1,8 +1,8 @@
 use blockscan_model::validator::{
-    ActiveEra, ActiveValidator, StakingInfo, ValidatorPrefs, ValidatorType,
+    ActiveValidator, StakingInfo, ValidatorPrefs, ValidatorType,
 };
 use codec::{Decode, Encode};
-use config::{COMMISSION_DENOMINATOR, SESSIONS_PER_ERA};
+use config::COMMISSION_DENOMINATOR;
 use custom_error::ServiceError;
 use futures::future::try_join_all;
 use sp_core::crypto::Ss58Codec;
@@ -173,84 +173,6 @@ impl ValidatorInfo {
                     e
                 ))
             })
-    }
-
-    pub async fn current_era_info(&self) -> Result<ActiveEra, ServiceError> {
-        let active_era = self.get_active_era_info().await?;
-
-        // Run all queries concurrently
-        let (start_session, total_stake, current_session) = futures::try_join!(
-            self.era_start_session(active_era.index),
-            self.era_total_stake(active_era.index),
-            self.current_session()
-        )?;
-
-        Ok(ActiveEra {
-            era: active_era.index,
-            start_time: active_era.start.unwrap_or(0),
-            start_session,
-            current_session,
-            total_stake,
-            end_session: start_session + SESSIONS_PER_ERA,
-        })
-    }
-
-    async fn get_active_era_info(&self) -> Result<ActiveEraInfo, ServiceError> {
-        self.api
-            .get_storage::<ActiveEraInfo>("Staking", "ActiveEra", self.block_hash)
-            .await
-            .map_err(|e| {
-                ServiceError::SubstrateError(format!("Failed to get current active era: {:?}", e))
-            })?
-            .ok_or_else(|| ServiceError::SubstrateError("No active era found".to_string()))
-    }
-
-    async fn era_start_session(&self, era_index: u32) -> Result<u32, ServiceError> {
-        self.api
-            .get_storage_map::<u32, u32>(
-                "Staking",
-                "ErasStartSessionIndex",
-                era_index,
-                self.block_hash,
-            )
-            .await
-            .map_err(|e| {
-                ServiceError::SubstrateError(format!(
-                    "Failed to get era start session for era {}: {:?}",
-                    era_index, e
-                ))
-            })?
-            .ok_or_else(|| {
-                ServiceError::SubstrateError(format!(
-                    "No start session found for era {}",
-                    era_index
-                ))
-            })
-    }
-
-    async fn era_total_stake(&self, era_index: u32) -> Result<u128, ServiceError> {
-        self.api
-            .get_storage_map::<u32, u128>("Staking", "ErasTotalStake", era_index, self.block_hash)
-            .await
-            .map_err(|e| {
-                ServiceError::SubstrateError(format!(
-                    "Failed to get total stake for era {}: {:?}",
-                    era_index, e
-                ))
-            })?
-            .ok_or_else(|| {
-                ServiceError::SubstrateError(format!("No total stake found for era {}", era_index))
-            })
-    }
-
-    async fn current_session(&self) -> Result<u32, ServiceError> {
-        self.api
-            .get_storage::<u32>("Session", "CurrentIndex", self.block_hash)
-            .await
-            .map_err(|e| {
-                ServiceError::SubstrateError(format!("Failed to get current session: {:?}", e))
-            })?
-            .ok_or_else(|| ServiceError::SubstrateError("No current session found".to_string()))
     }
 
     async fn current_era(&self) -> Result<u32, ServiceError> {

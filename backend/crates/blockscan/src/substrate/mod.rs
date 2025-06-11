@@ -4,9 +4,7 @@ mod validator;
 pub mod substrate_subxt;
 
 use blockscan_model::{
-    event::EventsResponse,
-    extrinsic::ExtrinsicDetails,
-    validator::{ActiveEra, ActiveValidator},
+    block::SubstrateBlock, event::EventsResponse, extrinsic::ExtrinsicDetails, validator::ActiveValidator
 };
 use custom_error::ServiceError;
 use substrate_api_client::{
@@ -55,20 +53,7 @@ impl SubstrtaeBlockQuery {
         })
     }
 
-    pub async fn fetch_latest_block(&self) -> Result<u32, ServiceError> {
-        match self.api.get_block(None).await {
-            Ok(Some(block)) => Ok(block.header.number),
-            Ok(None) => return Err(ServiceError::SubstrateError(format!("No blocks found"))),
-            Err(e) => {
-                return Err(ServiceError::SubstrateError(format!(
-                    "Error getting latest block: {:?}",
-                    e
-                )));
-            }
-        }
-    }
-
-    pub async fn block_info(&self) -> Result<(), ServiceError> {
+    pub async fn block_info(&self) -> Result<SubstrateBlock, ServiceError> {
         let block = match self.api.get_block(self.block_hash).await {
             Ok(Some(block)) => block,
             Ok(None) => return Err(ServiceError::SubstrateError(format!("Block not found"))),
@@ -79,44 +64,37 @@ impl SubstrtaeBlockQuery {
                 )));
             }
         };
-        println!("Block detail: {:?}", block);
 
-        let _timestamp = self.get_block_timestamp().await?;
-        // println!("timestamp: {:?}", _timestamp);
+        let is_finalize = self.check_block_finalization_status().await?;
+        let timestamp = self.get_block_timestamp().await?;
 
-        let _finalize = self.check_block_finalization_status().await?;
-        // println!("is finalize: {:?}", _finalize);
-
-        let _extrinsics = self.get_extrinsics(block).await?;
-        println!("extrinsics data: {:?}", _extrinsics);
-
-        let _event = self.block_event().await?;
-        println!("event data: {:?}", _event);
-
-        let _validator = self.active_validaora().await?;
-        // println!("validator data: {:?}", _validator);
-
-        let _era_info = self.current_era().await?;
-        // println!("validator data: {:?}", _era_info);
-
-        Ok(())
+        Ok(SubstrateBlock {
+            number: block.header.number,
+            hash: format!("{:#x}", block.header.hash()),
+            parent_hash: format!("{:#x}", block.header.parent_hash),
+            state_root: format!("{:#x}", block.header.state_root),
+            extrinsics_root: format!("{:#x}", block.header.extrinsics_root),
+            timestamp,
+            is_finalize,
+        })
     }
 
-    async fn get_block_timestamp(&self) -> Result<u64, ServiceError> {
-        match self
-            .api
-            .get_storage::<u64>("Timestamp", "Now", self.block_hash)
-            .await
-        {
-            Ok(Some(timestamp)) => Ok(timestamp),
-            Ok(None) => Err(ServiceError::SubstrateError(
-                "Timestamp not found".to_string(),
-            )),
-            Err(e) => Err(ServiceError::SubstrateError(format!(
-                "Error getting timestamp: {:?}",
-                e
-            ))),
-        }
+    pub async fn get_extrinsics(
+        &self,
+        block: Block<Header<u32, BlakeTwo256>, OpaqueExtrinsic>,
+    ) -> Result<Vec<ExtrinsicDetails>, ServiceError> {
+        let extrinsic = extrinsic::ExtrinsicInfo::new(block);
+        extrinsic.get_extrinsics().await
+    }
+
+    pub async fn block_event(&self) -> Result<EventsResponse, ServiceError> {
+        let event = event::EventInfo::new(self.api.clone(), self.block_hash);
+        event.get_events().await
+    }
+
+    pub async fn active_validaora(&self) -> Result<Vec<ActiveValidator>, ServiceError> {
+        let validator = validator::ValidatorInfo::new(self.api.clone(), self.block_hash);
+        validator.get_all_validators().await
     }
 
     async fn check_block_finalization_status(&self) -> Result<bool, ServiceError> {
@@ -142,26 +120,21 @@ impl SubstrtaeBlockQuery {
         Ok(self.block_number <= finalized_block_number)
     }
 
-    async fn get_extrinsics(
-        &self,
-        block: Block<Header<u32, BlakeTwo256>, OpaqueExtrinsic>,
-    ) -> Result<Vec<ExtrinsicDetails>, ServiceError> {
-        let extrinsic = extrinsic::ExtrinsicInfo::new(block);
-        extrinsic.get_extrinsics().await
+    async fn get_block_timestamp(&self) -> Result<u64, ServiceError> {
+        match self
+            .api
+            .get_storage::<u64>("Timestamp", "Now", self.block_hash)
+            .await
+        {
+            Ok(Some(timestamp)) => Ok(timestamp),
+            Ok(None) => Err(ServiceError::SubstrateError(
+                "Timestamp not found".to_string(),
+            )),
+            Err(e) => Err(ServiceError::SubstrateError(format!(
+                "Error getting timestamp: {:?}",
+                e
+            ))),
+        }
     }
 
-    async fn block_event(&self) -> Result<EventsResponse, ServiceError> {
-        let event = event::EventInfo::new(self.api.clone(), self.block_hash);
-        event.get_events().await
-    }
-
-    pub async fn active_validaora(&self) -> Result<Vec<ActiveValidator>, ServiceError> {
-        let validator = validator::ValidatorInfo::new(self.api.clone(), self.block_hash);
-        validator.get_all_validators().await
-    }
-
-    pub async fn current_era(&self) -> Result<ActiveEra, ServiceError> {
-        let validator = validator::ValidatorInfo::new(self.api.clone(), self.block_hash);
-        validator.current_era_info().await
-    }
 }
