@@ -28,9 +28,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = JsonrpseeClient::new(endpoint).await.map_err(|e| {
         Box::<dyn std::error::Error>::from(format!("Failed to connect to endpoint: {:?}", e))
     })?;
-
-    // Initialize block processing service
-    let block_processor = BlockProcessingService::new(client, database).await?;
     
     //1619130  869240
     let config = ProcessingConfig {
@@ -41,6 +38,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         max_retries: 3,
     };
 
+     // Initialize block processing service
+    let block_processor = BlockProcessingService::new(client, database)?;
     let processor = ContinuousProcessor::new(block_processor, config);
 
     match processor.start_processing().await {

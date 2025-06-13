@@ -5,6 +5,8 @@ use custom_error::ServiceError;
 use evm::{AccountService, ContractService, EvmBlockService, TransactionService};
 use surrealdb::{Surreal, engine::any, opt::auth::Root};
 
+use crate::substrate::{SubstrateBlockService, SubstrateEventService, SubstrateExtrinsicService};
+
 #[derive(Clone)]
 pub struct DatabaseService {
     pub db: Surreal<any::Any>,
@@ -49,5 +51,17 @@ impl DatabaseService {
 
     pub fn contracts(&self) -> ContractService {
         ContractService { db: &self.db }
+    }
+
+    pub fn substrate_blocks(&self) -> SubstrateBlockService {
+        SubstrateBlockService { db: &self.db }
+    }
+
+    pub fn substrate_extrinsics(&self) -> SubstrateExtrinsicService {
+        SubstrateExtrinsicService { db: &self.db }
+    }
+
+    pub fn substrate_events(&self) -> SubstrateEventService {
+        SubstrateEventService { db: &self.db }
     }
 }

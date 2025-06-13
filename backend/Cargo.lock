@@ -9918,6 +9918,7 @@ dependencies = [
  "database",
  "dotenv",
  "models",
+ "serde_json",
  "substrate-api-client",
  "tokio",
 ]

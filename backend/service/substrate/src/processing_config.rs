@@ -1,4 +1,3 @@
-
 use std::time::Duration;
 use tokio::time::sleep;
 
@@ -39,7 +38,7 @@ impl ContinuousProcessor {
     }
 
     pub async fn start_processing(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        let latest_block = self.block_processor.api.lastest_block().await?;
+        let latest_block = self.block_processor.lastest_block().await?;
         let start_block = self.config.start_block.unwrap_or_default();
         let end_block = self.config.end_block.unwrap_or(latest_block);
 
@@ -99,26 +98,17 @@ impl ContinuousProcessor {
         end: u32,
     ) -> Result<u32, Box<dyn std::error::Error + Send + Sync>> {
         let mut processed = 0;
-        let mut handles = Vec::new();
 
+        // Process blocks sequentially instead of spawning tasks
+        // This avoids the Send trait issues with the underlying API client
         for block_num in start..=end {
-            let block_processor = self.block_processor.clone();
-
-            let handle = tokio::spawn(async move {
-                Self::process_single_block_with_retry(block_processor, block_num as u32, 3).await
-            });
-
-            handles.push(handle);
-        }
-
-        // Wait for all tasks to complete
-        for handle in handles {
-            match handle.await? {
+            match Self::process_single_block_with_retry(self.block_processor.clone(), block_num, 3).await {
                 Ok(_) => {
                     processed += 1;
+                    println!("✅ Block {} processed successfully", block_num);
                 }
                 Err(e) => {
-                    println!("❌ Failed to process block in batch: {}", e);
+                    println!("❌ Failed to process block {}: {}", block_num, e);
                     // Continue processing other blocks in the batch
                 }
             }
@@ -165,7 +155,7 @@ impl ContinuousProcessor {
         println!("🔄 Starting continuous sync mode...");
 
         loop {
-            let latest_block = self.block_processor.api.lastest_block().await?;
+            let latest_block = self.block_processor.lastest_block().await?;
             let start_block = self.config.start_block.unwrap_or(latest_block);
 
             if start_block <= latest_block {
@@ -195,12 +185,20 @@ impl ContinuousProcessor {
         block_processor: BlockProcessingService,
         block_number: u32,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        // Process block and transactions concurrently
-        let _block_result = block_processor.process_block(block_number);
-        // let tx_result = block_processor.process_transactions(block_number);
-
-        // // Wait for both to complete
-        // tokio::try_join!(block_result, tx_result)?;
+        // Process each operation sequentially to avoid Send issues
+        // This is safer and still reasonably performant for block processing
+        
+        // Process block first
+        block_processor.process_block(block_number).await
+            .map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>)?;
+        
+        // Then process extrinsics
+        block_processor.process_extrinsic(block_number).await
+            .map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>)?;
+        
+        // Finally process events
+        block_processor.process_event(block_number).await
+            .map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>)?;
 
         Ok(())
     }

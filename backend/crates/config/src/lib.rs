@@ -7,6 +7,10 @@ pub const EVM_TXS_TABLE: &'static str = "evm_transaction";
 pub const EVM_ACCOUNTS_TABLE: &'static str = "evm_accounts";
 pub const EVM_CONTRACTS_TABLE: &'static str = "evm_contracts";
 
+pub const SUBSTRATE_BLOCKS_TABLE: &str = "substrate_blocks";
+pub const SUBSTRATE_EXTRINSICS_TABLE: &str = "substrate_extrinsics";
+pub const SUBSTRATE_EVENTS_TABLE: &str = "substrate_events";
+
 #[subxt::subxt(runtime_metadata_path = "selendra_metadata.scale")]
 pub mod selendra {}
 
