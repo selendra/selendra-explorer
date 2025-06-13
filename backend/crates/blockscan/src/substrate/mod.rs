@@ -4,7 +4,7 @@ mod validator;
 pub mod substrate_subxt;
 
 use blockscan_model::{
-    block::SubstrateBlock, event::EventsResponse, extrinsic::ExtrinsicDetails, validator::ActiveValidator
+    event::EventsResponse, extrinsic::ExtrinsicDetails, validator::ActiveValidator
 };
 use custom_error::ServiceError;
 use substrate_api_client::{
@@ -13,6 +13,7 @@ use substrate_api_client::{
 };
 pub use substrate_api_client::rpc::JsonrpseeClient;
 
+#[derive(Clone)]
 pub struct SubstrtaeBlockQuery {
     pub api: Api<DefaultRuntimeConfig, JsonrpseeClient>,
     pub block_number: u32,
@@ -53,7 +54,20 @@ impl SubstrtaeBlockQuery {
         })
     }
 
-    pub async fn block_info(&self) -> Result<SubstrateBlock, ServiceError> {
+    pub async fn lastest_block(&self) -> Result<u32, ServiceError> {
+        match self.api.get_block(None).await {
+            Ok(Some(block)) => Ok(block.header.number),
+            Ok(None) => return Err(ServiceError::SubstrateError(format!("No blocks found"))),
+            Err(e) => {
+                return Err(ServiceError::SubstrateError(format!(
+                    "Error getting latest block: {:?}",
+                    e
+                )));
+            }
+        }
+    }
+
+    pub async fn block_info(&self) -> Result<Block<Header<u32, BlakeTwo256>, OpaqueExtrinsic>, ServiceError> {
         let block = match self.api.get_block(self.block_hash).await {
             Ok(Some(block)) => block,
             Ok(None) => return Err(ServiceError::SubstrateError(format!("Block not found"))),
@@ -65,18 +79,7 @@ impl SubstrtaeBlockQuery {
             }
         };
 
-        let is_finalize = self.check_block_finalization_status().await?;
-        let timestamp = self.get_block_timestamp().await?;
-
-        Ok(SubstrateBlock {
-            number: block.header.number,
-            hash: format!("{:#x}", block.header.hash()),
-            parent_hash: format!("{:#x}", block.header.parent_hash),
-            state_root: format!("{:#x}", block.header.state_root),
-            extrinsics_root: format!("{:#x}", block.header.extrinsics_root),
-            timestamp,
-            is_finalize,
-        })
+        Ok(block)
     }
 
     pub async fn get_extrinsics(
@@ -97,7 +100,24 @@ impl SubstrtaeBlockQuery {
         validator.get_all_validators().await
     }
 
-    async fn check_block_finalization_status(&self) -> Result<bool, ServiceError> {
+    pub async fn get_block_timestamp(&self) -> Result<u64, ServiceError> {
+        match self
+            .api
+            .get_storage::<u64>("Timestamp", "Now", self.block_hash)
+            .await
+        {
+            Ok(Some(timestamp)) => Ok(timestamp),
+            Ok(None) => Err(ServiceError::SubstrateError(
+                "Timestamp not found".to_string(),
+            )),
+            Err(e) => Err(ServiceError::SubstrateError(format!(
+                "Error getting timestamp: {:?}",
+                e
+            ))),
+        }
+    }
+
+    pub async fn check_block_finalization_status(&self) -> Result<bool, ServiceError> {
         let finalized_head = self.api.get_finalized_head().await.map_err(|e| {
             ServiceError::SubstrateError(format!("Error getting finalized head: {:?}", e))
         })?;
@@ -119,22 +139,4 @@ impl SubstrtaeBlockQuery {
 
         Ok(self.block_number <= finalized_block_number)
     }
-
-    async fn get_block_timestamp(&self) -> Result<u64, ServiceError> {
-        match self
-            .api
-            .get_storage::<u64>("Timestamp", "Now", self.block_hash)
-            .await
-        {
-            Ok(Some(timestamp)) => Ok(timestamp),
-            Ok(None) => Err(ServiceError::SubstrateError(
-                "Timestamp not found".to_string(),
-            )),
-            Err(e) => Err(ServiceError::SubstrateError(format!(
-                "Error getting timestamp: {:?}",
-                e
-            ))),
-        }
-    }
-
 }

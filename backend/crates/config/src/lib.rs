@@ -34,3 +34,7 @@ pub const BLOCKS_PER_SESSION: u32 = 900;
 pub const BLOCKS_PER_ERA: u32 = SESSIONS_PER_ERA * BLOCKS_PER_SESSION;
 pub const COMMISSION_DENOMINATOR: f64 = 10_000_000.0;
 pub const GENESIS_TIMESTAMP: u128 = 1_745_282_623_000;
+
+// Constants for better maintainability
+pub const DECIMALS: u128 = 1_000_000_000_000_000_000; // 10^18
+pub const DECIMALS_F64: f64 = 1_000_000_000_000_000_000.0;

@@ -1,4 +1,5 @@
 use blockscan_model::event::{EventsResponse, FormattedEvent};
+use config::{DECIMALS, DECIMALS_F64};
 use custom_error::ServiceError;
 use substrate_api_client::{
     Api, GetStorage,
@@ -12,10 +13,6 @@ pub struct EventInfo {
 }
 
 type EventRecord = frame_system::EventRecord<selendra_runtime::RuntimeEvent, H256>;
-
-// Constants for better maintainability
-const DECIMALS: u128 = 1_000_000_000_000_000_000; // 10^18
-const DECIMALS_F64: f64 = 1_000_000_000_000_000_000.0;
 
 impl EventInfo {
     #[inline]

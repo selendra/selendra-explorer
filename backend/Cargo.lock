@@ -9913,7 +9913,10 @@ name = "substrate-service"
 version = "0.1.0"
 dependencies = [
  "blockscan",
+ "config",
  "custom-error",
+ "database",
+ "dotenv",
  "models",
  "substrate-api-client",
  "tokio",

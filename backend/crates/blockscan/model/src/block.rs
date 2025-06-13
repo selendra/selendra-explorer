@@ -16,14 +16,3 @@ pub struct EvmBlockInfo {
     pub size: Option<usize>,
     pub nonce: Option<u64>,
 }
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SubstrateBlock {
-    pub number: u32,
-    pub timestamp: u64,
-    pub is_finalize: bool,
-    pub hash: String,
-    pub parent_hash: String,
-    pub state_root: String,
-    pub extrinsics_root: String
-}
