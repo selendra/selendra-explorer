@@ -36,6 +36,26 @@ impl<'a> SubstrateExtrinsicService<'a> {
         Ok(saved_extrinsics)
     }
 
+    pub async fn get_all(&self, limit: u32, offset: u32) -> Result<Vec<SubstrateExtrinsic>, ServiceError> {
+        let query = format!(
+            "SELECT * FROM {} ORDER BY timestamp DESC LIMIT $limit START $offset",
+            SUBSTRATE_EXTRINSICS_TABLE
+        );
+        let mut result = self
+            .db
+            .query(query)
+            .bind(("limit", limit))
+            .bind(("offset", offset))
+            .await
+            .map_err(|e| ServiceError::DatabaseError(format!("All extrinsics query failed: {}", e)))?;
+
+        let extrinsics: Vec<SubstrateExtrinsic> = result
+            .take(0)
+            .map_err(|e| ServiceError::DatabaseError(format!("All extrinsics extraction failed: {}", e)))?;
+
+        Ok(extrinsics)
+    }
+
     pub async fn get_by_block_number(&self, block_number: u32) -> Result<Vec<SubstrateExtrinsic>, ServiceError> {
         let query = format!(
             "SELECT * FROM {} WHERE block_number = $block_number ORDER BY extrinsic_index ASC",
@@ -75,6 +95,26 @@ impl<'a> SubstrateExtrinsicService<'a> {
         Ok(extrinsics)
     }
 
+    pub async fn get_by_module(&self, module: &str, limit: u32) -> Result<Vec<SubstrateExtrinsic>, ServiceError> {
+        let query = format!(
+            "SELECT * FROM {} WHERE call_module = $module ORDER BY timestamp DESC LIMIT $limit",
+            SUBSTRATE_EXTRINSICS_TABLE
+        );
+        let mut result = self
+            .db
+            .query(query)
+            .bind(("module", module.to_string()))
+            .bind(("limit", limit))
+            .await
+            .map_err(|e| ServiceError::DatabaseError(format!("Extrinsics by module query failed: {}", e)))?;
+
+        let extrinsics: Vec<SubstrateExtrinsic> = result
+            .take(0)
+            .map_err(|e| ServiceError::DatabaseError(format!("Extrinsics by module extraction failed: {}", e)))?;
+
+        Ok(extrinsics)
+    }
+
     pub async fn get_by_module_and_function(
         &self, 
         module: &str, 
@@ -101,26 +141,6 @@ impl<'a> SubstrateExtrinsicService<'a> {
         Ok(extrinsics)
     }
 
-    pub async fn get_all(&self, limit: u32, offset: u32) -> Result<Vec<SubstrateExtrinsic>, ServiceError> {
-        let query = format!(
-            "SELECT * FROM {} ORDER BY timestamp DESC LIMIT $limit START $offset",
-            SUBSTRATE_EXTRINSICS_TABLE
-        );
-        let mut result = self
-            .db
-            .query(query)
-            .bind(("limit", limit))
-            .bind(("offset", offset))
-            .await
-            .map_err(|e| ServiceError::DatabaseError(format!("All extrinsics query failed: {}", e)))?;
-
-        let extrinsics: Vec<SubstrateExtrinsic> = result
-            .take(0)
-            .map_err(|e| ServiceError::DatabaseError(format!("All extrinsics extraction failed: {}", e)))?;
-
-        Ok(extrinsics)
-    }
-
     pub async fn count_by_block_number(&self, block_number: u32) -> Result<i64, ServiceError> {
         let query = format!(
             "SELECT VALUE count() FROM {} WHERE block_number = $block_number",
@@ -138,5 +158,41 @@ impl<'a> SubstrateExtrinsicService<'a> {
             .map_err(|e| ServiceError::DatabaseError(format!("Extrinsics count extraction failed: {}", e)))?;
 
         Ok(count.unwrap_or(0))
+    }
+
+    pub async fn get_by_call_function(&self, function: &str, limit: u32) -> Result<Vec<SubstrateExtrinsic>, ServiceError> {
+        let query = format!(
+            "SELECT * FROM {} WHERE call_function = $function ORDER BY timestamp DESC LIMIT $limit",
+            SUBSTRATE_EXTRINSICS_TABLE
+        );
+        let mut result = self
+            .db
+            .query(query)
+            .bind(("function", function.to_string()))
+            .bind(("limit", limit))
+            .await
+            .map_err(|e| ServiceError::DatabaseError(format!("Extrinsics by function query failed: {}", e)))?;
+
+        let extrinsics: Vec<SubstrateExtrinsic> = result
+            .take(0)
+            .map_err(|e| ServiceError::DatabaseError(format!("Extrinsics by function extraction failed: {}", e)))?;
+
+        Ok(extrinsics)
+    }
+
+    pub async fn get_latest(&self) -> Result<Option<SubstrateExtrinsic>, ServiceError> {
+        let query = format!(
+            "SELECT * FROM {} ORDER BY timestamp DESC LIMIT 1",
+            SUBSTRATE_EXTRINSICS_TABLE
+        );
+        let mut result = self.db.query(query).await.map_err(|e| {
+            ServiceError::DatabaseError(format!("Latest extrinsic query failed: {}", e))
+        })?;
+
+        let extrinsic: Option<SubstrateExtrinsic> = result.take(0).map_err(|e| {
+            ServiceError::DatabaseError(format!("Latest extrinsic extraction failed: {}", e))
+        })?;
+
+        Ok(extrinsic)
     }
 }
