@@ -2,9 +2,10 @@ use dotenv::dotenv;
 use lazy_static::lazy_static;
 use std::env;
 
+pub const ACCOUNTS_TABLE: &'static str = "accounts";
+
 pub const EVM_BLOCK_TABLE: &'static str = "evm_blocks";
 pub const EVM_TXS_TABLE: &'static str = "evm_transaction";
-pub const EVM_ACCOUNTS_TABLE: &'static str = "evm_accounts";
 pub const EVM_CONTRACTS_TABLE: &'static str = "evm_contracts";
 
 pub const SUBSTRATE_BLOCKS_TABLE: &str = "substrate_blocks";
