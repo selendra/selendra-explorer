@@ -6,8 +6,10 @@ use axum::{
 use models::evm::EvmBlock;
 use std::sync::Arc;
 
-use super::{ApiResponse, PaginationQuery};
-use crate::AppState;
+use crate::{
+    AppState,
+    handlers::{ApiResponse, PaginationQuery},
+};
 
 // Block API Handlers
 pub async fn get_all_blocks(

@@ -1,12 +1,12 @@
 pub mod account_process;
 
+use config::{
+    DATABASE_NAMESPACE, DATABASE_PASSWORD, DATABASE_TABLE, DATABASE_URL, DATABASE_USERNAME,
+    SUBSTRATE_URL,
+};
 use database::DatabaseService;
 use dotenv::dotenv;
 use subxt::{OnlineClient, SubstrateConfig};
-use config::{
-    DATABASE_NAMESPACE, DATABASE_PASSWORD, DATABASE_TABLE, DATABASE_URL, DATABASE_USERNAME,
-    SUBSTRATE_URL
-};
 
 use crate::account_process::AccountProcessingService;
 

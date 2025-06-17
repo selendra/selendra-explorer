@@ -7,8 +7,8 @@ use config::{
 };
 use dotenv::dotenv;
 use processing_config::{ContinuousProcessor, ProcessingConfig};
-use substrate_api_client::rpc::JsonrpseeClient;
 use std::time::Duration;
+use substrate_api_client::rpc::JsonrpseeClient;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -28,7 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = JsonrpseeClient::new(endpoint).await.map_err(|e| {
         Box::<dyn std::error::Error>::from(format!("Failed to connect to endpoint: {:?}", e))
     })?;
-    
+
     //1619130  869240
     let config = ProcessingConfig {
         start_block: Some(1619130),
@@ -38,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         max_retries: 3,
     };
 
-     // Initialize block processing service
+    // Initialize block processing service
     let block_processor = BlockProcessingService::new(client, database)?;
     let processor = ContinuousProcessor::new(block_processor, config);
 

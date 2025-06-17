@@ -7,10 +7,10 @@ use ethers::{
     providers::{Http, Middleware, Provider},
     types::BlockId,
 };
-use models::{AddressType, AccountInfo, evm::{
-    EvmBlock, EvmContract, EvmTransaction,
-    TransactionType,
-}};
+use models::{
+    AccountInfo, AddressType,
+    evm::{EvmBlock, EvmContract, EvmTransaction, TransactionType},
+};
 
 #[derive(Clone)]
 pub struct BlockProcessingService {
@@ -234,7 +234,12 @@ impl BlockProcessingService {
         {
             self.db_service
                 .accounts()
-                .update_account(&account.address, Some(timestamp), Some(account.balance_token), Some(account.free_balance))
+                .update_account(
+                    &account.address,
+                    Some(timestamp),
+                    Some(account.balance_token),
+                    Some(account.free_balance),
+                )
                 .await?;
         } else {
             // Save new account

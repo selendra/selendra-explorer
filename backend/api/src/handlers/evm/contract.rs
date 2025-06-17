@@ -6,8 +6,10 @@ use axum::{
 use models::evm::{ContractType, EvmContract};
 use std::sync::Arc;
 
-use super::{ApiResponse, PaginationQuery};
-use crate::AppState;
+use crate::{
+    AppState,
+    handlers::{ApiResponse, PaginationQuery},
+};
 
 pub async fn get_all_contracts(
     State(state): State<Arc<AppState>>,

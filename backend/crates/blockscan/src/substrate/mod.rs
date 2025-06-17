@@ -1,17 +1,17 @@
 mod event;
 mod extrinsic;
-mod validator;
 pub mod substrate_subxt;
+mod validator;
 
 use blockscan_model::{
-    event::EventsResponse, extrinsic::ExtrinsicDetails, validator::ActiveValidator
+    event::EventsResponse, extrinsic::ExtrinsicDetails, validator::ActiveValidator,
 };
 use custom_error::ServiceError;
+pub use substrate_api_client::rpc::JsonrpseeClient;
 use substrate_api_client::{
     Api, GetChainInfo, GetStorage,
     ac_primitives::{BlakeTwo256, Block, DefaultRuntimeConfig, H256, Header, OpaqueExtrinsic},
 };
-pub use substrate_api_client::rpc::JsonrpseeClient;
 
 #[derive(Clone)]
 pub struct SubstrtaeBlockQuery {
@@ -21,7 +21,10 @@ pub struct SubstrtaeBlockQuery {
 }
 
 impl SubstrtaeBlockQuery {
-    pub async fn new(client: JsonrpseeClient, block_number: Option<u32>) -> Result<Self, ServiceError> {
+    pub async fn new(
+        client: JsonrpseeClient,
+        block_number: Option<u32>,
+    ) -> Result<Self, ServiceError> {
         let api = Api::<DefaultRuntimeConfig, _>::new(client)
             .await
             .map_err(|e| ServiceError::SubstrateError(format!("Failed to create API: {:?}", e)))?;
@@ -29,20 +32,29 @@ impl SubstrtaeBlockQuery {
         let (block_number, block_hash) = match block_number {
             Some(num) => {
                 // Specific block number provided
-                let hash = api.get_block_hash(Some(num.into())).await
-                    .map_err(|e| ServiceError::SubstrateError(format!("Error getting block hash: {:?}", e)))?;
+                let hash = api.get_block_hash(Some(num.into())).await.map_err(|e| {
+                    ServiceError::SubstrateError(format!("Error getting block hash: {:?}", e))
+                })?;
                 (num, hash)
             }
             None => {
                 // No block number provided, get latest
-                let latest_block = api.get_block(None).await
-                    .map_err(|e| ServiceError::SubstrateError(format!("Error getting latest block: {:?}", e)))?
+                let latest_block = api
+                    .get_block(None)
+                    .await
+                    .map_err(|e| {
+                        ServiceError::SubstrateError(format!("Error getting latest block: {:?}", e))
+                    })?
                     .ok_or_else(|| ServiceError::SubstrateError("No blocks found".to_string()))?;
-                
+
                 let block_num = latest_block.header.number;
-                let block_hash = api.get_block_hash(Some(block_num.into())).await
-                    .map_err(|e| ServiceError::SubstrateError(format!("Error getting block hash: {:?}", e)))?;
-                
+                let block_hash = api
+                    .get_block_hash(Some(block_num.into()))
+                    .await
+                    .map_err(|e| {
+                        ServiceError::SubstrateError(format!("Error getting block hash: {:?}", e))
+                    })?;
+
                 (block_num, block_hash)
             }
         };
@@ -67,7 +79,9 @@ impl SubstrtaeBlockQuery {
         }
     }
 
-    pub async fn block_info(&self) -> Result<Block<Header<u32, BlakeTwo256>, OpaqueExtrinsic>, ServiceError> {
+    pub async fn block_info(
+        &self,
+    ) -> Result<Block<Header<u32, BlakeTwo256>, OpaqueExtrinsic>, ServiceError> {
         let block = match self.api.get_block(self.block_hash).await {
             Ok(Some(block)) => block,
             Ok(None) => return Err(ServiceError::SubstrateError(format!("Block not found"))),

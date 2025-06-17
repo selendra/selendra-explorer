@@ -1,6 +1,6 @@
 pub mod block;
-pub mod extrinsic;
 pub mod event;
+pub mod extrinsic;
 
 use surrealdb::{Surreal, engine::any::Any};
 

@@ -7,8 +7,10 @@ use models::substrate::SubstrateExtrinsic;
 use serde::Deserialize;
 use std::sync::Arc;
 
-use crate::handlers::evm::{ApiResponse, PaginationQuery};
-use crate::AppState;
+use crate::{
+    AppState,
+    handlers::{ApiResponse, PaginationQuery},
+};
 
 #[derive(Debug, Deserialize)]
 pub struct ExtrinsicByModuleQuery {
@@ -48,13 +50,13 @@ pub async fn get_substrate_extrinsics_by_block_number(
 ) -> Result<Json<ApiResponse<Vec<SubstrateExtrinsic>>>, StatusCode> {
     let extrinsic_service = state.db.substrate_extrinsics();
 
-    match extrinsic_service
-        .get_by_block_number(block_number)
-        .await
-    {
+    match extrinsic_service.get_by_block_number(block_number).await {
         Ok(extrinsics) => Ok(Json(ApiResponse::success(extrinsics))),
         Err(e) => {
-            eprintln!("Error fetching substrate extrinsics by block number: {:?}", e);
+            eprintln!(
+                "Error fetching substrate extrinsics by block number: {:?}",
+                e
+            );
             Err(StatusCode::INTERNAL_SERVER_ERROR)
         }
     }

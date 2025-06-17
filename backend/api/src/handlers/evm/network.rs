@@ -1,11 +1,11 @@
 use axum::{Json, http::StatusCode};
-use blockscan::{ethers, BlockStateQuery};
+use blockscan::{BlockStateQuery, ethers};
 use config::EVM_RPC_URL;
 use ethers::providers::{Http, Provider};
 use models::evm::EvmNetworkInfo;
 use std::sync::Arc;
 
-use super::ApiResponse;
+use crate::handlers::ApiResponse;
 
 pub async fn get_all_network_info() -> Result<Json<ApiResponse<EvmNetworkInfo>>, StatusCode> {
     let provider = Provider::<Http>::try_from(EVM_RPC_URL.as_str())

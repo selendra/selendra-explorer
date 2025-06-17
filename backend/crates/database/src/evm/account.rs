@@ -20,11 +20,7 @@ impl<'a> AccountService<'a> {
         Ok(created)
     }
 
-    pub async fn get_all(
-        &self,
-        limit: u32,
-        offset: u32,
-    ) -> Result<Vec<AccountInfo>, ServiceError> {
+    pub async fn get_all(&self, limit: u32, offset: u32) -> Result<Vec<AccountInfo>, ServiceError> {
         let query = format!(
             "SELECT * FROM {} ORDER BY created_at DESC LIMIT $limit START $offset",
             EVM_ACCOUNTS_TABLE
@@ -72,10 +68,7 @@ impl<'a> AccountService<'a> {
         Ok(accounts)
     }
 
-    pub async fn get_by_address(
-        &self,
-        address: &str,
-    ) -> Result<Option<AccountInfo>, ServiceError> {
+    pub async fn get_by_address(&self, address: &str) -> Result<Option<AccountInfo>, ServiceError> {
         let query = format!(
             "SELECT * FROM {} WHERE address = $address LIMIT 1",
             EVM_ACCOUNTS_TABLE
@@ -93,7 +86,7 @@ impl<'a> AccountService<'a> {
 
         Ok(accounts.into_iter().next())
     }
-    
+
     pub async fn update_account(
         &self,
         address: &str,
@@ -103,47 +96,47 @@ impl<'a> AccountService<'a> {
     ) -> Result<Option<AccountInfo>, ServiceError> {
         let mut set_clauses = Vec::new();
         let mut bindings = vec![("address", address.to_string())];
-    
+
         if let Some(timestamp) = last_activity {
             set_clauses.push("last_activity = $timestamp");
             bindings.push(("timestamp", timestamp.to_string()));
         }
-    
+
         if let Some(balance) = balance_token {
             set_clauses.push("balance_token = $balance_token");
             bindings.push(("balance_token", balance.to_string()));
         }
-    
+
         if let Some(balance) = free_balance {
             set_clauses.push("free_balance = $free_balance");
             bindings.push(("free_balance", balance.to_string()));
         }
-    
+
         if set_clauses.is_empty() {
-            return Err(ServiceError::DatabaseError("No fields to update".to_string()));
+            return Err(ServiceError::DatabaseError(
+                "No fields to update".to_string(),
+            ));
         }
-    
+
         let query = format!(
             "UPDATE {} SET {} WHERE address = $address RETURN *",
             EVM_ACCOUNTS_TABLE,
             set_clauses.join(", ")
         );
-    
+
         let mut query_builder = self.db.query(query);
         for (key, value) in bindings {
             query_builder = query_builder.bind((key, value));
         }
-    
+
         let mut result = query_builder
             .await
-            .map_err(|e| {
-                ServiceError::DatabaseError(format!("Account update failed: {}", e))
-            })?;
-    
+            .map_err(|e| ServiceError::DatabaseError(format!("Account update failed: {}", e)))?;
+
         let account: Option<AccountInfo> = result.take(0).map_err(|e| {
             ServiceError::DatabaseError(format!("Account update extraction failed: {}", e))
         })?;
-    
+
         Ok(account)
     }
 

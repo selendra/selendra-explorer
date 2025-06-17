@@ -7,8 +7,10 @@ use models::AccountInfo;
 use serde::Deserialize;
 use std::sync::Arc;
 
-use super::{ApiResponse, PaginationQuery};
-use crate::AppState;
+use crate::{
+    AppState,
+    handlers::{ApiResponse, PaginationQuery},
+};
 
 #[derive(Debug, Deserialize)]
 pub struct BalanceRangeQuery {

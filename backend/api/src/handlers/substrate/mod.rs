@@ -1,11 +1,11 @@
-mod network;
 mod account;
 mod block;
-mod extrinsic;
 mod event;
+mod extrinsic;
+mod network;
 
-pub use network::*;
 pub use account::*;
 pub use block::*;
-pub use extrinsic::*;
 pub use event::*;
+pub use extrinsic::*;
+pub use network::*;

@@ -6,8 +6,10 @@ use axum::{
 use models::substrate::{SubstrateBlock, SubstrateBlockRes};
 use std::sync::Arc;
 
-use crate::handlers::evm::{ApiResponse, PaginationQuery};
-use crate::AppState;
+use crate::{
+    AppState,
+    handlers::{ApiResponse, PaginationQuery},
+};
 
 // Substrate Block API Handlers
 pub async fn get_all_substrate_blocks(
@@ -43,7 +45,7 @@ pub async fn get_substrate_block_by_number(
                 .count_by_block_number(block_number)
                 .await
                 .unwrap_or(0) as usize;
-            
+
             let events_count = event_service
                 .count_by_block_number(block_number)
                 .await
@@ -85,7 +87,7 @@ pub async fn get_latest_substrate_block(
                 .count_by_block_number(block.number)
                 .await
                 .unwrap_or(0) as usize;
-            
+
             let events_count = event_service
                 .count_by_block_number(block.number)
                 .await
@@ -128,7 +130,7 @@ pub async fn get_substrate_block_by_hash(
                 .count_by_block_number(block.number)
                 .await
                 .unwrap_or(0) as usize;
-            
+
             let events_count = event_service
                 .count_by_block_number(block.number)
                 .await

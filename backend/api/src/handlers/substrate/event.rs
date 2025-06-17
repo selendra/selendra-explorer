@@ -7,8 +7,10 @@ use models::substrate::SubstrateEvent;
 use serde::Deserialize;
 use std::sync::Arc;
 
-use crate::handlers::evm::{ApiResponse, PaginationQuery};
-use crate::AppState;
+use crate::{
+    AppState,
+    handlers::{ApiResponse, PaginationQuery},
+};
 
 #[derive(Debug, Deserialize)]
 pub struct EventByModuleQuery {
@@ -60,10 +62,7 @@ pub async fn get_substrate_events_by_block_number(
 ) -> Result<Json<ApiResponse<Vec<SubstrateEvent>>>, StatusCode> {
     let event_service = state.db.substrate_events();
 
-    match event_service
-        .get_by_block_number(block_number)
-        .await
-    {
+    match event_service.get_by_block_number(block_number).await {
         Ok(events) => Ok(Json(ApiResponse::success(events))),
         Err(e) => {
             eprintln!("Error fetching substrate events by block number: {:?}", e);

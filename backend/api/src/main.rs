@@ -38,6 +38,7 @@ async fn main() -> anyhow::Result<()> {
 
     // Move the log statement BEFORE axum::serve() since serve() blocks indefinitely
     println!("🚀 Server running on http://{}", addr);
+    println!("🔌 WebSocket endpoints available at ws://{}/ws/*", addr);
 
     // This call blocks indefinitely until the server shuts down
     axum::serve(listener, app.into_make_service()).await?;

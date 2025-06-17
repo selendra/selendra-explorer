@@ -102,7 +102,9 @@ impl ContinuousProcessor {
         // Process blocks sequentially instead of spawning tasks
         // This avoids the Send trait issues with the underlying API client
         for block_num in start..=end {
-            match Self::process_single_block_with_retry(self.block_processor.clone(), block_num, 3).await {
+            match Self::process_single_block_with_retry(self.block_processor.clone(), block_num, 3)
+                .await
+            {
                 Ok(_) => {
                     processed += 1;
                     println!("✅ Block {} processed successfully", block_num);
@@ -187,17 +189,23 @@ impl ContinuousProcessor {
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         // Process each operation sequentially to avoid Send issues
         // This is safer and still reasonably performant for block processing
-        
+
         // Process block first
-        block_processor.process_block(block_number).await
+        block_processor
+            .process_block(block_number)
+            .await
             .map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>)?;
-        
+
         // Then process extrinsics
-        block_processor.process_extrinsic(block_number).await
+        block_processor
+            .process_extrinsic(block_number)
+            .await
             .map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>)?;
-        
+
         // Finally process events
-        block_processor.process_event(block_number).await
+        block_processor
+            .process_event(block_number)
+            .await
             .map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>)?;
 
         Ok(())

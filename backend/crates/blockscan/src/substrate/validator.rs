@@ -1,6 +1,4 @@
-use blockscan_model::validator::{
-    ActiveValidator, StakingInfo, ValidatorPrefs, ValidatorType,
-};
+use blockscan_model::validator::{ActiveValidator, StakingInfo, ValidatorPrefs, ValidatorType};
 use codec::{Decode, Encode};
 use config::COMMISSION_DENOMINATOR;
 use custom_error::ServiceError;

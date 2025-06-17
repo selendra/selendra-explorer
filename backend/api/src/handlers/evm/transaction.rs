@@ -6,8 +6,10 @@ use axum::{
 use models::evm::EvmTransaction;
 use std::sync::Arc;
 
-use super::{ApiResponse, PaginationQuery};
-use crate::AppState;
+use crate::{
+    AppState,
+    handlers::{ApiResponse, PaginationQuery},
+};
 
 pub async fn get_all_transactions(
     State(state): State<Arc<AppState>>,

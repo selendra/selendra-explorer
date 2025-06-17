@@ -11,7 +11,9 @@ impl<'a> SubstrateBlockService<'a> {
             .create(SUBSTRATE_BLOCKS_TABLE)
             .content(block.clone())
             .await
-            .map_err(|e| ServiceError::DatabaseError(format!("Substrate block save failed: {}", e)))?
+            .map_err(|e| {
+                ServiceError::DatabaseError(format!("Substrate block save failed: {}", e))
+            })?
             .ok_or_else(|| {
                 ServiceError::DatabaseError("Failed to create substrate block record".to_string())
             })?;
@@ -19,7 +21,11 @@ impl<'a> SubstrateBlockService<'a> {
         Ok(created)
     }
 
-    pub async fn get_all(&self, limit: u32, offset: u32) -> Result<Vec<SubstrateBlock>, ServiceError> {
+    pub async fn get_all(
+        &self,
+        limit: u32,
+        offset: u32,
+    ) -> Result<Vec<SubstrateBlock>, ServiceError> {
         let query = format!(
             "SELECT * FROM {} ORDER BY number DESC LIMIT $limit START $offset",
             SUBSTRATE_BLOCKS_TABLE
@@ -39,7 +45,10 @@ impl<'a> SubstrateBlockService<'a> {
         Ok(blocks)
     }
 
-    pub async fn get_by_number(&self, block_number: u32) -> Result<Option<SubstrateBlock>, ServiceError> {
+    pub async fn get_by_number(
+        &self,
+        block_number: u32,
+    ) -> Result<Option<SubstrateBlock>, ServiceError> {
         let query = format!(
             "SELECT * FROM {} WHERE number = $block_number LIMIT 1",
             SUBSTRATE_BLOCKS_TABLE
@@ -60,7 +69,10 @@ impl<'a> SubstrateBlockService<'a> {
         Ok(blocks.into_iter().next())
     }
 
-    pub async fn get_by_hash(&self, block_hash: &str) -> Result<Option<SubstrateBlock>, ServiceError> {
+    pub async fn get_by_hash(
+        &self,
+        block_hash: &str,
+    ) -> Result<Option<SubstrateBlock>, ServiceError> {
         let query = format!(
             "SELECT * FROM {} WHERE hash = $block_hash LIMIT 1",
             SUBSTRATE_BLOCKS_TABLE
@@ -70,7 +82,9 @@ impl<'a> SubstrateBlockService<'a> {
             .query(query)
             .bind(("block_hash", block_hash.to_string()))
             .await
-            .map_err(|e| ServiceError::DatabaseError(format!("Substrate block hash query failed: {}", e)))?;
+            .map_err(|e| {
+                ServiceError::DatabaseError(format!("Substrate block hash query failed: {}", e))
+            })?;
 
         let blocks: Vec<SubstrateBlock> = result.take(0).map_err(|e| {
             ServiceError::DatabaseError(format!("Substrate block hash extraction failed: {}", e))
