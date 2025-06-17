@@ -36,6 +36,7 @@ impl BlockProcessingService {
             parent_hash: format!("{:#x}", block.header.parent_hash),
             state_root: format!("{:#x}", block.header.state_root),
             extrinsics_root: format!("{:#x}", block.header.extrinsics_root),
+            extrinscs_len: block.extrinsics.len(),
             timestamp,
             is_finalize,
         };
