@@ -2933,6 +2933,7 @@ dependencies = [
  "custom-error",
  "database",
  "dotenv",
+ "futures",
  "futures-util",
  "models",
  "serde",

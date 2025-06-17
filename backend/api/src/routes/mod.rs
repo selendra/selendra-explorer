@@ -2,10 +2,12 @@ use crate::AppState;
 use axum::{Router, routing::get};
 use std::sync::Arc;
 
-use crate::handlers::{evm::*, substrate::*};
+use crate::handlers::{evm::*, substrate::*, websocket::websocket_handler};
 
 pub fn create_api_routes() -> Router<Arc<AppState>> {
     Router::new()
+        // ===== WEBSOCKET ENDPOINTS =====
+        .route("/ws", get(websocket_handler))
         // ===== NETWORK ENDPOINTS =====
         .route("/api/network", get(get_all_network_info))
         .route("/api/latest_block", get(get_substrate_latest_block))

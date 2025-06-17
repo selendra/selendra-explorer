@@ -1,5 +1,6 @@
 pub mod evm;
 pub mod substrate;
+pub mod websocket;
 
 use serde::{Deserialize, Serialize};
 

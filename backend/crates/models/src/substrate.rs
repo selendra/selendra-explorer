@@ -18,6 +18,7 @@ pub struct SubstrateBlock {
     pub state_root: String,
     pub extrinsics_root: String,
     pub extrinscs_len: usize,
+    pub events_len: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

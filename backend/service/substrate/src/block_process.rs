@@ -28,6 +28,7 @@ impl BlockProcessingService {
         let block = api.block_info().await?;
         let is_finalize = api.check_block_finalization_status().await?;
         let timestamp = api.get_block_timestamp().await?;
+        let events_len = api.block_event().await?.total_count;
 
         // Create block info
         let block_info = SubstrateBlock {
@@ -37,6 +38,7 @@ impl BlockProcessingService {
             state_root: format!("{:#x}", block.header.state_root),
             extrinsics_root: format!("{:#x}", block.header.extrinsics_root),
             extrinscs_len: block.extrinsics.len(),
+            events_len,
             timestamp,
             is_finalize,
         };
