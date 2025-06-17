@@ -15,7 +15,7 @@ export const selendra = {
     default: { http: ['https://rpc.selendra.org', 'https://rpcx.selendra.org'] },
   },
   blockExplorers: {
-    default: { name: 'SelendraExplorer', url: 'https://explorer.selendra.org' },
+    default: { name: 'SelendraExplorer', url: 'http://localhost:3000', websocket: "ws://localhost:3000" },
   },
   contracts: {
     multicall3: {
