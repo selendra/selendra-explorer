@@ -5,6 +5,11 @@
 http://localhost:3000/api
 ```
 
+## WebSocket Endpoint
+```
+ws://localhost:3000/ws
+```
+
 ## Overview
 This API provides access to blockchain data from both EVM and Substrate networks, including network information, blocks, transactions, accounts, contracts, extrinsics, and events. All endpoints return JSON responses in a standardized format and support standard HTTP methods.
 
