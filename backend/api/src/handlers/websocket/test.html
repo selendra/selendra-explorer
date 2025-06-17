@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Explorer Testing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .control-panel {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+        }
+
+        .control-panel h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .connection-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #00b894 0%, #00cec9 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #fdcb6e 0%, #e17055 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .status.disconnected {
+            background: #ffebee;
+            color: #c62828;
+            border: 2px solid #ef5350;
+        }
+
+        .status.connected {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 2px solid #66bb6a;
+        }
+
+        .status.connecting {
+            background: #fff3e0;
+            color: #f57c00;
+            border: 2px solid #ffb74d;
+        }
+
+        .subscription-section {
+            margin-bottom: 25px;
+        }
+
+        .subscription-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .active-subscriptions {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .active-subscriptions h4 {
+            margin-bottom: 10px;
+            color: #1976d2;
+        }
+
+        .subscription-tag {
+            display: inline-block;
+            background: #2196f3;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-right: 8px;
+            margin-bottom: 5px;
+        }
+
+        .log-panel {
+            background: #1e1e1e;
+            border-radius: 12px;
+            padding: 25px;
+            color: #f8f8f2;
+            height: 600px;
+            overflow-y: auto;
+            border: 2px solid #333;
+        }
+
+        .log-panel h2 {
+            color: #50fa7b;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 3px solid #50fa7b;
+            padding-bottom: 10px;
+        }
+
+        .log-entry {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            border-left: 4px solid #6272a4;
+            background: rgba(98, 114, 164, 0.1);
+        }
+
+        .log-entry.sent {
+            border-left-color: #50fa7b;
+            background: rgba(80, 250, 123, 0.1);
+        }
+
+        .log-entry.received {
+            border-left-color: #8be9fd;
+            background: rgba(139, 233, 253, 0.1);
+        }
+
+        .log-entry.error {
+            border-left-color: #ff5555;
+            background: rgba(255, 85, 85, 0.1);
+        }
+
+        .log-entry.success {
+            border-left-color: #50fa7b;
+            background: rgba(80, 250, 123, 0.1);
+        }
+
+        .log-timestamp {
+            color: #6272a4;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .log-content {
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .clear-logs {
+            margin-bottom: 15px;
+        }
+
+        .message-section {
+            border-top: 2px solid #dee2e6;
+            padding-top: 20px;
+        }
+
+        .custom-message {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .custom-message textarea {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .subscription-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 WebSocket Explorer Testing</h1>
+            <p>Real-time testing interface for EVM and Substrate blockchain data streams</p>
+        </div>
+
+        <div class="main-content">
+            <div class="control-panel">
+                <h2>🎮 Control Panel</h2>
+                
+                <!-- Connection Section -->
+                <div class="connection-section">
+                    <div class="input-group">
+                        <label for="wsUrl">WebSocket URL:</label>
+                        <input type="text" id="wsUrl" value="ws://localhost:3000/ws" placeholder="Enter WebSocket URL">
+                    </div>
+                    
+                    <div id="connectionStatus" class="status disconnected">
+                        ❌ Disconnected
+                    </div>
+                    
+                    <button id="connectBtn" class="btn btn-primary">🔌 Connect</button>
+                    <button id="disconnectBtn" class="btn btn-danger" disabled>🔌 Disconnect</button>
+                </div>
+
+                <!-- Statistics -->
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="messagesSent">0</div>
+                        <div class="stat-label">Messages Sent</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="messagesReceived">0</div>
+                        <div class="stat-label">Messages Received</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="errors">0</div>
+                        <div class="stat-label">Errors</div>
+                    </div>
+                </div>
+
+                <!-- Subscription Section -->
+                <div class="subscription-section">
+                    <h3>📡 Subscriptions</h3>
+                    <div class="subscription-buttons">
+                        <button class="btn btn-success subscription-btn" data-topic="blocks">🏗️ EVM Blocks</button>
+                        <button class="btn btn-success subscription-btn" data-topic="transactions">💰 EVM Transactions</button>
+                        <button class="btn btn-success subscription-btn" data-topic="substrate_blocks">⛓️ Substrate Blocks</button>
+                        <button class="btn btn-success subscription-btn" data-topic="substrate_events">📋 Substrate Events</button>
+                    </div>
+                    
+                    <div class="active-subscriptions">
+                        <h4>🎯 Active Subscriptions:</h4>
+                        <div id="activeSubscriptions">None</div>
+                    </div>
+                    
+                    <button id="unsubscribeAll" class="btn btn-warning">❌ Unsubscribe All</button>
+                </div>
+
+                <!-- Custom Message Section -->
+                <div class="message-section">
+                    <h3>✉️ Send Custom Message</h3>
+                    <div class="custom-message">
+                        <textarea id="customMessage" placeholder='{"type": "subscribe", "topic": "blocks"}'></textarea>
+                        <button id="sendMessage" class="btn btn-primary">📤 Send</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="log-panel">
+                <h2>📋 Message Log</h2>
+                <button id="clearLogs" class="btn btn-warning clear-logs">🗑️ Clear Logs</button>
+                <div id="logContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class WebSocketTester {
+            constructor() {
+                this.ws = null;
+                this.messagesSent = 0;
+                this.messagesReceived = 0;
+                this.errors = 0;
+                this.subscriptions = new Set();
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                // Connection buttons
+                document.getElementById('connectBtn').addEventListener('click', () => this.connect());
+                document.getElementById('disconnectBtn').addEventListener('click', () => this.disconnect());
+                
+                // Subscription buttons
+                document.querySelectorAll('.subscription-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.toggleSubscription(e.target.dataset.topic));
+                });
+                
+                // Unsubscribe all
+                document.getElementById('unsubscribeAll').addEventListener('click', () => this.unsubscribeAll());
+                
+                // Custom message
+                document.getElementById('sendMessage').addEventListener('click', () => this.sendCustomMessage());
+                
+                // Clear logs
+                document.getElementById('clearLogs').addEventListener('click', () => this.clearLogs());
+                
+                // Enter key for custom message
+                document.getElementById('customMessage').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && e.ctrlKey) {
+                        this.sendCustomMessage();
+                    }
+                });
+            }
+
+            connect() {
+                const url = document.getElementById('wsUrl').value;
+                
+                try {
+                    this.updateStatus('connecting', '🔄 Connecting...');
+                    this.ws = new WebSocket(url);
+                    
+                    this.ws.onopen = () => {
+                        this.updateStatus('connected', '✅ Connected');
+                        this.log('Connected to WebSocket server', 'success');
+                        document.getElementById('connectBtn').disabled = true;
+                        document.getElementById('disconnectBtn').disabled = false;
+                    };
+                    
+                    this.ws.onmessage = (event) => {
+                        this.handleMessage(event.data);
+                    };
+                    
+                    this.ws.onclose = () => {
+                        this.updateStatus('disconnected', '❌ Disconnected');
+                        this.log('WebSocket connection closed', 'error');
+                        document.getElementById('connectBtn').disabled = false;
+                        document.getElementById('disconnectBtn').disabled = true;
+                        this.subscriptions.clear();
+                        this.updateActiveSubscriptions();
+                    };
+                    
+                    this.ws.onerror = (error) => {
+                        this.errors++;
+                        this.updateStats();
+                        this.log(`WebSocket error: ${error}`, 'error');
+                    };
+                    
+                } catch (error) {
+                    this.errors++;
+                    this.updateStats();
+                    this.log(`Connection failed: ${error.message}`, 'error');
+                    this.updateStatus('disconnected', '❌ Connection Failed');
+                }
+            }
+
+            disconnect() {
+                if (this.ws) {
+                    this.ws.close();
+                    this.ws = null;
+                }
+            }
+
+            toggleSubscription(topic) {
+                if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+                    this.log('Cannot subscribe: WebSocket not connected', 'error');
+                    return;
+                }
+
+                if (this.subscriptions.has(topic)) {
+                    this.unsubscribe(topic);
+                } else {
+                    this.subscribe(topic);
+                }
+            }
+
+            subscribe(topic) {
+                const message = {
+                    type: 'subscribe',
+                    topic: topic
+                };
+                
+                this.sendMessage(message);
+                this.subscriptions.add(topic);
+                this.updateActiveSubscriptions();
+            }
+
+            unsubscribe(topic) {
+                const message = {
+                    type: 'unsubscribe',
+                    topic: topic
+                };
+                
+                this.sendMessage(message);
+                this.subscriptions.delete(topic);
+                this.updateActiveSubscriptions();
+            }
+
+            unsubscribeAll() {
+                Array.from(this.subscriptions).forEach(topic => {
+                    this.unsubscribe(topic);
+                });
+            }
+
+            sendMessage(message) {
+                if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+                    this.log('Cannot send message: WebSocket not connected', 'error');
+                    return;
+                }
+
+                const messageStr = JSON.stringify(message, null, 2);
+                this.ws.send(messageStr);
+                this.messagesSent++;
+                this.updateStats();
+                this.log(`Sent: ${messageStr}`, 'sent');
+            }
+
+            sendCustomMessage() {
+                const messageText = document.getElementById('customMessage').value.trim();
+                
+                if (!messageText) {
+                    this.log('Cannot send empty message', 'error');
+                    return;
+                }
+
+                try {
+                    const message = JSON.parse(messageText);
+                    this.sendMessage(message);
+                    document.getElementById('customMessage').value = '';
+                } catch (error) {
+                    this.errors++;
+                    this.updateStats();
+                    this.log(`Invalid JSON: ${error.message}`, 'error');
+                }
+            }
+
+            handleMessage(data) {
+                this.messagesReceived++;
+                this.updateStats();
+                
+                try {
+                    const message = JSON.parse(data);
+                    this.log(`Received: ${JSON.stringify(message, null, 2)}`, 'received');
+                    
+                    // Handle specific message types
+                    this.handleSpecificMessage(message);
+                    
+                } catch (error) {
+                    this.errors++;
+                    this.updateStats();
+                    this.log(`Failed to parse message: ${data}`, 'error');
+                }
+            }
+
+            handleSpecificMessage(message) {
+                switch (message.type) {
+                    case 'block_update':
+                        this.log(`🏗️ New EVM Block #${message.data?.number || 'N/A'}`, 'received');
+                        break;
+                    case 'transaction_update':
+                        this.log(`💰 New EVM Transaction: ${message.data?.hash?.substring(0, 10) || 'N/A'}...`, 'received');
+                        break;
+                    case 'substrate_block_update':
+                        this.log(`⛓️ New Substrate Block #${message.data?.number || 'N/A'} (${message.data?.extrinsics_len || 0} extrinsics, ${message.data?.event_len || 0} events)`, 'received');
+                        break;
+                    case 'substrate_event_update':
+                        const eventCount = Array.isArray(message.data) ? message.data.length : 0;
+                        this.log(`📋 ${eventCount} New Substrate Events`, 'received');
+                        break;
+                    case 'success':
+                        this.log(`✅ ${message.message}`, 'success');
+                        break;
+                    case 'error':
+                        this.errors++;
+                        this.updateStats();
+                        this.log(`❌ Error: ${message.message}`, 'error');
+                        break;
+                }
+            }
+
+            updateStatus(status, text) {
+                const statusEl = document.getElementById('connectionStatus');
+                statusEl.className = `status ${status}`;
+                statusEl.textContent = text;
+            }
+
+            updateStats() {
+                document.getElementById('messagesSent').textContent = this.messagesSent;
+                document.getElementById('messagesReceived').textContent = this.messagesReceived;
+                document.getElementById('errors').textContent = this.errors;
+            }
+
+            updateActiveSubscriptions() {
+                const container = document.getElementById('activeSubscriptions');
+                
+                if (this.subscriptions.size === 0) {
+                    container.innerHTML = 'None';
+                } else {
+                    container.innerHTML = Array.from(this.subscriptions)
+                        .map(topic => `<span class="subscription-tag">${topic}</span>`)
+                        .join('');
+                }
+            }
+
+            log(message, type = 'info') {
+                const logContainer = document.getElementById('logContainer');
+                const logEntry = document.createElement('div');
+                logEntry.className = `log-entry ${type}`;
+                
+                const timestamp = new Date().toLocaleTimeString();
+                logEntry.innerHTML = `
+                    <div class="log-timestamp">[${timestamp}]</div>
+                    <div class="log-content">${message}</div>
+                `;
+                
+                logContainer.appendChild(logEntry);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+
+            clearLogs() {
+                document.getElementById('logContainer').innerHTML = '';
+                this.messagesSent = 0;
+                this.messagesReceived = 0;
+                this.errors = 0;
+                this.updateStats();
+            }
+        }
+
+        // Initialize the WebSocket tester when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new WebSocketTester();
+        });
+    </script>
+</body>
+</html>
