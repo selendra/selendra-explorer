@@ -1,6 +1,7 @@
+import React from 'react';
 import { TEXTS } from '../../content';
 
-const Home = () => {
+const Home: React.FC = () => {
   return (
     <div className="page home-page">
       <div className="container">

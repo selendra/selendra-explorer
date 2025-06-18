@@ -3,12 +3,12 @@ import { Home } from './pages';
 import { APP_CONFIG } from './config/app.config';
 import './App.css';
 
-function App() {
+const App: React.FC = () => {
   return (
     <Layout>
       <Home />
     </Layout>
   );
-}
+};
 
 export default App;

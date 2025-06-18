@@ -1,6 +1,8 @@
+import React from 'react';
 import { SITE_CONSTANTS } from '../../../content';
+import { HeaderProps } from '../../../types';
 
-const Header = () => {
+const Header: React.FC<HeaderProps> = () => {
   return (
     <header className="header">
       <nav className="nav">
