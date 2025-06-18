@@ -1,9 +1,13 @@
-import { useState, useMemo } from 'react';
-import { SITE_CONSTANTS } from '../content';
+import { useState, useMemo } from "react";
+import { SITE_CONSTANTS } from "../content";
+import { UsePaginationReturn } from "../types";
 
-export const usePagination = (totalItems, initialPageSize = SITE_CONSTANTS.FORMAT.DEFAULT_PAGE_SIZE) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(initialPageSize);
+export const usePagination = (
+  totalItems: number,
+  initialPageSize: number = SITE_CONSTANTS.FORMAT.DEFAULT_PAGE_SIZE
+): UsePaginationReturn => {
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(initialPageSize);
 
   const totalPages = useMemo(() => {
     return Math.ceil(totalItems / pageSize);
@@ -13,28 +17,28 @@ export const usePagination = (totalItems, initialPageSize = SITE_CONSTANTS.FORMA
     return (currentPage - 1) * pageSize;
   }, [currentPage, pageSize]);
 
-  const goToPage = (page) => {
+  const goToPage = (page: number): void => {
     const validPage = Math.max(1, Math.min(page, totalPages));
     setCurrentPage(validPage);
   };
 
-  const goToNext = () => {
+  const goToNext = (): void => {
     goToPage(currentPage + 1);
   };
 
-  const goToPrevious = () => {
+  const goToPrevious = (): void => {
     goToPage(currentPage - 1);
   };
 
-  const goToFirst = () => {
+  const goToFirst = (): void => {
     goToPage(1);
   };
 
-  const goToLast = () => {
+  const goToLast = (): void => {
     goToPage(totalPages);
   };
 
-  const reset = () => {
+  const reset = (): void => {
     setCurrentPage(1);
   };
 

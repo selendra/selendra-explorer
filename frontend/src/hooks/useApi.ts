@@ -1,16 +1,22 @@
 import { useState, useEffect, useCallback } from 'react';
 import { SITE_CONSTANTS } from '../content';
+import { UseApiOptions, UseApiReturn } from '../types';
 
-export const useApi = (apiCall, params = {}, options = {}) => {
+export const useApi = <T = any>(
+  apiCall: (params?: any) => Promise<T>, 
+  params: Record<string, any> = {}, 
+  options: UseApiOptions = {}
+): UseApiReturn<T> => {
   const { 
     immediate = true, 
-    refreshInterval = null  } = options;
+    refreshInterval = null 
+  } = options;
 
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(immediate);
-  const [error, setError] = useState(null);
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState<boolean>(immediate);
+  const [error, setError] = useState<string | null>(null);
 
-  const execute = useCallback(async (customParams = {}) => {
+  const execute = useCallback(async (customParams: Record<string, any> = {}): Promise<T> => {
     try {
       setLoading(true);
       setError(null);
@@ -21,7 +27,7 @@ export const useApi = (apiCall, params = {}, options = {}) => {
       setData(result);
       return result;
     } catch (err) {
-      const errorMessage = err.message || SITE_CONSTANTS.MESSAGES.ERROR;
+      const errorMessage = (err as Error).message || SITE_CONSTANTS.MESSAGES.ERROR;
       setError(errorMessage);
       throw err;
     } finally {
@@ -29,7 +35,7 @@ export const useApi = (apiCall, params = {}, options = {}) => {
     }
   }, [apiCall, params]);
 
-  const refresh = useCallback(() => {
+  const refresh = useCallback((): Promise<T> => {
     return execute();
   }, [execute]);
 

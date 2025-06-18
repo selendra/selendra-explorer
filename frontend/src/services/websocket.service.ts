@@ -1,18 +1,21 @@
 import { APP_CONFIG } from '../config/app.config';
+import { WebSocketMessage, WebSocketConnectionStatus, WebSocketEventType } from '../types';
 
 class WebSocketService {
+  private ws: WebSocket | null = null;
+  private url: string;
+  private listeners: Map<string, Array<(data: any) => void>> = new Map();
+  private subscriptions: Set<string> = new Set();
+  private reconnectAttempts: number = 0;
+  private maxReconnectAttempts: number = 5;
+  private reconnectDelay: number = 1000;
+  private isConnected: boolean = false;
+
   constructor() {
-    this.ws = null;
     this.url = APP_CONFIG.api.websocketUrl;
-    this.listeners = new Map();
-    this.subscriptions = new Set();
-    this.reconnectAttempts = 0;
-    this.maxReconnectAttempts = 5;
-    this.reconnectDelay = 1000;
-    this.isConnected = false;
   }
 
-  connect() {
+  public connect(): void {
     try {
       this.ws = new WebSocket(this.url);
       
@@ -20,43 +23,43 @@ class WebSocketService {
         console.log('WebSocket connected');
         this.isConnected = true;
         this.reconnectAttempts = 0;
-        this.emit('connected');
+        this.emit('connected', null);
         
         // Re-subscribe to previous subscriptions after reconnection
         this.resubscribeAll();
       };
 
-      this.ws.onmessage = (event) => {
+      this.ws.onmessage = (event: MessageEvent) => {
         try {
-          const message = JSON.parse(event.data);
+          const message: WebSocketMessage = JSON.parse(event.data);
           this.emit('message', message);
           
           // Handle specific message types based on the backend format
           this.handleMessage(message);
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
-          this.emit('error', { type: 'parse_error', message: error.message });
+          this.emit('error', { type: 'parse_error', message: (error as Error).message });
         }
       };
 
       this.ws.onclose = () => {
         console.log('WebSocket disconnected');
         this.isConnected = false;
-        this.emit('disconnected');
+        this.emit('disconnected', null);
         this.reconnect();
       };
 
-      this.ws.onerror = (error) => {
+      this.ws.onerror = (error: Event) => {
         console.error('WebSocket error:', error);
         this.emit('error', { type: 'connection_error', error });
       };
     } catch (error) {
       console.error('Failed to connect WebSocket:', error);
-      this.emit('error', { type: 'connection_failed', message: error.message });
+      this.emit('error', { type: 'connection_failed', message: (error as Error).message });
     }
   }
 
-  disconnect() {
+  public disconnect(): void {
     if (this.ws) {
       this.ws.close();
       this.ws = null;
@@ -65,7 +68,7 @@ class WebSocketService {
     }
   }
 
-  reconnect() {
+  private reconnect(): void {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
       setTimeout(() => {
@@ -76,13 +79,13 @@ class WebSocketService {
   }
 
   // Subscribe to a specific topic
-  subscribe(topic) {
+  public subscribe(topic: string): boolean {
     if (!this.isConnected) {
       console.warn('Cannot subscribe: WebSocket not connected');
       return false;
     }
 
-    const message = {
+    const message: WebSocketMessage = {
       type: 'subscribe',
       topic: topic
     };
@@ -94,13 +97,13 @@ class WebSocketService {
   }
 
   // Unsubscribe from a specific topic
-  unsubscribe(topic) {
+  public unsubscribe(topic: string): boolean {
     if (!this.isConnected) {
       console.warn('Cannot unsubscribe: WebSocket not connected');
       return false;
     }
 
-    const message = {
+    const message: WebSocketMessage = {
       type: 'unsubscribe',
       topic: topic
     };
@@ -112,18 +115,18 @@ class WebSocketService {
   }
 
   // Unsubscribe from all topics
-  unsubscribeAll() {
+  public unsubscribeAll(): void {
     Array.from(this.subscriptions).forEach(topic => {
       this.unsubscribe(topic);
     });
   }
 
   // Re-subscribe to all previous subscriptions (used after reconnection)
-  resubscribeAll() {
+  private resubscribeAll(): void {
     if (this.subscriptions.size > 0) {
       console.log('Re-subscribing to previous subscriptions...');
       Array.from(this.subscriptions).forEach(topic => {
-        const message = {
+        const message: WebSocketMessage = {
           type: 'subscribe',
           topic: topic
         };
@@ -133,7 +136,7 @@ class WebSocketService {
   }
 
   // Handle incoming messages based on type
-  handleMessage(message) {
+  private handleMessage(message: WebSocketMessage): void {
     switch (message.type) {
       case 'block_update':
         this.emit('newEvmBlock', message.data);
@@ -172,7 +175,7 @@ class WebSocketService {
     }
   }
 
-  send(data) {
+  public send(data: WebSocketMessage): boolean {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(data));
       return true;
@@ -183,7 +186,7 @@ class WebSocketService {
   }
 
   // Get current connection status
-  getConnectionStatus() {
+  public getConnectionStatus(): WebSocketConnectionStatus {
     return {
       connected: this.isConnected,
       subscriptions: Array.from(this.subscriptions),
@@ -191,26 +194,28 @@ class WebSocketService {
     };
   }
 
-  on(event, callback) {
+  public on(event: WebSocketEventType, callback: (data: any) => void): void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, []);
     }
-    this.listeners.get(event).push(callback);
+    this.listeners.get(event)?.push(callback);
   }
 
-  off(event, callback) {
+  public off(event: WebSocketEventType, callback: (data: any) => void): void {
     if (this.listeners.has(event)) {
       const listeners = this.listeners.get(event);
-      const index = listeners.indexOf(callback);
-      if (index > -1) {
-        listeners.splice(index, 1);
+      if (listeners) {
+        const index = listeners.indexOf(callback);
+        if (index > -1) {
+          listeners.splice(index, 1);
+        }
       }
     }
   }
 
-  emit(event, data) {
+  private emit(event: WebSocketEventType | any, data: any): void {
     if (this.listeners.has(event)) {
-      this.listeners.get(event).forEach(callback => {
+      this.listeners.get(event)?.forEach(callback => {
         try {
           callback(data);
         } catch (error) {

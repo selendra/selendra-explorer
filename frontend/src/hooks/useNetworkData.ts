@@ -1,31 +1,32 @@
-import { useApi } from './useApi';
-import { apiService } from '../services';
-import { APP_CONFIG } from '../config/app.config';
+import { useApi } from "./useApi";
+import { apiService } from "../services";
+import { APP_CONFIG } from "../config/app.config";
+import { NetworkInfo, SessionEra } from "../types";
 
 export const useNetworkInfo = () => {
-  return useApi(
+  return useApi<NetworkInfo>(
     () => apiService.getNetworkInfo(),
     {},
-    { 
+    {
       immediate: true,
-      refreshInterval: APP_CONFIG.refreshIntervals.network 
+      refreshInterval: APP_CONFIG.refreshIntervals.network,
     }
   );
 };
 
 export const useLatestBlockNumber = () => {
-  return useApi(
+  return useApi<number>(
     () => apiService.getLatestBlockNumber(),
     {},
-    { 
+    {
       immediate: true,
-      refreshInterval: APP_CONFIG.refreshIntervals.latestBlock 
+      refreshInterval: APP_CONFIG.refreshIntervals.latestBlock,
     }
   );
 };
 
 export const useTotalIssuance = () => {
-  return useApi(
+  return useApi<string>(
     () => apiService.getTotalIssuance(),
     {},
     { immediate: true }
@@ -33,7 +34,7 @@ export const useTotalIssuance = () => {
 };
 
 export const useSessionEra = () => {
-  return useApi(
+  return useApi<SessionEra>(
     () => apiService.getSessionEra(),
     {},
     { immediate: true }

@@ -1,4 +1,6 @@
-export const ROUTES = {
+import { Routes, ApiEndpoints } from '../types';
+
+export const ROUTES: Routes = {
   // Main navigation
   home: '/',
   dashboard: '/dashboard',
@@ -31,9 +33,9 @@ export const ROUTES = {
   about: '/about',
   contact: '/contact',
   api: '/api-docs',
-};
+} as const;
 
-export const API_ENDPOINTS = {
+export const API_ENDPOINTS: ApiEndpoints = {
   // Network endpoints
   network: '/network',
   latestBlock: '/latest_block',
@@ -80,4 +82,4 @@ export const API_ENDPOINTS = {
     eventsByName: '/substrate/events/name',
     eventsRecent: '/substrate/events/recent',
   }
-};
+} as const;

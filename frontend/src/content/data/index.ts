@@ -1,4 +1,28 @@
-export const SAMPLE_DATA = {
+import {
+  EvmBlock,
+  EvmTransaction,
+  EvmAccount,
+  EvmContract,
+  SubstrateBlock,
+  SubstrateExtrinsic,
+  SubstrateEvent,
+  NetworkInfo,
+  SessionEra
+} from '../../types';
+
+interface SampleData {
+  evmBlock: EvmBlock;
+  evmTransaction: EvmTransaction;
+  evmAccount: EvmAccount;
+  evmContract: EvmContract;
+  substrateBlock: SubstrateBlock;
+  substrateExtrinsic: SubstrateExtrinsic;
+  substrateEvent: SubstrateEvent;
+  networkInfo: NetworkInfo;
+  sessionEra: SessionEra;
+}
+
+export const SAMPLE_DATA: SampleData = {
   // Sample EVM data structures
   evmBlock: {
     number: 869242,

@@ -1,4 +1,6 @@
-export const SITE_CONSTANTS = {
+import { SiteConstants } from '../../types';
+
+export const SITE_CONSTANTS: SiteConstants = {
   SITE_NAME: 'Blockchain Explorer',
   SITE_DESCRIPTION: 'Explore EVM and Substrate blockchain data in real-time',
   

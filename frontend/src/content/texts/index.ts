@@ -1,4 +1,160 @@
-export const TEXTS = {
+interface TextContent {
+  home: {
+    title: string;
+    subtitle: string;
+    description: string;
+    features: string[];
+  };
+  dashboard: {
+    title: string;
+    subtitle: string;
+    evmSection: string;
+    substrateSection: string;
+  };
+  evm: {
+    blocks: {
+      title: string;
+      subtitle: string;
+      latest: string;
+      search: string;
+    };
+    transactions: {
+      title: string;
+      subtitle: string;
+      latest: string;
+      search: string;
+    };
+    accounts: {
+      title: string;
+      subtitle: string;
+      search: string;
+    };
+    contracts: {
+      title: string;
+      subtitle: string;
+      verified: string;
+      types: string;
+    };
+  };
+  substrate: {
+    blocks: {
+      title: string;
+      subtitle: string;
+      latest: string;
+      finalized: string;
+    };
+    extrinsics: {
+      title: string;
+      subtitle: string;
+      latest: string;
+      modules: string;
+    };
+    events: {
+      title: string;
+      subtitle: string;
+      recent: string;
+      modules: string;
+    };
+  };
+  tools: {
+    addressConverter: {
+      title: string;
+      subtitle: string;
+      ss58ToEvm: string;
+      evmToSs58: string;
+      description: string;
+    };
+    search: {
+      title: string;
+      subtitle: string;
+      placeholder: string;
+      results: string;
+    };
+  };
+  api: {
+    title: string;
+    subtitle: string;
+    description: string;
+    baseUrl: string;
+    endpoints: string;
+    examples: string;
+  };
+  about: {
+    title: string;
+    description: string;
+    features: string;
+    technology: string;
+  };
+  errors: {
+    notFound: string;
+    networkError: string;
+    timeout: string;
+    invalidInput: string;
+    serverError: string;
+  };
+  labels: {
+    // Common labels
+    address: string;
+    hash: string;
+    blockNumber: string;
+    timestamp: string;
+    amount: string;
+    fee: string;
+    gas: string;
+    nonce: string;
+    status: string;
+    type: string;
+    
+    // EVM specific
+    gasPrice: string;
+    gasLimit: string;
+    gasUsed: string;
+    baseFee: string;
+    burnFee: string;
+    validator: string;
+    transactionCount: string;
+    
+    // Substrate specific
+    module: string;
+    function: string;
+    event: string;
+    extrinsic: string;
+    era: string;
+    session: string;
+    phase: string;
+    signer: string;
+    
+    // Contract specific
+    contractType: string;
+    verified: string;
+    symbol: string;
+    decimals: string;
+    totalSupply: string;
+    creator: string;
+  };
+  buttons: {
+    search: string;
+    convert: string;
+    refresh: string;
+    loadMore: string;
+    back: string;
+    details: string;
+    copy: string;
+    download: string;
+    filter: string;
+    reset: string;
+  };
+  placeholders: {
+    searchAddress: string;
+    searchHash: string;
+    searchBlock: string;
+    ss58Address: string;
+    evmAddress: string;
+    contractAddress: string;
+  };
+}
+
+export const TEXTS: TextContent = {
   home: {
     title: 'Blockchain Explorer',
     subtitle: 'Real-time EVM and Substrate blockchain data',

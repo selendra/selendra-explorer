@@ -1,9 +1,10 @@
 import { useApi } from './useApi';
 import { apiService } from '../services';
 import { APP_CONFIG } from '../config/app.config';
+import { EvmBlock, EvmTransaction, EvmAccount, EvmContract, PaginationParams } from '../types';
 
-export const useEvmBlocks = (params = {}) => {
-  return useApi(
+export const useEvmBlocks = (params: PaginationParams = {}) => {
+  return useApi<EvmBlock[]>(
     (p) => apiService.getEvmBlocks(p),
     params,
     { immediate: true }
@@ -11,7 +12,7 @@ export const useEvmBlocks = (params = {}) => {
 };
 
 export const useLatestEvmBlock = () => {
-  return useApi(
+  return useApi<EvmBlock>(
     () => apiService.getLatestEvmBlock(),
     {},
     { 
@@ -21,24 +22,23 @@ export const useLatestEvmBlock = () => {
   );
 };
 
-export const useEvmBlock = (identifier, type = 'number') => {
-  return useApi(
+export const useEvmBlock = (identifier: string | number, type: 'number' | 'hash' = 'number') => {
+  return useApi<EvmBlock>(
     () => {
       if (type === 'hash') {
-        return apiService.getEvmBlockByHash(identifier);
+        return apiService.getEvmBlockByHash(identifier as string);
       }
-      return apiService.getEvmBlockByNumber(identifier);
+      return apiService.getEvmBlockByNumber(identifier as number);
     },
     {},
     { 
-      immediate: !!identifier,
-      dependencies: [identifier, type] 
+      immediate: !!identifier
     }
   );
 };
 
-export const useEvmTransactions = (params = {}) => {
-  return useApi(
+export const useEvmTransactions = (params: PaginationParams = {}) => {
+  return useApi<EvmTransaction[]>(
     (p) => apiService.getEvmTransactions(p),
     params,
     { 
@@ -48,52 +48,49 @@ export const useEvmTransactions = (params = {}) => {
   );
 };
 
-export const useEvmTransaction = (txHash) => {
-  return useApi(
+export const useEvmTransaction = (txHash: string) => {
+  return useApi<EvmTransaction>(
     () => apiService.getEvmTransactionByHash(txHash),
     {},
     { 
-      immediate: !!txHash,
-      dependencies: [txHash] 
+      immediate: !!txHash
     }
   );
 };
 
-export const useEvmAccounts = (params = {}) => {
-  return useApi(
+export const useEvmAccounts = (params: PaginationParams = {}) => {
+  return useApi<EvmAccount[]>(
     (p) => apiService.getEvmAccounts(p),
     params,
     { immediate: true }
   );
 };
 
-export const useEvmAccount = (address) => {
-  return useApi(
+export const useEvmAccount = (address: string) => {
+  return useApi<EvmAccount>(
     () => apiService.getEvmAccountByAddress(address),
     {},
     { 
       immediate: !!address,
-      dependencies: [address],
       refreshInterval: APP_CONFIG.refreshIntervals.accounts 
     }
   );
 };
 
-export const useEvmContracts = (params = {}) => {
-  return useApi(
+export const useEvmContracts = (params: PaginationParams = {}) => {
+  return useApi<EvmContract[]>(
     (p) => apiService.getEvmContracts(p),
     params,
     { immediate: true }
   );
 };
 
-export const useEvmContract = (address) => {
-  return useApi(
+export const useEvmContract = (address: string) => {
+  return useApi<EvmContract>(
     () => apiService.getEvmContractByAddress(address),
     {},
     { 
-      immediate: !!address,
-      dependencies: [address] 
+      immediate: !!address
     }
   );
 };

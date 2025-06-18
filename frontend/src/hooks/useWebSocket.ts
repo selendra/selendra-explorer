@@ -1,8 +1,13 @@
 import { useEffect, useCallback, useState } from 'react';
 import { wsService } from '../services';
+import { WebSocketConnectionStatus, WebSocketEventType } from '../types';
 
 // Enhanced WebSocket hook with subscription management
-export const useWebSocket = (eventType, callback, dependencies = []) => {
+export const useWebSocket = (
+  eventType: WebSocketEventType, 
+  callback: (data: any) => void, 
+  dependencies: any[] = []
+) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedCallback = useCallback(callback, dependencies);
 
@@ -14,7 +19,7 @@ export const useWebSocket = (eventType, callback, dependencies = []) => {
     };
   }, [eventType, memoizedCallback]);
 
-  const sendMessage = useCallback((data) => {
+  const sendMessage = useCallback((data: any) => {
     return wsService.send(data);
   }, []);
 
@@ -23,7 +28,7 @@ export const useWebSocket = (eventType, callback, dependencies = []) => {
 
 // Hook for managing WebSocket connection
 export const useWebSocketConnection = () => {
-  const [connectionStatus, setConnectionStatus] = useState({
+  const [connectionStatus, setConnectionStatus] = useState<WebSocketConnectionStatus>({
     connected: false,
     subscriptions: [],
     reconnectAttempts: 0
@@ -63,10 +68,10 @@ export const useWebSocketConnection = () => {
 };
 
 // Hook for managing subscriptions
-export const useWebSocketSubscription = (topic, enabled = true) => {
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
+export const useWebSocketSubscription = (topic: string, enabled: boolean = true) => {
+  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+  const [data, setData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const subscribe = useCallback(() => {
     if (wsService.subscribe(topic)) {
@@ -86,11 +91,11 @@ export const useWebSocketSubscription = (topic, enabled = true) => {
 
   // Handle incoming data for this topic
   useEffect(() => {
-    const handleData = (newData) => {
+    const handleData = (newData: any) => {
       setData(newData);
     };
 
-    const handleError = (errorData) => {
+    const handleError = (errorData: { message?: string }) => {
       setError(errorData.message || 'WebSocket error occurred');
     };
 
@@ -132,29 +137,29 @@ export const useWebSocketSubscription = (topic, enabled = true) => {
 };
 
 // Specific hooks for different data types
-export const useEvmBlockUpdates = (enabled = true) => {
+export const useEvmBlockUpdates = (enabled: boolean = true) => {
   return useWebSocketSubscription('blocks', enabled);
 };
 
-export const useEvmTransactionUpdates = (enabled = true) => {
+export const useEvmTransactionUpdates = (enabled: boolean = true) => {
   return useWebSocketSubscription('transactions', enabled);
 };
 
-export const useSubstrateBlockUpdates = (enabled = true) => {
+export const useSubstrateBlockUpdates = (enabled: boolean = true) => {
   return useWebSocketSubscription('substrate_blocks', enabled);
 };
 
-export const useSubstrateEventUpdates = (enabled = true) => {
+export const useSubstrateEventUpdates = (enabled: boolean = true) => {
   return useWebSocketSubscription('substrate_events', enabled);
 };
 
 // Helper function to map topics to event types
-const getEventTypeForTopic = (topic) => {
-  const topicMap = {
+const getEventTypeForTopic = (topic: string): WebSocketEventType | null => {
+  const topicMap: Record<string, WebSocketEventType> = {
     'blocks': 'newEvmBlock',
     'transactions': 'newEvmTransaction',
     'substrate_blocks': 'newSubstrateBlock', 
     'substrate_events': 'newSubstrateEvents'
   };
-  return topicMap[topic];
+  return topicMap[topic] || null;
 };

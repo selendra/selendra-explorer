@@ -1,17 +1,18 @@
-export const formatDate = (timestamp, isSeconds = false) => {
+// Date utilities
+export const formatDate = (timestamp: number, isSeconds: boolean = false): string => {
   const date = new Date(isSeconds ? timestamp * 1000 : timestamp);
   return date.toLocaleDateString();
 };
 
-export const formatDateTime = (timestamp, isSeconds = false) => {
+export const formatDateTime = (timestamp: number, isSeconds: boolean = false): string => {
   const date = new Date(isSeconds ? timestamp * 1000 : timestamp);
   return date.toLocaleString();
 };
 
-export const formatRelativeTime = (timestamp, isSeconds = false) => {
+export const formatRelativeTime = (timestamp: number, isSeconds: boolean = false): string => {
   const date = new Date(isSeconds ? timestamp * 1000 : timestamp);
   const now = new Date();
-  const diff = now - date;
+  const diff = now.getTime() - date.getTime();
   
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
@@ -25,40 +26,40 @@ export const formatRelativeTime = (timestamp, isSeconds = false) => {
 };
 
 // String utilities
-export const capitalize = (str) => {
+export const capitalize = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-export const truncateHash = (hash, length = 10) => {
+export const truncateHash = (hash: string, length: number = 10): string => {
   if (!hash) return '';
   if (hash.length <= length + 2) return hash;
   return `${hash.slice(0, length)}...${hash.slice(-4)}`;
 };
 
-export const truncateAddress = (address, length = 8) => {
+export const truncateAddress = (address: string, length: number = 8): string => {
   if (!address) return '';
   if (address.length <= length + 2) return address;
   return `${address.slice(0, length)}...${address.slice(-4)}`;
 };
 
 // Blockchain utilities
-export const formatWei = (wei, decimals = 18, displayDecimals = 6) => {
+export const formatWei = (wei: string | number, decimals: number = 18, displayDecimals: number = 6): string => {
   if (!wei) return '0';
   const value = Number(wei) / Math.pow(10, decimals);
   return value.toFixed(displayDecimals);
 };
 
-export const formatTokenAmount = (amount, decimals = 18, symbol = '') => {
+export const formatTokenAmount = (amount: string | number, decimals: number = 18, symbol: string = ''): string => {
   const formatted = formatWei(amount, decimals);
   return symbol ? `${formatted} ${symbol}` : formatted;
 };
 
-export const formatGasPrice = (gasPrice) => {
+export const formatGasPrice = (gasPrice: string | number): string => {
   const gwei = Number(gasPrice) / 1e9;
   return `${gwei.toFixed(2)} Gwei`;
 };
 
-export const formatBytes = (bytes) => {
+export const formatBytes = (bytes: number): string => {
   if (bytes === 0) return '0 Bytes';
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -67,26 +68,28 @@ export const formatBytes = (bytes) => {
 };
 
 // Validation utilities
-export const isValidEvmAddress = (address) => {
+export const isValidEvmAddress = (address: string): boolean => {
   return /^0x[a-fA-F0-9]{40}$/.test(address);
 };
 
-export const isValidSs58Address = (address) => {
+export const isValidSs58Address = (address: string): boolean => {
   return /^5[a-zA-Z0-9]{47}$/.test(address);
 };
 
-export const isValidHash = (hash) => {
+export const isValidHash = (hash: string): boolean => {
   return /^0x[a-fA-F0-9]{64}$/.test(hash);
 };
 
-export const isValidBlockNumber = (blockNumber) => {
+export const isValidBlockNumber = (blockNumber: string | number): boolean => {
   return /^\d+$/.test(blockNumber.toString()) && Number(blockNumber) >= 0;
 };
 
-// HTTP utilities
-export const debounce = (func, wait) => {
-  let timeout;
-  return function executedFunction(...args) {
+export const debounce = <T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): ((...args: Parameters<T>) => void) => {
+  let timeout: ReturnType<typeof setTimeout>;
+  return function executedFunction(...args: Parameters<T>) {
     const later = () => {
       clearTimeout(timeout);
       func(...args);
@@ -96,12 +99,12 @@ export const debounce = (func, wait) => {
   };
 };
 
-export const sleep = (ms) => {
+export const sleep = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
 // API utilities
-export const buildQueryString = (params) => {
+export const buildQueryString = (params: Record<string, any>): string => {
   const searchParams = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
@@ -111,15 +114,15 @@ export const buildQueryString = (params) => {
   return searchParams.toString();
 };
 
-export const handleApiError = (error) => {
+export const handleApiError = (error: Error): string => {
   if (error.name === 'AbortError') {
     return 'Request was cancelled';
   }
   if (error.name === 'TimeoutError') {
     return 'Request timeout - please try again';
   }
-  if (error.response) {
-    return error.response.data?.error || 'Server error occurred';
+  if ('response' in error && error.response) {
+    return (error.response as any).data?.error || 'Server error occurred';
   }
   if (error.message) {
     return error.message;
@@ -128,13 +131,13 @@ export const handleApiError = (error) => {
 };
 
 // Array utilities
-export const paginate = (array, page, limit) => {
+export const paginate = <T>(array: T[], page: number, limit: number): T[] => {
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + limit;
   return array.slice(startIndex, endIndex);
 };
 
-export const sortBy = (array, key, direction = 'asc') => {
+export const sortBy = <T>(array: T[], key: keyof T, direction: 'asc' | 'desc' = 'asc'): T[] => {
   return [...array].sort((a, b) => {
     const aVal = a[key];
     const bVal = b[key];
@@ -148,20 +151,20 @@ export const sortBy = (array, key, direction = 'asc') => {
 };
 
 // Number utilities
-export const formatNumber = (num, decimals = 0) => {
+export const formatNumber = (num: number, decimals: number = 0): string => {
   return new Intl.NumberFormat('en-US', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   }).format(num);
 };
 
-export const formatPercentage = (value, total) => {
+export const formatPercentage = (value: number, total: number): string => {
   if (total === 0) return '0%';
   return `${((value / total) * 100).toFixed(2)}%`;
 };
 
 // Local storage utilities
-export const getStorageItem = (key, defaultValue = null) => {
+export const getStorageItem = <T>(key: string, defaultValue: T | null = null): T | null => {
   try {
     const item = localStorage.getItem(key);
     return item ? JSON.parse(item) : defaultValue;
@@ -171,7 +174,7 @@ export const getStorageItem = (key, defaultValue = null) => {
   }
 };
 
-export const setStorageItem = (key, value) => {
+export const setStorageItem = <T>(key: string, value: T): void => {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
@@ -179,7 +182,7 @@ export const setStorageItem = (key, value) => {
   }
 };
 
-export const removeStorageItem = (key) => {
+export const removeStorageItem = (key: string): void => {
   try {
     localStorage.removeItem(key);
   } catch (error) {
@@ -188,11 +191,10 @@ export const removeStorageItem = (key) => {
 };
 
 // Copy to clipboard utility
-export const copyToClipboard = async (text) => {
+export const copyToClipboard = async (text: string): Promise<boolean> => {
   try {
     await navigator.clipboard.writeText(text);
     return true;
-  // eslint-disable-next-line no-unused-vars
   } catch (error) {
     // Fallback for older browsers
     try {
@@ -211,16 +213,16 @@ export const copyToClipboard = async (text) => {
 };
 
 // Theme utilities
-export const getSystemTheme = () => {
+export const getSystemTheme = (): 'dark' | 'light' => {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 };
 
 // URL utilities
-export const getSearchParams = () => {
+export const getSearchParams = (): URLSearchParams => {
   return new URLSearchParams(window.location.search);
 };
 
-export const updateSearchParams = (params) => {
+export const updateSearchParams = (params: Record<string, string | number | null | undefined>): void => {
   const searchParams = new URLSearchParams(window.location.search);
   Object.entries(params).forEach(([key, value]) => {
     if (value === null || value === undefined || value === '') {

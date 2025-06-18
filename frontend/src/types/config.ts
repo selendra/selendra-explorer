@@ -29,8 +29,8 @@ export interface NetworkConfig {
 }
 
 export interface AppSettings {
-  theme: string;
-  language: string;
+  theme: 'dark' | 'light';
+  language: 'en' | 'es' | 'fr' | 'de' | 'zh' | 'ja' | 'ko';
   itemsPerPage: number;
   maxPageSize: number;
   refreshInterval: number;
