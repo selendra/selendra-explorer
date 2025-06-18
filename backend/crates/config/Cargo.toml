@@ -1,0 +1,9 @@
+[package]
+name = "config"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+subxt = { workspace = true }
+dotenv = { workspace = true }
+lazy_static = { workspace = true }

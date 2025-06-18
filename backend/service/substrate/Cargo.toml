@@ -1,0 +1,16 @@
+[package]
+name = "substrate-service"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+dotenv = { workspace = true }
+tokio = { workspace = true }
+serde_json = { workspace = true }
+substrate-api-client = { workspace = true }
+
+blockscan = { workspace = true }
+models = { workspace = true }
+custom-error = { workspace = true }
+config = { workspace = true }
+database = { workspace = true }

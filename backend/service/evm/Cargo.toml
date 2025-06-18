@@ -1,0 +1,16 @@
+[package]
+name = "evm-service"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+dotenv = { workspace = true }
+ethers = { workspace = true }
+tokio = { workspace = true }
+surrealdb = { workspace = true }
+
+blockscan = { workspace = true }
+models = { workspace = true }
+config = { workspace = true }
+database = { workspace = true }
+custom-error = { workspace = true }

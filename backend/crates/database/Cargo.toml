@@ -1,0 +1,11 @@
+[package]
+name = "database"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+surrealdb = { workspace = true }
+
+custom-error = { workspace = true }
+models = { workspace = true }
+config = { workspace = true }

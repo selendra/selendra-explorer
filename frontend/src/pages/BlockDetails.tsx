@@ -4,7 +4,6 @@ import DataTable from '../components/data/DataTable';
 import TimeAgo from '../components/ui/TimeAgo';
 import AddressDisplay from '../components/ui/AddressDisplay';
 import NetworkBadge from '../components/ui/NetworkBadge';
-import StatusBadge from '../components/ui/StatusBadge';
 import { 
   CubeIcon, 
   ClockIcon, 
@@ -103,10 +102,7 @@ const BlockDetails: React.FC = () => {
   // Find next and previous blocks
   const prevBlock = mockBlocks.find(b => b.number === block.number + 1);
   const nextBlock = mockBlocks.find(b => b.number === block.number - 1);
-  
-  // Calculate confirmation count
-  const latestBlock = mockBlocks[0];
-  const confirmations = latestBlock.number - block.number + 1;
+  const session = 110;
   
   // Calculate gas usage percentage
   const gasUsagePercentage = Math.min(100, parseInt(block.gasUsed) / parseInt(block.gasLimit) * 100);
@@ -211,7 +207,7 @@ const BlockDetails: React.FC = () => {
             <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center">
               <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary-300 to-secondary-300 mr-2 flex-shrink-0"></div>
               <AddressDisplay
-                address={block.miner}
+                address={block.validator}
                 networkType={block.networkType}
                 truncate={true}
                 className="text-sm hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
@@ -225,14 +221,14 @@ const BlockDetails: React.FC = () => {
           <div className="bg-gray-50 dark:bg-gray-900/30 p-4 rounded-lg border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300">
             <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center">
               <DocumentTextIcon className="h-3 w-3 mr-1.5" />
-              Confirmations
+              Session
             </div>
             <div className="text-lg font-bold text-gray-900 dark:text-white">
-              {confirmations.toLocaleString()}
+              {session.toLocaleString()}
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center">
               <CheckCircleIcon className="h-3 w-3 mr-1 text-green-500" />
-              Fully confirmed
+              era 11
             </div>
           </div>
         </div>
@@ -299,16 +295,6 @@ const BlockDetails: React.FC = () => {
               <div className="text-gray-500 dark:text-gray-400">Nonce</div>
               <div className="col-span-2 font-medium text-gray-900 dark:text-white font-mono">
                 {block.nonce}
-              </div>
-              
-              <div className="text-gray-500 dark:text-gray-400">Difficulty</div>
-              <div className="col-span-2 font-medium text-gray-900 dark:text-white">
-                {parseInt(block.difficulty).toLocaleString()}
-              </div>
-              
-              <div className="text-gray-500 dark:text-gray-400">Total Difficulty</div>
-              <div className="col-span-2 font-medium text-gray-900 dark:text-white">
-                {BigInt(block.totalDifficulty).toLocaleString()}
               </div>
               
               <div className="text-gray-500 dark:text-gray-400">Size</div>
@@ -421,7 +407,7 @@ const BlockDetails: React.FC = () => {
                 header: 'Method',
                 accessor: (tx) => (
                   <span className="px-2 py-1 text-xs rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300">
-                    {tx.method || 'Transfer'}
+                    {tx.transactionType || 'Transfer'}
                   </span>
                 ),
               },
@@ -461,9 +447,9 @@ const BlockDetails: React.FC = () => {
                 header: 'Fee',
                 accessor: (tx) => (
                   <div className="text-right text-sm">
-                    <div className="font-medium">{(parseFloat(tx.gas) * 0.00001).toFixed(6)} SEL</div>
+                    <div className="font-medium">{(parseFloat(tx.fee ?? '0') * 0.00001).toFixed(6)} SEL</div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {tx.gas} Gas
+                      {tx.fee} Fee
                     </div>
                   </div>
                 ),
