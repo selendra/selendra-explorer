@@ -1,3 +1,3 @@
 export { SITE_CONSTANTS } from './constants';
-export { Evm_data } from './data';
+export { SAMPLE_DATA } from './data';
 export { TEXTS } from './texts';
