@@ -53,7 +53,7 @@ export const APP_CONFIG: AppConfig = {
   // Data refresh intervals (in milliseconds)
   refreshIntervals: {
     network: parseInt(import.meta.env.VITE_NETWORK_REFRESH_INTERVAL as string) || 60000,
-    latestBlock: parseInt(import.meta.env.VITE_BLOCK_REFRESH_INTERVAL as string) || 6000,
+    latestBlock: parseInt(import.meta.env.VITE_BLOCK_REFRESH_INTERVAL as string) || 60000,
     transactions: parseInt(import.meta.env.VITE_TRANSACTION_REFRESH_INTERVAL as string) || 10000,
     accounts: parseInt(import.meta.env.VITE_ACCOUNT_REFRESH_INTERVAL as string) || 30000,
     events: parseInt(import.meta.env.VITE_EVENT_REFRESH_INTERVAL as string) || 15000,
