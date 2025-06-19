@@ -11,7 +11,7 @@ export const convertSubstrateBlockToBlock = (
     number: substrateBlock.number,
     hash: substrateBlock.hash,
     parentHash: substrateBlock.parent_hash,
-    timestamp: substrateBlock.timestamp.toString(), // Already in milliseconds
+    timestamp: new Date(substrateBlock.timestamp).toISOString(), // Convert to ISO string
     transactionCount: substrateBlock.extrinscs_len, // Note: using extrinsics count
     size: 0, // Not available in SubstrateBlock
     gasUsed: "0", // Not applicable for Substrate
