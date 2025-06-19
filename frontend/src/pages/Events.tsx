@@ -1,25 +1,23 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  ArrowsRightLeftIcon, 
+  SparklesIcon, 
   CheckCircleIcon, 
-  XCircleIcon,
+  ExclamationTriangleIcon,
   ArrowPathIcon,
-  AdjustmentsHorizontalIcon
+  AdjustmentsHorizontalIcon,
+  ClockIcon
 } from '@heroicons/react/24/outline';
 import { formatDistance } from 'date-fns';
-import { useSubstrateExtrinsics } from '../contexts/ApiContext';
+import { useSubstrateEvents } from '../contexts/ApiContext';
 import Pagination from '../components/ui/Pagination';
-import IdentityBadge from '../components/identity/IdentityBadge';
-import { SubstrateExtrinsic } from '../types';
 
-const Extrinsics: React.FC = () => {
+const Events: React.FC = () => {
   const [page, setPage] = useState(1);
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
-  const [selectedFunction, setSelectedFunction] = useState<string | null>(null);
   const pageSize = 20;
   
-  const { data, isLoading, error } = useSubstrateExtrinsics(page, pageSize);
+  const { data, isLoading, error } = useSubstrateEvents(page, pageSize);
   
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -28,30 +26,44 @@ const Extrinsics: React.FC = () => {
   
   const totalPages = data ? Math.ceil(data.totalCount / pageSize) : 0;
   
-  // Get unique modules and functions for filtering
-  const modules = data ? Array.from(new Set(data.items.map(ex => ex.call_module))).sort() : [];
-  const functions = data ? Array.from(new Set(data.items.map(ex => ex.call_function))).sort() : [];
+  // Get unique modules for filtering
+  const modules = data ? Array.from(new Set(data.items.map(event => event.module))).sort() : [];
   
-  // Filter extrinsics based on selected module and function
-  const filteredExtrinsics = data?.items.filter(ex => {
-    if (selectedModule && ex.call_module !== selectedModule) return false;
-    if (selectedFunction && ex.call_function !== selectedFunction) return false;
+  // Filter events based on selected module
+  const filteredEvents = data?.items.filter(event => {
+    if (selectedModule && event.module !== selectedModule) return false;
     return true;
   }) || [];
 
-  // Helper to create unique key for extrinsic
-  const getExtrinsicKey = (extrinsic: SubstrateExtrinsic) => 
-    `${extrinsic.block_number}-${extrinsic.extrinsic_index}`;
+  // Helper to parse event name and method from the event string
+  const parseEventInfo = (eventString: string) => {
+    // Example: "System::ExtrinsicSuccess (weight: 284906000, class: DispatchClass::Mandatory)"
+    const parts = eventString.split('::');
+    if (parts.length >= 2) {
+      const module = parts[0];
+      const rest = parts[1];
+      const methodMatch = rest.match(/^([^(]+)/);
+      const method = methodMatch ? methodMatch[1].trim() : rest;
+      return { module, method };
+    }
+    return { module: 'Unknown', method: eventString };
+  };
 
-  // Helper to create extrinsic ID for display
-  const getExtrinsicId = (extrinsic: SubstrateExtrinsic) => 
-    `${extrinsic.block_number}-${extrinsic.extrinsic_index}`;
+  // Helper to get event status/type icon
+  const getEventIcon = (eventString: string) => {
+    if (eventString.includes('Success')) {
+      return <CheckCircleIcon className="h-4 w-4 text-green-500" />;
+    } else if (eventString.includes('Error') || eventString.includes('Failed')) {
+      return <ExclamationTriangleIcon className="h-4 w-4 text-red-500" />;
+    }
+    return <SparklesIcon className="h-4 w-4 text-blue-500" />;
+  };
 
   if (error) {
     return (
       <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">Error Loading Extrinsics</h2>
+          <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">Error Loading Events</h2>
           <p className="text-gray-600 dark:text-gray-400 mt-2">{error.message}</p>
         </div>
       </div>
@@ -63,11 +75,11 @@ const Extrinsics: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
-            <ArrowsRightLeftIcon className="h-8 w-8 mr-3 text-primary-500 dark:text-primary-400" />
-            Substrate Extrinsics
+            <SparklesIcon className="h-8 w-8 mr-3 text-primary-500 dark:text-primary-400" />
+            Substrate Events
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            View and explore Substrate extrinsics on the Selendra blockchain
+            View and explore Substrate events on the Selendra blockchain
           </p>
         </div>
         
@@ -101,32 +113,17 @@ const Extrinsics: React.FC = () => {
               ))}
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Function
-            </label>
-            <select
-              value={selectedFunction || ''}
-              onChange={(e) => setSelectedFunction(e.target.value || null)}
-              className="rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm w-48"
-            >
-              <option value="">All Functions</option>
-              {functions.map(func => (
-                <option key={func} value={func}>{func}</option>
-              ))}
-            </select>
-          </div>
         </div>
       </div>
       
-      {/* Extrinsics Table */}
+      {/* Events Table */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-900/50">
               <tr>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Extrinsic ID
+                  Event
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Block
@@ -135,13 +132,13 @@ const Extrinsics: React.FC = () => {
                   Age
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Action
+                  Module
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Signer
+                  Phase
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Signed
+                  Data
                 </th>
               </tr>
             </thead>
@@ -151,7 +148,7 @@ const Extrinsics: React.FC = () => {
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48"></div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
@@ -160,85 +157,81 @@ const Extrinsics: React.FC = () => {
                       <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
                     </td>
                   </tr>
                 ))
-              ) : filteredExtrinsics.length === 0 ? (
+              ) : filteredEvents.length === 0 ? (
                 // Empty state
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center">
                     <div className="text-gray-500 dark:text-gray-400">
-                      <ArrowsRightLeftIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p className="text-lg font-medium">No extrinsics found</p>
+                      <SparklesIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p className="text-lg font-medium">No events found</p>
                       <p className="text-sm">Try adjusting your filters or check back later.</p>
                     </div>
                   </td>
                 </tr>
               ) : (
-                filteredExtrinsics.map((extrinsic) => (
-                  <tr key={getExtrinsicKey(extrinsic)} className="hover:bg-gray-50 dark:hover:bg-gray-700/30">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Link 
-                        to={`/extrinsics/${extrinsic.block_number}/${extrinsic.extrinsic_index}`}
-                        className="text-primary-600 dark:text-primary-400 hover:underline font-mono text-sm"
-                      >
-                        {getExtrinsicId(extrinsic)}
-                      </Link>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Link 
-                        to={`/blocks/${extrinsic.block_number}`}
-                        className="text-primary-600 dark:text-primary-400 hover:underline"
-                      >
-                        {extrinsic.block_number.toLocaleString()}
-                      </Link>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                      {formatDistance(new Date(extrinsic.timestamp), new Date(), { addSuffix: true })}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        {extrinsic.call_module}.{extrinsic.call_function}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {extrinsic.signer ? (
-                        <IdentityBadge 
-                          address={extrinsic.signer} 
-                          showFullInfo={false}
-                        />
-                      ) : (
-                        <span className="text-gray-500 dark:text-gray-400 text-sm">Unsigned</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        extrinsic.is_signed 
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                          : 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
-                      }`}>
-                        {extrinsic.is_signed ? (
-                          <>
-                            <CheckCircleIcon className="h-4 w-4 mr-1.5" />
-                            Signed
-                          </>
-                        ) : (
-                          <>
-                            <XCircleIcon className="h-4 w-4 mr-1.5" />
-                            Unsigned
-                          </>
-                        )}
-                      </span>
-                    </td>
-                  </tr>
-                ))
+                filteredEvents.map((event) => {
+                  const { method } = parseEventInfo(event.event);
+                  const eventKey = `${event.block_number}-${event.event_index}`;
+                  
+                  return (
+                    <tr key={eventKey} className="hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          {getEventIcon(event.event)}
+                          <div className="ml-3">
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">
+                              {method}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-xs">
+                              Index: {event.event_index}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Link 
+                          to={`/blocks/${event.block_number}`}
+                          className="text-primary-600 dark:text-primary-400 hover:underline"
+                        >
+                          {event.block_number.toLocaleString()}
+                        </Link>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <div className="flex items-center">
+                          <ClockIcon className="h-4 w-4 mr-1 opacity-60" />
+                          {formatDistance(new Date(event.timestamp), new Date(), { addSuffix: true })}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                          {event.module}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                        {event.phase}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 max-w-xs truncate">
+                          {event.data && event.data !== '[]' ? (
+                            <pre className="whitespace-pre-wrap break-words">{event.data}</pre>
+                          ) : (
+                            <span className="italic">No data</span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -252,7 +245,7 @@ const Extrinsics: React.FC = () => {
                 <p className="text-sm text-gray-700 dark:text-gray-300">
                   Showing <span className="font-medium">{((page - 1) * pageSize) + 1}</span> to{' '}
                   <span className="font-medium">{Math.min(page * pageSize, data.totalCount)}</span> of{' '}
-                  <span className="font-medium">{data.totalCount.toLocaleString()}</span> extrinsics
+                  <span className="font-medium">{data.totalCount.toLocaleString()}</span> events
                 </p>
               </div>
               <div>
@@ -270,4 +263,4 @@ const Extrinsics: React.FC = () => {
   );
 };
 
-export default Extrinsics; 
+export default Events;

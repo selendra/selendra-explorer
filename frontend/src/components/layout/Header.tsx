@@ -10,6 +10,7 @@ import {
   ChevronDownIcon,
   CubeIcon,
   ArrowsRightLeftIcon,
+  SparklesIcon,
   UserIcon,
   DocumentTextIcon,
   CurrencyDollarIcon,
@@ -213,6 +214,14 @@ const Header: React.FC = () => {
                         Extrinsics
                       </Link>
                       <Link
+                        to="/events"
+                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
+                        onClick={() => setActiveDropdown(null)}
+                      >
+                        <SparklesIcon className="h-4 w-4 mr-2 text-primary-500 dark:text-secondary-400" />
+                        Events
+                      </Link>
+                      <Link
                         to="/api"
                         className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
                         onClick={() => setActiveDropdown(null)}
@@ -386,6 +395,13 @@ const Header: React.FC = () => {
                 >
                   <ArrowsRightLeftIcon className="h-5 w-5 mr-3 text-primary-500 dark:text-secondary-400" />
                   Extrinsics
+                </Link>
+                <Link
+                  to="/events"
+                  className="flex items-center px-3 py-2.5 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800"
+                >
+                  <SparklesIcon className="h-5 w-5 mr-3 text-primary-500 dark:text-secondary-400" />
+                  Events
                 </Link>
                 <Link
                   to="/api"

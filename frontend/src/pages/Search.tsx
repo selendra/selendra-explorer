@@ -65,8 +65,10 @@ const Search: React.FC = () => {
   const typeInfo = {
     block: { label: 'Blocks', route: '/blocks' },
     transaction: { label: 'Transactions', route: '/transactions' },
+    address: { label: 'Addresses', route: '/accounts' },
     account: { label: 'Accounts', route: '/accounts' },
     contract: { label: 'Contracts', route: '/contracts' },
+    extrinsic: { label: 'Extrinsics', route: '/extrinsics' },
     token: { label: 'Tokens', route: '/tokens' },
     validator: { label: 'Validators', route: '/validators' },
   };
@@ -94,20 +96,26 @@ const Search: React.FC = () => {
             
             <div className="space-y-4">
               {results.map((result) => {
-                // Determine the link based on the result type
+                // Determine the link based on the result type and network type
                 let link = '/';
-                if (type === 'block') {
-                  link = `/blocks/${result.id.replace('block-', '')}`;
-                } else if (type === 'transaction') {
-                  link = `/transactions/${result.id.replace('tx-', '')}`;
-                } else if (type === 'account') {
-                  link = `/accounts/${result.id.replace('account-', '')}`;
-                } else if (type === 'contract') {
-                  link = `/contracts/${result.id.replace('contract-', '')}`;
-                } else if (type === 'token') {
-                  link = `/tokens/${result.id.replace('token-', '')}`;
-                } else if (type === 'validator') {
-                  link = `/validators/${result.id.replace('validator-', '')}`;
+                if (result.type === 'block') {
+                  if (result.networkType === 'evm') {
+                    link = `/evm/blocks/${result.id}`;
+                  } else {
+                    link = `/substrate/blocks/${result.id}`;
+                  }
+                } else if (result.type === 'transaction') {
+                  link = `/evm/transactions/${result.id}`;
+                } else if (result.type === 'address' || result.type === 'account') {
+                  link = `/evm/accounts/${result.id}`;
+                } else if (result.type === 'contract') {
+                  link = `/evm/contracts/${result.id}`;
+                } else if (result.type === 'extrinsic') {
+                  link = `/substrate/extrinsics/${result.id}`;
+                } else if (result.type === 'token') {
+                  link = `/tokens/${result.id}`;
+                } else if (result.type === 'validator') {
+                  link = `/validators/${result.id}`;
                 }
                 
                 return (

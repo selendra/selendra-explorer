@@ -5,7 +5,6 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { apiService } from "../services/api";
-import { NetworkType } from "../types";
 
 // Re-export types from mocks for convenience
 import { mockBlocks } from "../mocks/blocks";
@@ -169,6 +168,68 @@ export const useSubstrateExtrinsicsByModule = (
   });
 };
 
+// Substrate Events
+export const useSubstrateEvents = (page: number = 1, pageSize: number = 10) => {
+  return useQuery({
+    queryKey: ["substrateEvents", page, pageSize],
+    queryFn: () => apiService.getSubstrateEvents(page, pageSize),
+    staleTime: 30000, // Consider data stale after 30 seconds
+    retry: 2, // Only retry 2 times
+    retryDelay: 1000, // Wait 1 second between retries
+  });
+};
+
+export const useSubstrateEventsByBlock = (blockNumber: number) => {
+  return useQuery({
+    queryKey: ["substrateEvents", "block", blockNumber],
+    queryFn: () => apiService.getSubstrateEventsByBlock(blockNumber),
+    enabled: !!blockNumber,
+    staleTime: 30000, // Consider data stale after 30 seconds
+    retry: 2, // Only retry 2 times
+    retryDelay: 1000, // Wait 1 second between retries
+  });
+};
+
+export const useSubstrateEventsByModule = (
+  module: string,
+  page: number = 1,
+  pageSize: number = 10
+) => {
+  return useQuery({
+    queryKey: ["substrateEvents", "module", module, page, pageSize],
+    queryFn: () => apiService.getSubstrateEventsByModule(module, page, pageSize),
+    enabled: !!module,
+    staleTime: 30000, // Consider data stale after 30 seconds
+    retry: 2, // Only retry 2 times
+    retryDelay: 1000, // Wait 1 second between retries
+  });
+};
+
+export const useSubstrateEventsByName = (
+  eventName: string,
+  page: number = 1,
+  pageSize: number = 10
+) => {
+  return useQuery({
+    queryKey: ["substrateEvents", "name", eventName, page, pageSize],
+    queryFn: () => apiService.getSubstrateEventsByName(eventName, page, pageSize),
+    enabled: !!eventName,
+    staleTime: 30000, // Consider data stale after 30 seconds
+    retry: 2, // Only retry 2 times
+    retryDelay: 1000, // Wait 1 second between retries
+  });
+};
+
+export const useRecentSubstrateEvents = () => {
+  return useQuery({
+    queryKey: ["substrateEvents", "recent"],
+    queryFn: () => apiService.getRecentSubstrateEvents(),
+    staleTime: 15000, // Consider data stale after 15 seconds (events are more dynamic)
+    retry: 2, // Only retry 2 times
+    retryDelay: 1000, // Wait 1 second between retries
+  });
+};
+
 // Transactions
 export const useTransactions = (
   page: number = 1,
@@ -219,12 +280,11 @@ export const useAccount = (address: string) => {
 // Contracts
 export const useContracts = (
   page: number = 1,
-  pageSize: number = 10,
-  networkType?: NetworkType
+  pageSize: number = 10
 ) => {
   return useQuery({
-    queryKey: ["contracts", page, pageSize, networkType],
-    queryFn: () => apiService.getContracts(page, pageSize, networkType),
+    queryKey: ["contracts", page, pageSize],
+    queryFn: () => apiService.getContracts(page, pageSize),
   });
 };
 
@@ -240,12 +300,11 @@ export const useContract = (address: string) => {
 export const useTokens = (
   page: number = 1,
   pageSize: number = 10,
-  type?: string,
-  networkType?: NetworkType
+  type?: string
 ) => {
   return useQuery({
-    queryKey: ["tokens", page, pageSize, type, networkType],
-    queryFn: () => apiService.getTokens(page, pageSize, type, networkType),
+    queryKey: ["tokens", page, pageSize, type],
+    queryFn: () => apiService.getTokens(page, pageSize, type),
   });
 };
 
@@ -260,12 +319,11 @@ export const useToken = (address: string) => {
 // Validators
 export const useValidators = (
   page: number = 1,
-  pageSize: number = 10,
-  status?: "active" | "waiting" | "inactive"
+  pageSize: number = 10
 ) => {
   return useQuery({
-    queryKey: ["validators", page, pageSize, status],
-    queryFn: () => apiService.getValidators(page, pageSize, status),
+    queryKey: ["validators", page, pageSize],
+    queryFn: () => apiService.getValidators(page, pageSize),
     refetchOnWindowFocus: false,
     refetchOnMount: true,
     staleTime: 1000 * 60 * 5, // 5 minutes

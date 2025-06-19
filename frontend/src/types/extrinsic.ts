@@ -1,11 +1,11 @@
 export interface SubstrateEvent {
-  id: string;
-  transaction_hash: string;
+  block_number: number;
   event_index: number;
-  section: string;
-  method: string;
   phase: string;
-  data: Record<string, unknown>;
+  module: string;
+  event: string;
+  data: string; // JSON serialized data
+  timestamp: number; // Backend timestamp in milliseconds
 }
 
 export interface SubstrateExtrinsic {

@@ -181,7 +181,9 @@ export interface SearchResult {
     | "block"
     | "transaction"
     | "account"
+    | "address"
     | "contract"
+    | "extrinsic"
     | "token"
     | "validator";
   id: string;

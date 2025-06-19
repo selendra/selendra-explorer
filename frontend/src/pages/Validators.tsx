@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useValidators } from '../contexts/ApiContext';
+import { NetworkType } from '../types';
 import DataTable from '../components/data/DataTable';
 import Pagination from '../components/ui/Pagination';
 import AddressDisplay from '../components/ui/AddressDisplay';
@@ -20,7 +21,7 @@ const Validators: React.FC = () => {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<'active' | 'waiting' | 'inactive' | undefined>(undefined);
   const pageSize = 20;
-  const { data, isLoading } = useValidators(page, pageSize, status);
+  const { data, isLoading } = useValidators(page, pageSize);
   
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -230,6 +231,7 @@ const Validators: React.FC = () => {
                 <div className="flex items-center group">
                   <AddressDisplay
                     address={validator.address}
+                    networkType={"substrate" as NetworkType}
                     truncate={true}
                     className="text-sm hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                   />
@@ -258,10 +260,10 @@ const Validators: React.FC = () => {
                 <div className="font-medium">
                   <div className="flex items-center text-primary-600 dark:text-primary-400">
                     <BanknotesIcon className="h-3.5 w-3.5 mr-1" />
-                    {validator.staked} SEL
+                    {validator.totalStake} SEL
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    ${(parseFloat(validator.staked) * 0.04).toFixed(2)}
+                    ${(parseFloat(validator.totalStake) * 0.04).toFixed(2)}
                   </div>
                 </div>
               ),
@@ -284,9 +286,9 @@ const Validators: React.FC = () => {
                   <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
                     <div 
                       className={`h-1.5 rounded-full ${
-                        parseFloat(validator.uptime) > 99 
+                        validator.uptime > 99 
                           ? 'bg-green-500 dark:bg-green-400' 
-                          : parseFloat(validator.uptime) > 95 
+                          : validator.uptime > 95 
                             ? 'bg-yellow-500 dark:bg-yellow-400' 
                             : 'bg-red-500 dark:bg-red-400'
                       }`}
@@ -307,10 +309,10 @@ const Validators: React.FC = () => {
             },
             {
               header: 'Last Active',
-              accessor: (validator) => (
+              accessor: () => (
                 <div className="flex items-center">
                   <ClockIcon className="h-3.5 w-3.5 mr-1.5 text-gray-500 dark:text-gray-400" />
-                  <span className="text-gray-900 dark:text-white">{validator.lastActive || 'N/A'}</span>
+                  <span className="text-gray-900 dark:text-white">N/A</span>
                 </div>
               ),
             },

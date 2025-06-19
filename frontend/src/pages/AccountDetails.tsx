@@ -317,12 +317,6 @@ const AccountDetails: React.FC = () => {
                   </dd>
                 </div>
                 
-                <div>
-                  <dt className="text-sm text-gray-500 dark:text-gray-400">Last Updated</dt>
-                  <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-                    {account.lastActivity ? new Date(account.lastActivity).toLocaleString() : 'N/A'}
-                  </dd>
-                </div>
               </dl>
             </div>
           </div>
@@ -614,14 +608,7 @@ const AccountDetails: React.FC = () => {
                 <div>
                   <dt className="text-sm text-gray-500 dark:text-gray-400">Creator</dt>
                   <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-                    {account.creator ? (
-                      <AddressDisplay
-                        address={account.creator}
-                        networkType={account.networkType}
-                        truncate={false}
-                        className="text-sm"
-                      />
-                    ) : 'Unknown'}
+                    Unknown
                   </dd>
                 </div>
                 

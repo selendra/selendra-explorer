@@ -49,19 +49,6 @@ const BlockDetails: React.FC = () => {
   const { data: transactions = [], isLoading: isLoadingTransactions } = useTransactionsByBlock(
     block?.number || 0
   );
-
-  // Transform transactions for table display
-  const transformedTransactions = transactions.map(tx => ({
-    hash: tx.hash,
-    transactionType: tx.transactionType || 'Transfer',
-    from: tx.from,
-    to: tx.to,
-    value: tx.value,
-    status: tx.status,
-    timestamp: tx.timestamp,
-    fee: tx.fee,
-    blockNumber: tx.blockNumber,
-  }));
   
   if (isLoadingBlock) {
     return (

@@ -30,6 +30,7 @@ import Search from "./pages/Search";
 import NotFound from "./pages/NotFound";
 import Extrinsics from "./pages/Extrinsics";
 import ExtrinsicDetails from "./pages/ExtrinsicDetails";
+import Events from "./pages/Events";
 import Identity from "./pages/Identity";
 import Charts from "./pages/Charts";
 import Api from "./pages/Api";
@@ -71,7 +72,8 @@ const router = createBrowserRouter(
         </React.Suspense>
       } />
       <Route path="extrinsics" element={<Extrinsics />} />
-      <Route path="extrinsics/:hash" element={<ExtrinsicDetails />} />
+      <Route path="extrinsics/:blockNumber/:extrinsicIndex" element={<ExtrinsicDetails />} />
+      <Route path="events" element={<Events />} />
       <Route path="charts" element={<Charts />} />
       <Route path="identity" element={<Identity />} />
       <Route path="api" element={<Api />} />

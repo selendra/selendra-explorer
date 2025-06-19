@@ -12,6 +12,7 @@ import type {
   Token,
   SubstrateBlock,
   SubstrateExtrinsic,
+  SubstrateEvent,
 } from "../types";
 
 // API Configuration
@@ -204,39 +205,6 @@ interface BackendEvmContract {
     timestamp: number;
     creation_bytecode: string;
   };
-}
-
-interface BackendSubstrateBlock {
-  number: number;
-  timestamp: number; // seconds (not milliseconds!)
-  is_finalize: boolean;
-  hash: string;
-  parent_hash: string;
-  state_root: string;
-  extrinsics_root: string;
-  extrinscs_len?: number; // note the typo in backend
-  event_len?: number;
-}
-
-interface BackendSubstrateExtrinsic {
-  block_number: number;
-  extrinsic_index: number;
-  is_signed: boolean;
-  signer: string | null;
-  call_module: string;
-  call_function: string;
-  args: string;
-  timestamp: number; // seconds
-}
-
-interface BackendSubstrateEvent {
-  block_number: number;
-  event_index: number;
-  phase: string;
-  module: string;
-  event: string;
-  data: string;
-  timestamp: number; // seconds
 }
 
 interface BackendNetworkInfo {
@@ -547,8 +515,7 @@ export class ApiService {
   // EVM Contracts
   async getContracts(
     page: number = 1,
-    pageSize: number = 10,
-    networkType?: NetworkType
+    pageSize: number = 10
   ): Promise<PaginatedResponse<Contract>> {
     const offset = (page - 1) * pageSize;
     // Backend doesn't filter by network type in contracts endpoint
@@ -581,8 +548,7 @@ export class ApiService {
   async getTokens(
     page: number = 1,
     pageSize: number = 10,
-    type?: string,
-    networkType?: NetworkType
+    type?: string
   ): Promise<PaginatedResponse<Token>> {
     // Use contracts endpoint and filter by type
     let endpoint = `${API_ENDPOINTS.EVM_CONTRACTS}`;
@@ -884,11 +850,151 @@ export class ApiService {
     }
   }
 
+  // Substrate Events
+  async getSubstrateEvents(
+    page: number = 1,
+    pageSize: number = 10
+  ): Promise<PaginatedResponse<SubstrateEvent>> {
+    const offset = (page - 1) * pageSize;
+    try {
+      const events = await apiRequest<SubstrateEvent[]>(
+        `${API_ENDPOINTS.SUBSTRATE_EVENTS}?limit=${pageSize}&offset=${offset}`
+      );
+
+      const convertedEvents = events.map((event) => ({
+        ...event,
+        // Backend provides timestamp in milliseconds
+        timestamp: event.timestamp,
+      }));
+
+      return {
+        items: convertedEvents,
+        totalCount: events.length,
+        page,
+        pageSize,
+        hasMore: events.length === pageSize,
+      };
+    } catch (error) {
+      console.warn(
+        "Error fetching substrate events, returning empty result:",
+        error
+      );
+      return {
+        items: [],
+        totalCount: 0,
+        page,
+        pageSize,
+        hasMore: false,
+      };
+    }
+  }
+
+  async getSubstrateEventsByBlock(
+    blockNumber: number
+  ): Promise<SubstrateEvent[]> {
+    try {
+      const events = await apiRequest<SubstrateEvent[]>(
+        `${API_ENDPOINTS.SUBSTRATE_EVENTS_BLOCK}/${blockNumber}`
+      );
+      return events.map((event) => ({
+        ...event,
+        timestamp: event.timestamp,
+      }));
+    } catch (error) {
+      console.error("Error fetching substrate events by block:", error);
+      return [];
+    }
+  }
+
+  async getSubstrateEventsByModule(
+    module: string,
+    page: number = 1,
+    pageSize: number = 10
+  ): Promise<PaginatedResponse<SubstrateEvent>> {
+    const offset = (page - 1) * pageSize;
+    try {
+      let endpoint = `${API_ENDPOINTS.SUBSTRATE_EVENTS_MODULE}?module=${module}&limit=${pageSize}&offset=${offset}`;
+
+      const events = await apiRequest<SubstrateEvent[]>(endpoint);
+
+      const convertedEvents = events.map((event) => ({
+        ...event,
+        timestamp: event.timestamp,
+      }));
+
+      return {
+        items: convertedEvents,
+        totalCount: events.length,
+        page,
+        pageSize,
+        hasMore: events.length === pageSize,
+      };
+    } catch (error) {
+      console.warn("Error fetching substrate events by module:", error);
+      return {
+        items: [],
+        totalCount: 0,
+        page,
+        pageSize,
+        hasMore: false,
+      };
+    }
+  }
+
+  async getSubstrateEventsByName(
+    eventName: string,
+    page: number = 1,
+    pageSize: number = 10
+  ): Promise<PaginatedResponse<SubstrateEvent>> {
+    const offset = (page - 1) * pageSize;
+    try {
+      const events = await apiRequest<SubstrateEvent[]>(
+        `${API_ENDPOINTS.SUBSTRATE_EVENTS_NAME}/${eventName}?limit=${pageSize}&offset=${offset}`
+      );
+
+      const convertedEvents = events.map((event) => ({
+        ...event,
+        timestamp: event.timestamp,
+      }));
+
+      return {
+        items: convertedEvents,
+        totalCount: events.length,
+        page,
+        pageSize,
+        hasMore: events.length === pageSize,
+      };
+    } catch (error) {
+      console.warn("Error fetching substrate events by name:", error);
+      return {
+        items: [],
+        totalCount: 0,
+        page,
+        pageSize,
+        hasMore: false,
+      };
+    }
+  }
+
+  async getRecentSubstrateEvents(): Promise<SubstrateEvent[]> {
+    try {
+      const events = await apiRequest<SubstrateEvent[]>(
+        `${API_ENDPOINTS.SUBSTRATE_EVENTS_RECENT}`
+      );
+      return events.map((event) => ({
+        ...event,
+        timestamp: event.timestamp,
+      }));
+    } catch (error) {
+      console.error("Error fetching recent substrate events:", error);
+      return [];
+    }
+  }
+
   // Validators (not implemented in backend yet - using mock for now)
   async getValidators(
     page: number = 1,
-    pageSize: number = 10,
-    status?: "active" | "waiting" | "inactive"
+    pageSize: number = 10
   ): Promise<PaginatedResponse<Validator>> {
     // TODO: Implement when backend provides validator endpoints
     console.warn("Validator endpoints not yet implemented in backend");
@@ -912,7 +1018,7 @@ export class ApiService {
   // Network Stats (constructed from various endpoints)
   async getNetworkStats(): Promise<NetworkStats> {
     try {
-      const [networkInfo, latestBlockNumber, totalIssuance, totalStaking] =
+      const [networkInfo, latestBlockNumber, , totalStaking] =
         await Promise.all([
           this.getNetworkInfo(),
           this.getLatestBlockNumber(),
@@ -952,82 +1058,171 @@ export class ApiService {
     }
   }
 
-  // Search (basic implementation - needs enhancement)
+  // Search (enhanced implementation for real backend data)
   async search(query: string): Promise<SearchResult[]> {
     const results: SearchResult[] = [];
 
     try {
-      // Try to search as block number
-      if (/^\d+$/.test(query)) {
-        const block = await this.getBlock(parseInt(query));
-        if (block) {
-          results.push({
-            type: "block",
-            id: block.id,
-            title: `Block #${block.number}`,
-            subtitle: `${block.transactionCount} transactions`,
-            networkType: block.networkType,
-          });
+      // Trim and normalize the query
+      const normalizedQuery = query.trim();
+
+      // Try to search as block number (for both EVM and Substrate blocks)
+      if (/^\d+$/.test(normalizedQuery)) {
+        const blockNumber = parseInt(normalizedQuery);
+
+        // Try EVM block first
+        try {
+          const evmBlock = await this.getBlock(blockNumber);
+          if (evmBlock && evmBlock.networkType === "evm") {
+            results.push({
+              type: "block",
+              id: evmBlock.id,
+              title: `EVM Block #${evmBlock.number}`,
+              subtitle: `${evmBlock.transactionCount} transactions`,
+              networkType: "evm" as NetworkType,
+            });
+          }
+        } catch (error) {
+          console.debug("EVM block not found for:", blockNumber);
+        }
+
+        // Try Substrate block
+        try {
+          const substrateBlock = await this.getSubstrateBlock(blockNumber);
+          if (substrateBlock) {
+            results.push({
+              type: "block",
+              id: substrateBlock.hash,
+              title: `Substrate Block #${substrateBlock.number}`,
+              subtitle: `${substrateBlock.extrinscs_len} extrinsics`,
+              networkType: "substrate" as NetworkType,
+            });
+          }
+        } catch (error) {
+          console.debug("Substrate block not found for:", blockNumber);
         }
       }
 
-      // Try to search as transaction hash
-      if (/^0x[a-fA-F0-9]{64}$/.test(query)) {
-        const transaction = await this.getTransaction(query);
-        if (transaction) {
-          results.push({
-            type: "transaction",
-            id: transaction.id,
-            title: `Transaction ${transaction.hash.substring(0, 10)}...`,
-            subtitle: `Block #${transaction.blockNumber}`,
-            networkType: transaction.networkType,
-          });
+      // Try to search as transaction hash (EVM)
+      if (/^0x[a-fA-F0-9]{64}$/.test(normalizedQuery)) {
+        try {
+          const transaction = await this.getTransaction(normalizedQuery);
+          if (transaction) {
+            results.push({
+              type: "transaction",
+              id: transaction.id,
+              title: `Transaction ${transaction.hash.substring(0, 10)}...`,
+              subtitle: `Block #${transaction.blockNumber}`,
+              networkType: "evm" as NetworkType,
+            });
+          }
+        } catch (error) {
+          console.debug("EVM transaction not found for:", normalizedQuery);
         }
 
-        // Also try as block hash
-        const block = await this.getBlock(query);
-        if (block) {
-          results.push({
-            type: "block",
-            id: block.id,
-            title: `Block #${block.number}`,
-            subtitle: block.hash.substring(0, 20) + "...",
-            networkType: block.networkType,
-          });
+        // Also try as EVM block hash
+        try {
+          const block = await this.getBlock(normalizedQuery);
+          if (block && block.networkType === "evm") {
+            results.push({
+              type: "block",
+              id: block.id,
+              title: `EVM Block ${block.hash.substring(0, 10)}...`,
+              subtitle: `#${block.number} • ${block.transactionCount} transactions`,
+              networkType: "evm" as NetworkType,
+            });
+          }
+        } catch (error) {
+          console.debug("EVM block hash not found for:", normalizedQuery);
+        }
+
+        // Try as Substrate block hash
+        try {
+          const substrateBlock = await this.getSubstrateBlock(normalizedQuery);
+          if (substrateBlock) {
+            results.push({
+              type: "block",
+              id: substrateBlock.hash,
+              title: `Substrate Block ${substrateBlock.hash.substring(
+                0,
+                10
+              )}...`,
+              subtitle: `#${substrateBlock.number} • ${substrateBlock.extrinscs_len} extrinsics`,
+              networkType: "substrate" as NetworkType,
+            });
+          }
+        } catch (error) {
+          console.debug("Substrate block hash not found for:", normalizedQuery);
         }
       }
 
-      // Try to search as address
-      if (/^0x[a-fA-F0-9]{40}$/.test(query)) {
-        const [account, contract] = await Promise.allSettled([
-          this.getAccount(query),
-          this.getContract(query),
-        ]);
-
-        if (account.status === "fulfilled" && account.value) {
-          results.push({
-            type: "account",
-            id: account.value.id,
-            title: `Account ${account.value.address.substring(0, 10)}...`,
-            subtitle: `Balance: ${account.value.balance}`,
-            networkType: account.value.networkType,
-          });
+      // Try to search as address (both EVM and SS58 formats)
+      if (
+        /^0x[a-fA-F0-9]{40}$/.test(normalizedQuery) ||
+        /^[1-9A-HJ-NP-Za-km-z]{47,48}$/.test(normalizedQuery)
+      ) {
+        // Try EVM account
+        try {
+          const account = await this.getAccount(normalizedQuery);
+          if (account) {
+            results.push({
+              type: "address",
+              id: account.id,
+              title: `Address ${account.address.substring(0, 10)}...`,
+              subtitle: `Balance: ${account.balance} SEL`,
+              networkType: "evm" as NetworkType,
+            });
+          }
+        } catch (error) {
+          console.debug("EVM account not found for:", normalizedQuery);
         }
 
-        if (contract.status === "fulfilled" && contract.value) {
-          results.push({
-            type: "contract",
-            id: contract.value.id,
-            title:
-              contract.value.name ||
-              `Contract ${contract.value.address.substring(0, 10)}...`,
-            subtitle: `Type: ${contract.value.contractType}`,
-            networkType: contract.value.networkType,
-          });
+        // Try EVM contract
+        try {
+          const contract = await this.getContract(normalizedQuery);
+          if (contract) {
+            results.push({
+              type: "contract",
+              id: contract.id,
+              title: `Contract ${contract.address.substring(0, 10)}...`,
+              subtitle: contract.name || "Smart Contract",
+              networkType: "evm" as NetworkType,
+            });
+          }
+        } catch (error) {
+          console.debug("EVM contract not found for:", normalizedQuery);
+        }
+      }
+
+      // Try to search as extrinsic ID (block-index format)
+      if (/^\d+-\d+$/.test(normalizedQuery)) {
+        const [blockStr, indexStr] = normalizedQuery.split("-");
+        const blockNumber = parseInt(blockStr);
+        const extrinsicIndex = parseInt(indexStr);
+
+        try {
+          const extrinsics = await this.getSubstrateExtrinsicsByBlock(
+            blockNumber
+          );
+          const extrinsic = extrinsics.find(
+            (ext) => ext.extrinsic_index === extrinsicIndex
+          );
+          if (extrinsic) {
+            results.push({
+              type: "extrinsic",
+              id: `${blockNumber}-${extrinsicIndex}`,
+              title: `Extrinsic ${blockNumber}-${extrinsicIndex}`,
+              subtitle: `${extrinsic.call_module}.${extrinsic.call_function}`,
+              networkType: "substrate" as NetworkType,
+            });
+          }
+        } catch (error) {
+          console.debug("Substrate extrinsic not found for:", normalizedQuery);
         }
       }
     } catch (error) {
       console.error("Search error:", error);
+      // Don't throw, just return empty results
     }
 
     return results;
