@@ -2,54 +2,61 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowsRightLeftIcon, 
-  ChevronRightIcon, 
   CheckCircleIcon, 
   XCircleIcon,
   ArrowPathIcon,
   AdjustmentsHorizontalIcon
 } from '@heroicons/react/24/outline';
-import IdentityBadge from '../components/identity/IdentityBadge';
 import { formatDistance } from 'date-fns';
-
-// Mock data - would be replaced with real data from the API
-const mockExtrinsics = Array.from({ length: 20 }, (_, i) => ({
-  id: `extrinsic-${i}`,
-  extrinsic_hash: `0x${Math.random().toString(16).substring(2, 64)}`,
-  block_number: 12345678 - i,
-  timestamp: new Date(Date.now() - i * 60000).toISOString(),
-  sender: `5${Math.random().toString(16).substring(2, 45)}`,
-  action: ['balances.transfer', 'staking.bond', 'utility.batch', 'system.remark', 'identity.setIdentity'][
-    Math.floor(Math.random() * 5)
-  ],
-  nonce: Math.floor(Math.random() * 1000),
-  result: Math.random() > 0.2,
-  parameters: JSON.stringify({ amount: '1000000000000000000', dest: '5GTG4...' }),
-  signature: `0x${Math.random().toString(16).substring(2, 64)}`,
-  fee: `${(Math.random() * 0.01).toFixed(6)}`,
-  events: [],
-}));
-
-// Mock identities for some addresses
-const mockIdentities = {
-  [mockExtrinsics[0].sender]: { id: '1', name: 'Alice', sel_domain: 'alice.sel' },
-  [mockExtrinsics[1].sender]: { id: '2', name: 'Bob', sel_domain: 'bob.sel' },
-  [mockExtrinsics[2].sender]: { id: '3', name: 'Charlie', sel_domain: 'charlie.sel' },
-};
+import { useSubstrateExtrinsics } from '../contexts/ApiContext';
+import Pagination from '../components/ui/Pagination';
+import IdentityBadge from '../components/identity/IdentityBadge';
+import { SubstrateExtrinsic } from '../types';
 
 const Extrinsics: React.FC = () => {
-  const [selectedSection, setSelectedSection] = useState<string | null>(null);
-  const [selectedAction, setSelectedAction] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [selectedModule, setSelectedModule] = useState<string | null>(null);
+  const [selectedFunction, setSelectedFunction] = useState<string | null>(null);
+  const pageSize = 20;
   
-  // Filter options
-  const sections = Array.from(new Set(mockExtrinsics.map(ex => ex.action.split('.')[0])));
-  const actions = Array.from(new Set(mockExtrinsics.map(ex => ex.action)));
+  const { data, isLoading, error } = useSubstrateExtrinsics(page, pageSize);
   
-  // Filter extrinsics based on selected filters
-  const filteredExtrinsics = mockExtrinsics.filter(ex => {
-    if (selectedSection && !ex.action.startsWith(selectedSection)) return false;
-    if (selectedAction && ex.action !== selectedAction) return false;
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  const totalPages = data ? Math.ceil(data.totalCount / pageSize) : 0;
+  
+  // Get unique modules and functions for filtering
+  const modules = data ? Array.from(new Set(data.items.map(ex => ex.call_module))).sort() : [];
+  const functions = data ? Array.from(new Set(data.items.map(ex => ex.call_function))).sort() : [];
+  
+  // Filter extrinsics based on selected module and function
+  const filteredExtrinsics = data?.items.filter(ex => {
+    if (selectedModule && ex.call_module !== selectedModule) return false;
+    if (selectedFunction && ex.call_function !== selectedFunction) return false;
     return true;
-  });
+  }) || [];
+
+  // Helper to create unique key for extrinsic
+  const getExtrinsicKey = (extrinsic: SubstrateExtrinsic) => 
+    `${extrinsic.block_number}-${extrinsic.extrinsic_index}`;
+
+  // Helper to create extrinsic ID for display
+  const getExtrinsicId = (extrinsic: SubstrateExtrinsic) => 
+    `${extrinsic.block_number}-${extrinsic.extrinsic_index}`;
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">Error Loading Extrinsics</h2>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">{error.message}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -81,31 +88,31 @@ const Extrinsics: React.FC = () => {
         <div className="flex flex-wrap gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Section
+              Module
             </label>
             <select
-              value={selectedSection || ''}
-              onChange={(e) => setSelectedSection(e.target.value || null)}
+              value={selectedModule || ''}
+              onChange={(e) => setSelectedModule(e.target.value || null)}
               className="rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm w-40"
             >
-              <option value="">All Sections</option>
-              {sections.map(section => (
-                <option key={section} value={section}>{section}</option>
+              <option value="">All Modules</option>
+              {modules.map(module => (
+                <option key={module} value={module}>{module}</option>
               ))}
             </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Action
+              Function
             </label>
             <select
-              value={selectedAction || ''}
-              onChange={(e) => setSelectedAction(e.target.value || null)}
+              value={selectedFunction || ''}
+              onChange={(e) => setSelectedFunction(e.target.value || null)}
               className="rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm w-48"
             >
-              <option value="">All Actions</option>
-              {actions.map(action => (
-                <option key={action} value={action}>{action}</option>
+              <option value="">All Functions</option>
+              {functions.map(func => (
+                <option key={func} value={func}>{func}</option>
               ))}
             </select>
           </div>
@@ -119,7 +126,7 @@ const Extrinsics: React.FC = () => {
             <thead className="bg-gray-50 dark:bg-gray-900/50">
               <tr>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Extrinsic Hash
+                  Extrinsic ID
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Block
@@ -131,121 +138,133 @@ const Extrinsics: React.FC = () => {
                   Action
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Sender
+                  Signer
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Fee
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Status
+                  Signed
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredExtrinsics.map((extrinsic) => (
-                <tr key={extrinsic.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Link 
-                      to={`/extrinsics/${extrinsic.extrinsic_hash}`}
-                      className="text-primary-600 dark:text-primary-400 hover:underline font-mono text-sm"
-                    >
-                      {`${extrinsic.extrinsic_hash.slice(0, 8)}...${extrinsic.extrinsic_hash.slice(-6)}`}
-                    </Link>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Link 
-                      to={`/blocks/${extrinsic.block_number}`}
-                      className="text-primary-600 dark:text-primary-400 hover:underline"
-                    >
-                      {extrinsic.block_number.toLocaleString()}
-                    </Link>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {formatDistance(new Date(extrinsic.timestamp), new Date(), { addSuffix: true })}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      {extrinsic.action}
+              {isLoading ? (
+                // Loading state
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+                    </td>
+                  </tr>
+                ))
+              ) : filteredExtrinsics.length === 0 ? (
+                // Empty state
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center">
+                    <div className="text-gray-500 dark:text-gray-400">
+                      <ArrowsRightLeftIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p className="text-lg font-medium">No extrinsics found</p>
+                      <p className="text-sm">Try adjusting your filters or check back later.</p>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <IdentityBadge 
-                      address={extrinsic.sender} 
-                      identity={mockIdentities[extrinsic.sender]}
-                      showFullInfo
-                    />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                    {extrinsic.fee} SEL
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {extrinsic.result ? (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                        <CheckCircleIcon className="h-4 w-4 mr-1.5" />
-                        Success
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
-                        <XCircleIcon className="h-4 w-4 mr-1.5" />
-                        Failed
-                      </span>
-                    )}
-                  </td>
                 </tr>
-              ))}
+              ) : (
+                filteredExtrinsics.map((extrinsic) => (
+                  <tr key={getExtrinsicKey(extrinsic)} className="hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Link 
+                        to={`/extrinsics/${extrinsic.block_number}-${extrinsic.extrinsic_index}`}
+                        className="text-primary-600 dark:text-primary-400 hover:underline font-mono text-sm"
+                      >
+                        {getExtrinsicId(extrinsic)}
+                      </Link>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Link 
+                        to={`/blocks/${extrinsic.block_number}`}
+                        className="text-primary-600 dark:text-primary-400 hover:underline"
+                      >
+                        {extrinsic.block_number.toLocaleString()}
+                      </Link>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      {formatDistance(new Date(extrinsic.timestamp), new Date(), { addSuffix: true })}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                        {extrinsic.call_module}.{extrinsic.call_function}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {extrinsic.signer ? (
+                        <IdentityBadge 
+                          address={extrinsic.signer} 
+                          showFullInfo={false}
+                        />
+                      ) : (
+                        <span className="text-gray-500 dark:text-gray-400 text-sm">Unsigned</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        extrinsic.is_signed 
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                          : 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+                      }`}>
+                        {extrinsic.is_signed ? (
+                          <>
+                            <CheckCircleIcon className="h-4 w-4 mr-1.5" />
+                            Signed
+                          </>
+                        ) : (
+                          <>
+                            <XCircleIcon className="h-4 w-4 mr-1.5" />
+                            Unsigned
+                          </>
+                        )}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
         
         {/* Pagination */}
-        <div className="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
-          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-gray-700 dark:text-gray-300">
-                Showing <span className="font-medium">1</span> to <span className="font-medium">20</span> of{' '}
-                <span className="font-medium">1,234</span> extrinsics
-              </p>
-            </div>
-            <div>
-              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                <a
-                  href="#"
-                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
-                >
-                  <span className="sr-only">Previous</span>
-                  <ChevronRightIcon className="h-5 w-5 transform rotate-180" />
-                </a>
-                {/* Current: "z-10 bg-primary-50 border-primary-500 text-primary-600", Default: "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700" */}
-                <a
-                  href="#"
-                  aria-current="page"
-                  className="z-10 bg-primary-50 dark:bg-primary-900/20 border-primary-500 dark:border-primary-500 text-primary-600 dark:text-primary-400 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                >
-                  1
-                </a>
-                <a
-                  href="#"
-                  className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                >
-                  2
-                </a>
-                <a
-                  href="#"
-                  className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                >
-                  3
-                </a>
-                <a
-                  href="#"
-                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
-                >
-                  <span className="sr-only">Next</span>
-                  <ChevronRightIcon className="h-5 w-5" />
-                </a>
-              </nav>
+        {data && data.totalCount > pageSize && (
+          <div className="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
+            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  Showing <span className="font-medium">{((page - 1) * pageSize) + 1}</span> to{' '}
+                  <span className="font-medium">{Math.min(page * pageSize, data.totalCount)}</span> of{' '}
+                  <span className="font-medium">{data.totalCount.toLocaleString()}</span> extrinsics
+                </p>
+              </div>
+              <div>
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

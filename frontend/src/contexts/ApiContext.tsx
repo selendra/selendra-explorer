@@ -116,6 +116,59 @@ export const useLatestSubstrateBlock = () => {
   });
 };
 
+// Substrate Extrinsics
+export const useSubstrateExtrinsics = (page: number = 1, pageSize: number = 10) => {
+  return useQuery({
+    queryKey: ["substrateExtrinsics", page, pageSize],
+    queryFn: () => apiService.getSubstrateExtrinsics(page, pageSize),
+    staleTime: 30000, // Consider data stale after 30 seconds
+    retry: 2, // Only retry 2 times
+    retryDelay: 1000, // Wait 1 second between retries
+  });
+};
+
+export const useSubstrateExtrinsicsByBlock = (blockNumber: number) => {
+  return useQuery({
+    queryKey: ["substrateExtrinsics", "block", blockNumber],
+    queryFn: () => apiService.getSubstrateExtrinsicsByBlock(blockNumber),
+    enabled: !!blockNumber,
+    staleTime: 60000, // Consider data stale after 60 seconds
+    retry: 2, // Only retry 2 times
+    retryDelay: 1000, // Wait 1 second between retries
+  });
+};
+
+export const useSubstrateExtrinsicsBySigner = (
+  signer: string,
+  page: number = 1,
+  pageSize: number = 10
+) => {
+  return useQuery({
+    queryKey: ["substrateExtrinsics", "signer", signer, page, pageSize],
+    queryFn: () => apiService.getSubstrateExtrinsicsBySigner(signer, page, pageSize),
+    enabled: !!signer,
+    staleTime: 30000, // Consider data stale after 30 seconds
+    retry: 2, // Only retry 2 times
+    retryDelay: 1000, // Wait 1 second between retries
+  });
+};
+
+export const useSubstrateExtrinsicsByModule = (
+  module: string,
+  functionName?: string,
+  page: number = 1,
+  pageSize: number = 10
+) => {
+  return useQuery({
+    queryKey: ["substrateExtrinsics", "module", module, functionName, page, pageSize],
+    queryFn: () => apiService.getSubstrateExtrinsicsByModule(module, functionName, page, pageSize),
+    enabled: !!module,
+    staleTime: 30000, // Consider data stale after 30 seconds
+    retry: 2, // Only retry 2 times
+    retryDelay: 1000, // Wait 1 second between retries
+  });
+};
+
 // Transactions
 export const useTransactions = (
   page: number = 1,

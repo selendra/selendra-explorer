@@ -9,16 +9,12 @@ export interface SubstrateEvent {
 }
 
 export interface SubstrateExtrinsic {
-  id: string;
-  extrinsic_hash: string;
   block_number: number;
-  timestamp: string;
-  sender: string;
-  action: string;
-  nonce: number;
-  result: boolean;
-  parameters: string;
-  signature: string;
-  fee: string;
-  events: SubstrateEvent[];
-} 
+  extrinsic_index: number;
+  is_signed: boolean;
+  signer: string | null;
+  call_module: string;
+  call_function: string;
+  args: string; // JSON serialized arguments
+  timestamp: number; // Backend timestamp in milliseconds
+}

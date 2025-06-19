@@ -11,6 +11,7 @@ import type {
   Contract,
   Token,
   SubstrateBlock,
+  SubstrateExtrinsic,
 } from "../types";
 
 // API Configuration
@@ -737,6 +738,149 @@ export class ApiService {
     } catch (error) {
       console.error("Error fetching latest substrate block:", error);
       return null;
+    }
+  }
+
+  // Substrate Extrinsics
+  async getSubstrateExtrinsics(
+    page: number = 1,
+    pageSize: number = 10
+  ): Promise<PaginatedResponse<SubstrateExtrinsic>> {
+    try {
+      const offset = (page - 1) * pageSize;
+      const extrinsics = await apiRequest<SubstrateExtrinsic[]>(
+        `${API_ENDPOINTS.SUBSTRATE_EXTRINSICS}?limit=${pageSize}&offset=${offset}`
+      );
+
+      // Handle null or empty response
+      if (!extrinsics || !Array.isArray(extrinsics)) {
+        return {
+          items: [],
+          totalCount: 0,
+          page,
+          pageSize,
+          hasMore: false,
+        };
+      }
+
+      return {
+        items: extrinsics,
+        totalCount: extrinsics.length,
+        page,
+        pageSize,
+        hasMore: extrinsics.length === pageSize,
+      };
+    } catch (error) {
+      console.warn(
+        "Error fetching substrate extrinsics, returning empty result:",
+        error
+      );
+      return {
+        items: [],
+        totalCount: 0,
+        page,
+        pageSize,
+        hasMore: false,
+      };
+    }
+  }
+
+  async getSubstrateExtrinsicsByBlock(
+    blockNumber: number
+  ): Promise<SubstrateExtrinsic[]> {
+    try {
+      const extrinsics = await apiRequest<SubstrateExtrinsic[]>(
+        `${API_ENDPOINTS.SUBSTRATE_EXTRINSICS_BLOCK}/${blockNumber}`
+      );
+      return extrinsics || [];
+    } catch (error) {
+      console.error("Error fetching substrate extrinsics by block:", error);
+      return [];
+    }
+  }
+
+  async getSubstrateExtrinsicsBySigner(
+    signer: string,
+    page: number = 1,
+    pageSize: number = 10
+  ): Promise<PaginatedResponse<SubstrateExtrinsic>> {
+    try {
+      const offset = (page - 1) * pageSize;
+      const extrinsics = await apiRequest<SubstrateExtrinsic[]>(
+        `${API_ENDPOINTS.SUBSTRATE_EXTRINSICS_SIGNER}/${signer}?limit=${pageSize}&offset=${offset}`
+      );
+
+      if (!extrinsics || !Array.isArray(extrinsics)) {
+        return {
+          items: [],
+          totalCount: 0,
+          page,
+          pageSize,
+          hasMore: false,
+        };
+      }
+
+      return {
+        items: extrinsics,
+        totalCount: extrinsics.length,
+        page,
+        pageSize,
+        hasMore: extrinsics.length === pageSize,
+      };
+    } catch (error) {
+      console.warn("Error fetching substrate extrinsics by signer:", error);
+      return {
+        items: [],
+        totalCount: 0,
+        page,
+        pageSize,
+        hasMore: false,
+      };
+    }
+  }
+
+  async getSubstrateExtrinsicsByModule(
+    module: string,
+    functionName?: string,
+    page: number = 1,
+    pageSize: number = 10
+  ): Promise<PaginatedResponse<SubstrateExtrinsic>> {
+    try {
+      const offset = (page - 1) * pageSize;
+      let endpoint = `${API_ENDPOINTS.SUBSTRATE_EXTRINSICS_MODULE}?module=${module}&limit=${pageSize}&offset=${offset}`;
+
+      if (functionName) {
+        endpoint += `&function=${functionName}`;
+      }
+
+      const extrinsics = await apiRequest<SubstrateExtrinsic[]>(endpoint);
+
+      if (!extrinsics || !Array.isArray(extrinsics)) {
+        return {
+          items: [],
+          totalCount: 0,
+          page,
+          pageSize,
+          hasMore: false,
+        };
+      }
+
+      return {
+        items: extrinsics,
+        totalCount: extrinsics.length,
+        page,
+        pageSize,
+        hasMore: extrinsics.length === pageSize,
+      };
+    } catch (error) {
+      console.warn("Error fetching substrate extrinsics by module:", error);
+      return {
+        items: [],
+        totalCount: 0,
+        page,
+        pageSize,
+        hasMore: false,
+      };
     }
   }
 

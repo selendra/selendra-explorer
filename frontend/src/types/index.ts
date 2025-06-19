@@ -204,3 +204,6 @@ export interface NetworkStats {
     active: number;
   };
 }
+
+// Re-export types from separate files
+export { SubstrateExtrinsic, SubstrateEvent } from "./extrinsic";
