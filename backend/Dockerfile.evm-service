@@ -1,13 +1,14 @@
 # Dockerfile for evm-service
-FROM debian:bullseye-slim
+FROM ubuntu:22.04
 
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     wget \
-    libssl1.1 \
+    libssl3 \
     && rm -rf /var/lib/apt/lists/*
-    
+
 WORKDIR /app
+
 
 # Download the evm-service binary from GitHub releases
 RUN wget -O /app/evm-service https://github.com/selendra/selendra-explorer/releases/download/v-1.0.0/evm-service \

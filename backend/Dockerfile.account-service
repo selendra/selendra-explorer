@@ -1,14 +1,14 @@
 # Dockerfile for account-service
-FROM debian:bullseye-slim
+FROM ubuntu:22.04
 
-# Install required libraries for Rust binaries and wget
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     wget \
-    libssl1.1 \
+    libssl3 \
     && rm -rf /var/lib/apt/lists/*
-    
+
 WORKDIR /app
+
 
 # Download the account-service binary from GitHub releases
 RUN wget -O /app/account-service https://github.com/selendra/selendra-explorer/releases/download/v-1.0.0/account-service \
