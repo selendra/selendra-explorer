@@ -19,6 +19,19 @@ export interface Block {
   nonce?: string;
 }
 
+// Substrate Block Type (matches backend model)
+export interface SubstrateBlock {
+  number: number;
+  timestamp: number; // seconds (not milliseconds like EVM)
+  is_finalize: boolean;
+  hash: string;
+  parent_hash: string;
+  state_root: string;
+  extrinsics_root: string;
+  extrinscs_len: number; // Note: typo exists in backend
+  events_len: number;
+}
+
 // Transaction Types
 export type TransactionStatus = "success" | "failed" | "pending";
 export type TransactionType =

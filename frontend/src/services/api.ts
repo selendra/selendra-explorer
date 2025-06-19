@@ -10,6 +10,7 @@ import type {
   Account,
   Contract,
   Token,
+  SubstrateBlock,
 } from "../types";
 
 // API Configuration
@@ -653,6 +654,88 @@ export class ApiService {
       };
     } catch (error) {
       console.error("Error fetching token:", error);
+      return null;
+    }
+  }
+
+  // Substrate Blocks
+  async getSubstrateBlocks(
+    page: number = 1,
+    pageSize: number = 10
+  ): Promise<PaginatedResponse<SubstrateBlock>> {
+    try {
+      const offset = (page - 1) * pageSize;
+      const blocks = await apiRequest<SubstrateBlock[]>(
+        `${API_ENDPOINTS.SUBSTRATE_BLOCKS}?limit=${pageSize}&offset=${offset}`
+      );
+
+      // Handle null or empty response
+      if (!blocks || !Array.isArray(blocks)) {
+        return {
+          items: [],
+          totalCount: 0,
+          page,
+          pageSize,
+          hasMore: false,
+        };
+      }
+
+      return {
+        items: blocks,
+        totalCount: blocks.length,
+        page,
+        pageSize,
+        hasMore: blocks.length === pageSize,
+      };
+    } catch (error) {
+      console.warn(
+        "Error fetching substrate blocks, returning empty result:",
+        error
+      );
+      return {
+        items: [],
+        totalCount: 0,
+        page,
+        pageSize,
+        hasMore: false,
+      };
+    }
+  }
+
+  async getSubstrateBlock(
+    numberOrHash: string | number
+  ): Promise<SubstrateBlock | null> {
+    try {
+      let block: SubstrateBlock;
+
+      if (
+        typeof numberOrHash === "number" ||
+        /^\d+$/.test(numberOrHash.toString())
+      ) {
+        block = await apiRequest<SubstrateBlock>(
+          `${API_ENDPOINTS.SUBSTRATE_BLOCKS_NUMBER}/${numberOrHash}`
+        );
+      } else {
+        block = await apiRequest<SubstrateBlock>(
+          `${API_ENDPOINTS.SUBSTRATE_BLOCKS_HASH}/${numberOrHash}`
+        );
+      }
+
+      return block;
+    } catch (error) {
+      console.error("Error fetching substrate block:", error);
+      return null;
+    }
+  }
+
+  async getLatestSubstrateBlock(): Promise<SubstrateBlock | null> {
+    try {
+      const block = await apiRequest<SubstrateBlock>(
+        API_ENDPOINTS.SUBSTRATE_BLOCKS_LATEST
+      );
+      return block;
+    } catch (error) {
+      console.error("Error fetching latest substrate block:", error);
       return null;
     }
   }

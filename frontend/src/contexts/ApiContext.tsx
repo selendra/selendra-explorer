@@ -86,6 +86,36 @@ export const useBlock = (numberOrHash: string | number) => {
   });
 };
 
+// Substrate Blocks
+export const useSubstrateBlocks = (page: number = 1, pageSize: number = 10) => {
+  return useQuery({
+    queryKey: ["substrateBlocks", page, pageSize],
+    queryFn: () => apiService.getSubstrateBlocks(page, pageSize),
+    staleTime: 30000, // Consider data stale after 30 seconds
+    retry: 2, // Only retry 2 times
+    retryDelay: 1000, // Wait 1 second between retries
+  });
+};
+
+export const useSubstrateBlock = (numberOrHash: string | number) => {
+  return useQuery({
+    queryKey: ["substrateBlock", numberOrHash],
+    queryFn: () => apiService.getSubstrateBlock(numberOrHash),
+    enabled: !!numberOrHash,
+  });
+};
+
+export const useLatestSubstrateBlock = () => {
+  return useQuery({
+    queryKey: ["latestSubstrateBlock"],
+    queryFn: () => apiService.getLatestSubstrateBlock(),
+    refetchInterval: 30000, // Refetch every 30 seconds
+    staleTime: 10000, // Consider data stale after 10 seconds
+    retry: 2, // Only retry 2 times
+    retryDelay: 1000, // Wait 1 second between retries
+  });
+};
+
 // Transactions
 export const useTransactions = (
   page: number = 1,

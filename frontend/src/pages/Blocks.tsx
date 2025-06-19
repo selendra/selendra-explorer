@@ -1,23 +1,41 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useBlocks } from '../contexts/ApiContext';
+import { useBlocks, useSubstrateBlocks } from '../contexts/ApiContext';
 import DataTable from '../components/data/DataTable';
 import Pagination from '../components/ui/Pagination';
 import TimeAgo from '../components/ui/TimeAgo';
 import NetworkBadge from '../components/ui/NetworkBadge';
 import { CubeIcon, ArrowPathIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { convertSubstrateBlockToBlock, getTransactionCountLabel } from '../utils/blockUtils';
+import type { Block, NetworkType } from '../types';
 
 const Blocks: React.FC = () => {
   const [page, setPage] = useState(1);
+  const [networkType, setNetworkType] = useState<NetworkType>('evm');
   const pageSize = 20;
-  const { data, isLoading } = useBlocks(page, pageSize);
+  
+  // Fetch data based on network type
+  const { data: evmData, isLoading: isLoadingEvm } = useBlocks(page, pageSize);
+  const { data: substrateData, isLoading: isLoadingSubstrate } = useSubstrateBlocks(page, pageSize);
+  
+  // Current data and loading state based on network type
+  const isLoading = networkType === 'evm' ? isLoadingEvm : isLoadingSubstrate;
+  const currentData = networkType === 'evm' ? evmData : substrateData;
+  
+  // Convert substrate blocks to frontend format if needed
+  const displayData = currentData ? {
+    ...currentData,
+    items: networkType === 'evm' 
+      ? (currentData.items as Block[])
+      : (currentData.items as any[]).map(convertSubstrateBlockToBlock)
+  } : null;
   
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   
-  const totalPages = data ? Math.ceil(data.totalCount / pageSize) : 0;
+  const totalPages = displayData ? Math.ceil(displayData.totalCount / pageSize) : 0;
   
   return (
     <div className="animate-fade-in">
@@ -32,14 +50,40 @@ const Blocks: React.FC = () => {
           </p>
         </div>
         
-        <button 
-          className="btn btn-primary self-start flex items-center"
-          onClick={() => window.location.reload()}
-          aria-label="Refresh blocks"
-        >
-          <ArrowPathIcon className="h-4 w-4 mr-2" />
-          Refresh
-        </button>
+        <div className="flex items-center gap-4">
+          {/* Network Type Switcher */}
+          <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+            <button
+              onClick={() => setNetworkType('evm')}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                networkType === 'evm'
+                  ? 'bg-white dark:bg-gray-800 text-primary-600 dark:text-primary-400 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              EVM
+            </button>
+            <button
+              onClick={() => setNetworkType('wasm')}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                networkType === 'wasm'
+                  ? 'bg-white dark:bg-gray-800 text-primary-600 dark:text-primary-400 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              Substrate
+            </button>
+          </div>
+          
+          <button 
+            className="btn btn-primary self-start flex items-center"
+            onClick={() => window.location.reload()}
+            aria-label="Refresh blocks"
+          >
+            <ArrowPathIcon className="h-4 w-4 mr-2" />
+            Refresh
+          </button>
+        </div>
       </div>
       
       {/* Quick Stats */}
@@ -47,9 +91,9 @@ const Blocks: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-all duration-300">
           <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Latest Block</div>
           <div className="text-xl font-bold text-gray-900 dark:text-white">
-            {!isLoading && data?.items[0] ? (
-              <Link to={`/blocks/${data.items[0].number}`} className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                {data.items[0].number.toLocaleString()}
+            {!isLoading && displayData?.items[0] ? (
+              <Link to={`/blocks/${displayData.items[0].number}`} className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                {displayData.items[0].number.toLocaleString()}
               </Link>
             ) : (
               <div className="h-7 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
@@ -60,8 +104,8 @@ const Blocks: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-all duration-300">
           <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Blocks</div>
           <div className="text-xl font-bold text-gray-900 dark:text-white">
-            {!isLoading && data ? (
-              data.totalCount.toLocaleString()
+            {!isLoading && displayData ? (
+              displayData.totalCount.toLocaleString()
             ) : (
               <div className="h-7 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
             )}
@@ -86,9 +130,9 @@ const Blocks: React.FC = () => {
             Recent Blocks
           </h2>
           
-          {!isLoading && data && (
+          {!isLoading && displayData && (
             <div className="text-sm text-gray-500 dark:text-gray-400">
-              Showing blocks {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, data.totalCount)} of {data.totalCount.toLocaleString()}
+              Showing blocks {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, displayData.totalCount)} of {displayData.totalCount.toLocaleString()}
             </div>
           )}
         </div>
@@ -97,7 +141,7 @@ const Blocks: React.FC = () => {
           columns={[
             {
               header: 'Block',
-              accessor: (block) => (
+              accessor: (block: Block) => (
                 <Link to={`/blocks/${block.number}`} className="flex items-center text-primary-600 dark:text-primary-400 hover:underline font-medium">
                   <CubeIcon className="h-4 w-4 mr-1.5 text-gray-400" />
                   {block.number.toLocaleString()}
@@ -106,7 +150,7 @@ const Blocks: React.FC = () => {
             },
             {
               header: 'Age',
-              accessor: (block) => (
+              accessor: (block: Block) => (
                 <div className="flex flex-col">
                   <TimeAgo timestamp={block.timestamp} />
                   <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -116,8 +160,8 @@ const Blocks: React.FC = () => {
               ),
             },
             {
-              header: 'Transactions',
-              accessor: (block) => (
+              header: getTransactionCountLabel(networkType),
+              accessor: (block: Block) => (
                 <div className="font-medium">
                   {block.transactionCount > 0 ? (
                     <span className="text-primary-600 dark:text-primary-400">{block.transactionCount}</span>
@@ -129,7 +173,7 @@ const Blocks: React.FC = () => {
             },
             {
               header: 'Size',
-              accessor: (block) => (
+              accessor: (block: Block) => (
                 <div className="flex flex-col">
                   <span className="font-medium">{(block.size / 1024).toFixed(2)} KB</span>
                   <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -140,7 +184,7 @@ const Blocks: React.FC = () => {
             },
             {
               header: 'Gas Used',
-              accessor: (block) => (
+              accessor: (block: Block) => (
                 <div className="flex flex-col">
                   <span className="font-medium">{parseInt(block.gasUsed).toLocaleString()}</span>
                   <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mt-1.5">
@@ -154,7 +198,7 @@ const Blocks: React.FC = () => {
             },
             {
               header: 'Validator',
-              accessor: (block) => (
+              accessor: (block: Block) => (
                 <Link to={`/accounts/${block.validator}`} className="flex items-center text-primary-600 dark:text-primary-400 hover:underline font-mono group">
                   <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary-300 to-secondary-300 mr-2 opacity-80 group-hover:opacity-100 transition-opacity"></div>
                   {`${block.validator.substring(0, 6)}...${block.validator.substring(block.validator.length - 4)}`}
@@ -163,12 +207,12 @@ const Blocks: React.FC = () => {
             },
             {
               header: 'Type',
-              accessor: (block) => <NetworkBadge type={block.networkType} />,
+              accessor: (block: Block) => <NetworkBadge type={block.networkType} />,
               className: 'text-center',
             },
             {
               header: '',
-              accessor: (block) => (
+              accessor: (block: Block) => (
                 <Link to={`/blocks/${block.number}`} className="flex items-center justify-center text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                   <ChevronRightIcon className="h-5 w-5" />
                 </Link>
@@ -176,14 +220,14 @@ const Blocks: React.FC = () => {
               className: 'w-10',
             },
           ]}
-          data={data?.items || []}
+          data={displayData?.items || []}
           keyExtractor={(block) => block.id}
           isLoading={isLoading}
-          emptyMessage="No blocks found."
+          emptyMessage={`No ${networkType === 'evm' ? 'EVM' : 'Substrate'} blocks found.`}
           loadingRows={10}
         />
         
-        {data && (
+        {displayData && (
           <div className="p-6 border-t border-gray-200 dark:border-gray-700">
             <Pagination
               currentPage={page}
