@@ -1,0 +1,20 @@
+# Dockerfile for account-service
+FROM debian:bullseye-slim
+
+# Install required libraries for Rust binaries and wget
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libssl3 \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Download the account-service binary from GitHub releases
+RUN wget -O /app/account-service https://github.com/selendra/selendra-explorer/releases/download/v-1.0.0/account-service \
+    && chmod +x /app/account-service
+
+# Expose port if needed (uncomment if your service listens on a port)
+# EXPOSE 8080
+
+CMD ["/app/account-service"]

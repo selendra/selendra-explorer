@@ -1,0 +1,18 @@
+# Dockerfile for explorer-api
+FROM debian:bullseye-slim
+
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libssl3 \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Download the explorer-api binary from GitHub releases
+RUN wget -O /app/explorer-api https://github.com/selendra/selendra-explorer/releases/download/v-1.0.0/explorer-api \
+    && chmod +x /app/explorer-api
+
+EXPOSE 3000
+
+CMD ["/app/explorer-api"]
