@@ -11,7 +11,7 @@ export const convertSubstrateBlockToBlock = (
     number: substrateBlock.number,
     hash: substrateBlock.hash,
     parentHash: substrateBlock.parent_hash,
-    timestamp: (substrateBlock.timestamp * 1000).toString(), // Convert seconds to milliseconds
+    timestamp: substrateBlock.timestamp.toString(), // Already in milliseconds
     transactionCount: substrateBlock.extrinscs_len, // Note: using extrinsics count
     size: 0, // Not available in SubstrateBlock
     gasUsed: "0", // Not applicable for Substrate
@@ -24,7 +24,10 @@ export const convertSubstrateBlockToBlock = (
 };
 
 /**
- * Formats timestamp differences between EVM (ms) and Substrate (s)
+ * Formats timestamp differences between EVM (s) and Substrate (ms)
+ * NOTE: Backend has formats reversed from documentation
+ * - Substrate timestamps are actually in milliseconds (not seconds as documented)
+ * - EVM timestamps are actually in seconds (not milliseconds as documented)
  */
 export const formatBlockTimestamp = (
   timestamp: string | number,
@@ -33,15 +36,15 @@ export const formatBlockTimestamp = (
   let timestampMs: number;
 
   if (networkType === "wasm") {
-    // Substrate timestamps are in seconds
+    // Substrate timestamps are actually in milliseconds (backend bug)
+    timestampMs =
+      typeof timestamp === "string" ? parseInt(timestamp) : timestamp;
+  } else {
+    // EVM timestamps are actually in seconds (backend bug)
     timestampMs =
       typeof timestamp === "string"
         ? parseInt(timestamp) * 1000
         : timestamp * 1000;
-  } else {
-    // EVM timestamps are in milliseconds
-    timestampMs =
-      typeof timestamp === "string" ? parseInt(timestamp) : timestamp;
   }
 
   return new Date(timestampMs).toISOString();

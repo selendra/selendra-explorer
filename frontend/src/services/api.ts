@@ -262,7 +262,7 @@ const transformBackendBlockToFrontend = (
   number: backendBlock.number,
   hash: backendBlock.hash,
   parentHash: backendBlock.parent_hash,
-  timestamp: new Date(backendBlock.timestamp).toISOString(),
+  timestamp: new Date(backendBlock.timestamp * 1000).toISOString(), // EVM timestamps are in seconds, convert to ms
   transactionCount: backendBlock.transaction_count,
   size: backendBlock.size,
   gasUsed: backendBlock.gas_used.toString(),
@@ -281,7 +281,7 @@ const transformBackendTransactionToFrontend = (
   hash: backendTx.hash,
   blockNumber: backendTx.block_number,
   blockHash: "", // Not provided in backend response
-  timestamp: new Date(backendTx.timestamp).toISOString(),
+  timestamp: new Date(backendTx.timestamp * 1000).toISOString(), // EVM timestamps are in seconds, convert to ms
   from: backendTx.from,
   to: backendTx.to,
   value: backendTx.value.toString(),
