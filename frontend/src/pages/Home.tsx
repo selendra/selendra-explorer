@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
-import LineChart from "../components/charts/LineChart";
+import ModernLineChart from "../components/charts/ModernLineChart";
+import { chartApiService } from "../services/chartApi";
 import {
   CubeIcon,
   ChartBarIcon,
@@ -12,50 +13,55 @@ import {
 } from "@heroicons/react/24/outline";
 import { useBlocks, useTransactions, useNetworkStats } from "../contexts/ApiContext";
 
-/**
- * Generates chart data for homepage activity chart
- */
-const generateChartData = () => {
-  const labels = Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`);
-  const transactionData = Array.from(
-    { length: 30 },
-    () => Math.floor(Math.random() * 5000) + 1000
-  );
-  const blockData = Array.from(
-    { length: 30 },
-    () => Math.floor(Math.random() * 500) + 100
-  );
-
-  return {
-    labels,
-    datasets: [
-      {
-        label: "Transactions",
-        data: transactionData,
-        borderColor: "#8C30F5", // Selendra primary purple
-        backgroundColor: "rgba(140, 48, 245, 0.2)", // With opacity
-        tension: 0.4,
-        pointRadius: 0,
-        pointHoverRadius: 6,
-      },
-      {
-        label: "Blocks",
-        data: blockData,
-        borderColor: "#0CCBD6", // Selendra accent teal
-        backgroundColor: "rgba(12, 203, 214, 0.2)", // With opacity
-        tension: 0.4,
-        pointRadius: 0,
-        pointHoverRadius: 6,
-      },
-    ],
-  };
-};
-
 const Home: React.FC = () => {
   // Use real API hooks with conservative settings to prevent loops
   const { data: blocksData, isLoading: isLoadingBlocks } = useBlocks(1, 15);
   const { data: transactionsData, isLoading: isLoadingTransactions } = useTransactions(1, 15);
   const { data: networkStats } = useNetworkStats();
+
+  // Chart data state
+  const [transactionChartData, setTransactionChartData] = React.useState<
+    { name: string; value: number }[]
+  >([]);
+  const [blockChartData, setBlockChartData] = React.useState<
+    { name: string; value: number }[]
+  >([]);
+  const [isLoadingChartData, setIsLoadingChartData] = React.useState(true);
+
+  // Load chart data
+  React.useEffect(() => {
+    const loadChartData = async () => {
+      try {
+        setIsLoadingChartData(true);
+        
+        // Get transaction volume data
+        const transactionVolumeData = await chartApiService.getTransactionVolumeData("7d");
+        const formattedTransactionData = transactionVolumeData.data.map((point) => ({
+          name: new Date(point.timestamp).toLocaleDateString(),
+          value: point.value,
+        }));
+
+        // Get block production data
+        const blockProductionData = await chartApiService.getBlockProductionData("7d");
+        const formattedBlockData = blockProductionData.data.map((point) => ({
+          name: new Date(point.timestamp).toLocaleDateString(),
+          value: point.value,
+        }));
+
+        setTransactionChartData(formattedTransactionData);
+        setBlockChartData(formattedBlockData);
+      } catch (error) {
+        console.error("Failed to load chart data:", error);
+        // Fallback to empty data
+        setTransactionChartData([]);
+        setBlockChartData([]);
+      } finally {
+        setIsLoadingChartData(false);
+      }
+    };
+
+    loadChartData();
+  }, []);
 
   // Fallback data while loading
   const safeBLocksData = blocksData || { items: [], totalCount: 0 };
@@ -73,8 +79,6 @@ const Home: React.FC = () => {
 
   // Mocked total supply since it's not in the NetworkStats type
   const totalSupply = "601,091,728.63";
-
-  const chartData = React.useMemo(() => generateChartData(), []);
 
   return (
     <div className="container mx-auto space-y-8 sm:space-y-12 pt-6 px-4 sm:px-6 lg:px-8">
@@ -262,7 +266,41 @@ const Home: React.FC = () => {
             className="bg-gray-50/50 dark:bg-gray-900/20 p-4 rounded-lg"
             style={{ height: "340px", overflow: "hidden" }}
           >
-            <LineChart data={chartData} />
+            {isLoadingChartData ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8C30F5]"></div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {/* Transaction Volume Chart */}
+                <div className="h-36">
+                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Daily Transactions
+                  </h4>
+                  <ModernLineChart
+                    data={transactionChartData}
+                    color="#8C30F5"
+                    height={120}
+                    showArea={true}
+                    strokeWidth={2}
+                  />
+                </div>
+                
+                {/* Block Production Chart */}
+                <div className="h-36">
+                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Daily Blocks
+                  </h4>
+                  <ModernLineChart
+                    data={blockChartData}
+                    color="#0CCBD6"
+                    height={120}
+                    showArea={true}
+                    strokeWidth={2}
+                  />
+                </div>
+              </div>
+            )}
           </div>
           <div className="h-6"></div> {/* Extra spacing to prevent overlay */}
         </div>

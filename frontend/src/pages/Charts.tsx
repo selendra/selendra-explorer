@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ChartBarIcon,
   ArrowsRightLeftIcon,
@@ -7,69 +7,115 @@ import {
   ServerIcon,
   ClockIcon,
 } from "@heroicons/react/24/outline";
-import LineChart from "../components/charts/LineChart";
-
-/**
- * Generates chart data with consistent formatting
- * @param label Chart label
- * @param color Primary color (hex)
- * @param min Minimum random value
- * @param max Maximum random value
- * @returns Formatted chart data object
- */
-const generateChartData = (
-  label: string,
-  color: string,
-  min: number,
-  max: number
-) => {
-  const labels = Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`);
-  const data = Array.from(
-    { length: 30 },
-    () => Math.floor(Math.random() * (max - min)) + min
-  );
-
-  return {
-    labels,
-    datasets: [
-      {
-        label,
-        data,
-        borderColor: color,
-        backgroundColor: `${color}33`, // Add 20% opacity
-        tension: 0.4,
-        pointRadius: 0,
-        pointHoverRadius: 6,
-      },
-    ],
-  };
-};
-
-// Generate data for each chart type
-const transactionData = generateChartData(
-  "Transactions",
-  "#8C30F5",
-  1000,
-  5000
-);
-const blockTimeData = generateChartData(
-  "Block Time (seconds)",
-  "#0CCBD6",
-  4,
-  6
-);
-const gasUsageData = generateChartData("Gas Used", "#FF6B6B", 2000000, 8000000);
-const validatorData = generateChartData(
-  "Active Validators",
-  "#4CAF50",
-  95,
-  120
-);
+import ModernLineChart from "../components/charts/ModernLineChart";
+import { chartApiService, type NetworkStatsData } from "../services/chartApi";
 
 const Charts: React.FC = () => {
-  const [timeRange, setTimeRange] = useState<"24h" | "7d" | "30d" | "90d">(
-    "30d"
-  );
+  const [timeRange, setTimeRange] = useState<"24h" | "7d" | "30d" | "90d">("30d");
+  const [networkStats, setNetworkStats] = useState<NetworkStatsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch network stats data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await chartApiService.getNetworkStatsData(timeRange);
+        setNetworkStats(data);
+      } catch (err) {
+        console.error("Error fetching network stats:", err);
+        setError("Failed to load chart data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [timeRange]);
+
+  // Convert chart data to Recharts format
+  const convertToChartData = (data: any[]) => {
+    return data.map((point, index) => {
+      let name: string;
+      if (timeRange === "24h") {
+        name = `${index}:00`;
+      } else {
+        const date = new Date();
+        date.setDate(date.getDate() - (data.length - index - 1));
+        name = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      }
+
+      return {
+        name,
+        value: point.value,
+        timestamp: point.timestamp,
+      };
+    });
+  };
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + "M";
+    } else if (num >= 1000) {
+      return (num / 1000).toFixed(1) + "K";
+    } else {
+      return num.toLocaleString();
+    }
+  };
+
+  const formatPercentage = (change: number) => {
+    const sign = change >= 0 ? "↑" : "↓";
+    const color = change >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400";
+    return (
+      <span className={`text-sm ${color} flex items-center mt-1`}>
+        <span className="mr-1">{sign}</span> {Math.abs(change).toFixed(1)}% from previous period
+      </span>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
+            <ChartBarIcon className="h-8 w-8 mr-3 text-primary-500 dark:text-primary-400" />
+            Charts & Statistics
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2 max-w-3xl">
+            Visualize blockchain activity and metrics on the Selendra network
+          </p>
+        </div>
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg text-gray-600 dark:text-gray-400">Loading chart data...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
+            <ChartBarIcon className="h-8 w-8 mr-3 text-primary-500 dark:text-primary-400" />
+            Charts & Statistics
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2 max-w-3xl">
+            Visualize blockchain activity and metrics on the Selendra network
+          </p>
+        </div>
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg text-red-600 dark:text-red-400">{error}</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!networkStats) {
+    return null;
+  }
 
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -140,13 +186,11 @@ const Charts: React.FC = () => {
           </div>
           <div className="mt-2">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              1,230,495
+              {formatNumber(networkStats.transactionVolume.totalTransactions)}
             </p>
-            <p className="text-sm text-green-600 dark:text-green-400 flex items-center mt-1">
-              <span className="mr-1">↑</span> 12.5% from previous period
-            </p>
+            {formatPercentage(networkStats.transactionVolume.percentageChange)}
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              Avg: 42,344 per day
+              Avg: {formatNumber(networkStats.transactionVolume.averagePerDay)} per day
             </p>
           </div>
         </div>
@@ -160,13 +204,11 @@ const Charts: React.FC = () => {
           </div>
           <div className="mt-2">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              8,293,651
+              {formatNumber(networkStats.blockProduction.totalBlocks)}
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center mt-1">
-              <span className="mr-1">→</span> 0.2% from previous period
-            </p>
+            {formatPercentage(networkStats.blockProduction.percentageChange)}
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              Avg: 6 seconds per block
+              Avg: {networkStats.blockProduction.averageBlockTime}s per block
             </p>
           </div>
         </div>
@@ -180,13 +222,11 @@ const Charts: React.FC = () => {
           </div>
           <div className="mt-2">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              1.23 Gwei
+              {networkStats.gasUsage.averageGasPrice} Gwei
             </p>
-            <p className="text-sm text-red-600 dark:text-red-400 flex items-center mt-1">
-              <span className="mr-1">↓</span> 8.3% from previous period
-            </p>
+            {formatPercentage(networkStats.gasUsage.percentageChange)}
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              Avg: 1.45 Gwei over 30 days
+              Total gas used: {formatNumber(networkStats.gasUsage.totalGasUsed)}
             </p>
           </div>
         </div>
@@ -200,13 +240,11 @@ const Charts: React.FC = () => {
           </div>
           <div className="mt-2">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              108
+              {networkStats.validatorStats.activeValidators}
             </p>
-            <p className="text-sm text-green-600 dark:text-green-400 flex items-center mt-1">
-              <span className="mr-1">↑</span> 3.8% from previous period
-            </p>
+            {formatPercentage(networkStats.validatorStats.percentageChange)}
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              Total Stake: 394,799,619 SEL
+              Total: {networkStats.validatorStats.totalValidators} validators
             </p>
           </div>
         </div>
@@ -225,11 +263,16 @@ const Charts: React.FC = () => {
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
               <ClockIcon className="h-4 w-4 mr-1" />
-              Last updated: 10 minutes ago
+              Last updated: {new Date().toLocaleTimeString()}
             </div>
           </div>
           <div className="h-64">
-            <LineChart data={transactionData} animated={true} height={250} />
+            <ModernLineChart 
+              data={convertToChartData(networkStats.transactionVolume.data)}
+              color="#8C30F5"
+              height={250}
+              showArea={true}
+            />
           </div>
         </div>
 
@@ -244,11 +287,16 @@ const Charts: React.FC = () => {
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
               <ClockIcon className="h-4 w-4 mr-1" />
-              Last updated: 10 minutes ago
+              Last updated: {new Date().toLocaleTimeString()}
             </div>
           </div>
           <div className="h-64">
-            <LineChart data={blockTimeData} animated={true} height={250} />
+            <ModernLineChart 
+              data={convertToChartData(networkStats.blockProduction.data)}
+              color="#0CCBD6"
+              height={250}
+              showArea={true}
+            />
           </div>
         </div>
 
@@ -263,11 +311,16 @@ const Charts: React.FC = () => {
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
               <ClockIcon className="h-4 w-4 mr-1" />
-              Last updated: 10 minutes ago
+              Last updated: {new Date().toLocaleTimeString()}
             </div>
           </div>
           <div className="h-64">
-            <LineChart data={gasUsageData} animated={true} height={250} />
+            <ModernLineChart 
+              data={convertToChartData(networkStats.gasUsage.data)}
+              color="#FF6B6B"
+              height={250}
+              showArea={true}
+            />
           </div>
         </div>
 
@@ -282,11 +335,16 @@ const Charts: React.FC = () => {
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
               <ClockIcon className="h-4 w-4 mr-1" />
-              Last updated: 10 minutes ago
+              Last updated: {new Date().toLocaleTimeString()}
             </div>
           </div>
           <div className="h-64">
-            <LineChart data={validatorData} animated={true} height={250} />
+            <ModernLineChart 
+              data={convertToChartData(networkStats.validatorStats.data)}
+              color="#4CAF50"
+              height={250}
+              showArea={true}
+            />
           </div>
         </div>
       </div>
