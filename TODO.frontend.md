@@ -6,12 +6,12 @@ This document outlines all the tasks needed to integrate the backend API with th
 
 ### 1. API Service Overhaul
 
-- [ ] **Replace mock API service with real backend integration**
-  - [ ] Update `src/services/api.ts` to call actual backend endpoints
-  - [ ] Remove mock data dependencies
-  - [ ] Implement proper error handling for network failures
-  - [ ] Add retry logic with exponential backoff
-  - [ ] Configure base URL from environment variables
+- [x] **Replace mock API service with real backend integration**
+  - [x] Update `src/services/api.ts` to call actual backend endpoints
+  - [x] Remove mock data dependencies
+  - [x] Implement proper error handling for network failures
+  - [x] Add retry logic with exponential backoff
+  - [x] Configure base URL from environment variables
 
 ### 2. Backend API Response Format Integration
 
