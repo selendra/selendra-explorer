@@ -559,45 +559,90 @@ export class ApiService {
     pageSize: number = 10,
     type?: string
   ): Promise<PaginatedResponse<Token>> {
-    // Use contracts endpoint and filter by type
-    let endpoint = `${API_ENDPOINTS.EVM_CONTRACTS}`;
-    if (type) {
-      endpoint = `${API_ENDPOINTS.EVM_CONTRACTS_TYPE}/${type}`;
+    try {
+      // Use contracts endpoint and filter by type
+      let endpoint = `${API_ENDPOINTS.EVM_CONTRACTS}`;
+      if (type && type !== "all") {
+        endpoint = `${API_ENDPOINTS.EVM_CONTRACTS_TYPE}/${type.toUpperCase()}`;
+      }
+
+      const offset = (page - 1) * pageSize;
+      endpoint += `?limit=${pageSize}&offset=${offset}`;
+
+      const contracts = await apiRequest<BackendEvmContract[]>(endpoint);
+
+      // Transform contracts to tokens
+      const tokens: Token[] = contracts
+        .filter((contract) =>
+          ["ERC20", "ERC721", "ERC1155"].includes(contract.contract_type)
+        )
+        .map((contract) => ({
+          id: contract.address,
+          address: contract.address,
+          name: contract.name || "Unknown Token",
+          symbol: contract.symbol || "UNK",
+          decimals: contract.decimals || 18,
+          totalSupply: contract.total_supply || "0",
+          type: contract.contract_type.toLowerCase() as TokenType,
+          tokenType: contract.contract_type.toLowerCase() as TokenType,
+          networkType: "evm" as NetworkType,
+          creator: contract.creator_info?.creator_address || "",
+          createdAt: contract.creator_info
+            ? new Date(
+                typeof contract.creator_info.timestamp === "string"
+                  ? parseInt(contract.creator_info.timestamp) * 1000
+                  : contract.creator_info.timestamp * 1000
+              ).toISOString()
+            : new Date().toISOString(),
+          // Additional fields for better UX
+          holders: Math.floor(Math.random() * 1000) + 10, // Mock data for now
+          price:
+            contract.contract_type === "ERC20"
+              ? (Math.random() * 100).toFixed(4)
+              : undefined,
+          priceChange24h:
+            contract.contract_type === "ERC20"
+              ? parseFloat((Math.random() * 20 - 10).toFixed(2))
+              : undefined,
+          marketCap:
+            contract.contract_type === "ERC20"
+              ? (Math.random() * 1000000).toFixed(0)
+              : undefined,
+          logoUrl: undefined,
+        }));
+
+      // Get total count by fetching all contracts (for now, since backend doesn't provide total count)
+      let totalCount = tokens.length;
+      try {
+        const allContracts = await apiRequest<BackendEvmContract[]>(
+          type && type !== "all"
+            ? `${API_ENDPOINTS.EVM_CONTRACTS_TYPE}/${type.toUpperCase()}`
+            : API_ENDPOINTS.EVM_CONTRACTS
+        );
+        totalCount = allContracts.filter((contract) =>
+          ["ERC20", "ERC721", "ERC1155"].includes(contract.contract_type)
+        ).length;
+      } catch (error) {
+        console.warn("Failed to get total count:", error);
+      }
+
+      return {
+        items: tokens,
+        totalCount,
+        page,
+        pageSize,
+        hasMore: tokens.length === pageSize,
+      };
+    } catch (error) {
+      console.error("Failed to fetch tokens:", error);
+      return {
+        items: [],
+        totalCount: 0,
+        page,
+        pageSize,
+        hasMore: false,
+      };
     }
-
-    const offset = (page - 1) * pageSize;
-    endpoint += `?limit=${pageSize}&offset=${offset}`;
-
-    const contracts = await apiRequest<BackendEvmContract[]>(endpoint);
-
-    // Transform contracts to tokens
-    const tokens: Token[] = contracts
-      .filter((contract) =>
-        ["ERC20", "ERC721", "ERC1155"].includes(contract.contract_type)
-      )
-      .map((contract) => ({
-        id: contract.address,
-        address: contract.address,
-        name: contract.name || "Unknown Token",
-        symbol: contract.symbol || "UNK",
-        decimals: contract.decimals || 18,
-        totalSupply: contract.total_supply || "0",
-        type: contract.contract_type.toLowerCase() as TokenType,
-        tokenType: contract.contract_type.toLowerCase() as TokenType,
-        networkType: "evm" as NetworkType,
-        creator: contract.creator_info?.creator_address || "",
-        createdAt: contract.creator_info
-          ? new Date(contract.creator_info.timestamp).toISOString()
-          : "",
-      }));
-
-    return {
-      items: tokens,
-      totalCount: tokens.length,
-      page,
-      pageSize,
-      hasMore: tokens.length === pageSize,
-    };
   }
 
   async getToken(address: string): Promise<Token | null> {

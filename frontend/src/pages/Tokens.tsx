@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTokens } from "../contexts/ApiContext";
 import DataTable from "../components/data/DataTable";
 import Pagination from "../components/ui/Pagination";
@@ -90,22 +91,58 @@ const Tokens: React.FC = () => {
   const [networkType, setNetworkType] = useState<"evm" | "wasm" | undefined>(
     undefined
   );
+  const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   const pageSize = 20;
-  const { data, isLoading } = useTokens(page, pageSize, tokenType);
+  const { data, isLoading, error, refetch } = useTokens(page, pageSize, tokenType);
+
+  // Filter data by network type if specified
+  const filteredData = data ? {
+    ...data,
+    items: networkType 
+      ? data.items.filter(token => token.networkType === networkType)
+      : data.items,
+    totalCount: networkType 
+      ? data.items.filter(token => token.networkType === networkType).length
+      : data.totalCount
+  } : null;
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // Reset page when filters change
+  React.useEffect(() => {
+    setPage(1);
+  }, [tokenType, networkType]);
+
+  const handleTokenTypeChange = (type: string | undefined) => {
+    setTokenType(type);
+    setPage(1);
+  };
+
+  const handleNetworkTypeChange = (type: "evm" | "wasm" | undefined) => {
+    setNetworkType(type);
+    setPage(1);
+  };
+
+
   const copyToClipboard = (text: string | null) => {
     if (text) {
       navigator.clipboard.writeText(text);
-      // Could add toast notification here
+      setCopiedAddress(text);
+      setTimeout(() => setCopiedAddress(null), 2000);
     }
   };
 
-  const totalPages = data ? Math.ceil(data.totalCount / pageSize) : 0;
+  const handleRefresh = async () => {
+    await refetch();
+    // Also invalidate related queries
+    queryClient.invalidateQueries({ queryKey: ["tokens"] });
+  };
+
+  const totalPages = filteredData ? Math.ceil(filteredData.totalCount / pageSize) : 0;
 
   return (
     <div className="animate-fade-in">
@@ -123,11 +160,12 @@ const Tokens: React.FC = () => {
 
         <button
           className="btn-gradient self-start flex items-center px-5 py-2.5 rounded-lg shadow-sm text-white font-medium transition-all hover:shadow-md"
-          onClick={() => window.location.reload()}
+          onClick={handleRefresh}
+          disabled={isLoading}
           aria-label="Refresh tokens"
         >
-          <ArrowPathIcon className="h-4 w-4 mr-2" />
-          Refresh
+          <ArrowPathIcon className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+          {isLoading ? 'Loading...' : 'Refresh'}
         </button>
       </div>
 
@@ -139,7 +177,7 @@ const Tokens: React.FC = () => {
               <TagIcon className="h-5 w-5 mr-2 text-primary-500 dark:text-primary-400" />
               Token Type
             </div>
-            <TokenTypeButtons selected={tokenType} onChange={setTokenType} />
+            <TokenTypeButtons selected={tokenType} onChange={handleTokenTypeChange} />
           </div>
 
           <div>
@@ -149,11 +187,29 @@ const Tokens: React.FC = () => {
             </div>
             <NetworkTypeButtons
               selected={networkType}
-              onChange={setNetworkType}
+              onChange={handleNetworkTypeChange}
             />
           </div>
         </div>
       </div>
+
+      {/* Error State */}
+      {error && (
+        <div className="mb-8 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-5">
+          <div className="text-red-800 dark:text-red-200 font-medium mb-2">
+            Failed to load tokens
+          </div>
+          <div className="text-red-600 dark:text-red-300 text-sm">
+            {error.message || "An unexpected error occurred"}
+          </div>
+          <button
+            onClick={handleRefresh}
+            className="mt-3 text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 font-medium"
+          >
+            Try again
+          </button>
+        </div>
+      )}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
@@ -163,8 +219,8 @@ const Tokens: React.FC = () => {
             Total Tokens
           </div>
           <div className="text-xl font-bold text-gray-900 dark:text-white">
-            {!isLoading && data ? (
-              data.totalCount.toLocaleString()
+            {!isLoading && filteredData ? (
+              filteredData.totalCount.toLocaleString()
             ) : (
               <div className="h-7 bg-gray-200 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
             )}
@@ -186,11 +242,11 @@ const Tokens: React.FC = () => {
               : "ERC20 Tokens"}
           </div>
           <div className="text-xl font-bold text-gray-900 dark:text-white">
-            {!isLoading && data?.totalCount ? (
+            {!isLoading && filteredData?.totalCount ? (
               tokenType ? (
-                data.totalCount.toLocaleString()
+                filteredData.totalCount.toLocaleString()
               ) : (
-                Math.floor(data.totalCount * 0.7).toLocaleString()
+                Math.floor(filteredData.totalCount * 0.7).toLocaleString()
               )
             ) : (
               <div className="h-7 bg-gray-200 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
@@ -223,13 +279,14 @@ const Tokens: React.FC = () => {
             )}
           </div>
           <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Across {data?.totalCount || "-"} tokens
+            Across {filteredData?.totalCount || "-"} tokens
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-all duration-300">
+      {!error && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-all duration-300">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
             <CurrencyDollarIcon className="h-5 w-5 mr-2 text-primary-500 dark:text-primary-400" />
@@ -241,11 +298,11 @@ const Tokens: React.FC = () => {
             )}
           </h2>
 
-          {!isLoading && data && (
+          {!isLoading && filteredData && (
             <div className="text-sm text-gray-500 dark:text-gray-400 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-full">
               Showing tokens {(page - 1) * pageSize + 1} to{" "}
-              {Math.min(page * pageSize, data.totalCount)} of{" "}
-              {data.totalCount.toLocaleString()}
+              {Math.min(page * pageSize, filteredData.totalCount)} of{" "}
+              {filteredData.totalCount.toLocaleString()}
             </div>
           )}
         </div>
@@ -273,8 +330,13 @@ const Tokens: React.FC = () => {
                       <span className="font-mono">{token.symbol}</span>
                       <button
                         onClick={() => copyToClipboard(token.address)}
-                        className="ml-1.5 text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors opacity-0 group-hover:opacity-100"
+                        className={`ml-1.5 transition-colors opacity-0 group-hover:opacity-100 ${
+                          copiedAddress === token.address
+                            ? "text-green-500 dark:text-green-400"
+                            : "text-gray-400 hover:text-primary-500 dark:hover:text-primary-400"
+                        }`}
                         aria-label="Copy token address"
+                        title={copiedAddress === token.address ? "Copied!" : "Copy address"}
                       >
                         <DocumentDuplicateIcon className="h-3.5 w-3.5" />
                       </button>
@@ -382,7 +444,7 @@ const Tokens: React.FC = () => {
               className: "w-10",
             },
           ]}
-          data={data?.items || []}
+          data={filteredData?.items || []}
           keyExtractor={(token) => token.id}
           isLoading={isLoading}
           emptyMessage="No tokens found."
@@ -391,7 +453,7 @@ const Tokens: React.FC = () => {
           striped={true}
         />
 
-        {data && (
+        {filteredData && (
           <div className="p-6 border-t border-gray-200 dark:border-gray-700">
             <Pagination
               currentPage={page}
@@ -400,7 +462,8 @@ const Tokens: React.FC = () => {
             />
           </div>
         )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

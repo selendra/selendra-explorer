@@ -172,12 +172,15 @@ This document outlines all the tasks needed to integrate the backend API ### 10.
 
 ### 15. Enhanced Data Visualization
 
-- [ ] **Update chart components with real data**
-  - [ ] Remove mock chart data
-  - [ ] Integrate real transaction volume data
-  - [ ] Integrate real block production data
-  - [ ] Add network statistics dashboard
-  - [ ] Update `Charts.tsx` with backend data
+- [x] **Update chart components with real data**
+  - [x] Remove mock chart data
+  - [x] Integrate real transaction volume data
+  - [x] Integrate real block production data
+  - [x] Add network statistics dashboard
+  - [x] Update `Charts.tsx` with backend data
+  - [x] Replace custom chart components with Recharts library
+  - [x] Create ModernLineChart component using Recharts
+  - [x] Create additional chart components (Bar, Pie, Area)
 
 ### 16. Real-time Updates (Future Enhancement)
 
