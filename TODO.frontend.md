@@ -1,6 +1,16 @@
 # Frontend Integration TODO
 
-This document outlines all the tasks needed to integrate the backend API with the frontend explorer application. The backend provides comprehensive REST API endpoints for both EVM and Substrate blockchain data, while the frontend currently uses mock data.
+This document outlines all the tasks needed to integrate the backend API ### 10. Substrate Event Integration
+
+- [x] **Update Substrate event endpoints**
+  - [x] `GET /api/substrate/events` - Paginated events list
+  - [x] `GET /api/substrate/events/block/{block_number}` - Events by block
+  - [x] `GET /api/substrate/events/module` - Events by module/event name
+  - [x] `GET /api/substrate/events/name/{event_name}` - Events by name
+  - [x] `GET /api/substrate/events/recent` - Recent events
+  - [x] Create `Events.tsx` component
+  - [x] Update navigation to include Events page
+  - [x] Create proper `SubstrateEvent` type based on backend responserontend explorer application. The backend provides comprehensive REST API endpoints for both EVM and Substrate blockchain data, while the frontend currently uses mock data.
 
 ## 🎯 High Priority Tasks
 
@@ -79,41 +89,43 @@ This document outlines all the tasks needed to integrate the backend API with th
 
 ### 8. Substrate Block Integration
 
-- [ ] **Update Substrate block endpoints**
-  - [ ] `GET /api/substrate/blocks` - Paginated substrate blocks
-  - [ ] `GET /api/substrate/blocks/latest` - Latest substrate block
-  - [ ] `GET /api/substrate/blocks/number/{block_number}` - Block by number
-  - [ ] `GET /api/substrate/blocks/hash/{block_hash}` - Block by hash
-  - [ ] Create separate `SubstrateBlock` type
-  - [ ] Update components to handle both EVM and Substrate blocks
+- [x] **Update Substrate block endpoints**
+  - [x] `GET /api/substrate/blocks` - Paginated substrate blocks
+  - [x] `GET /api/substrate/blocks/latest` - Latest substrate block
+  - [x] `GET /api/substrate/blocks/number/{block_number}` - Block by number
+  - [x] `GET /api/substrate/blocks/hash/{block_hash}` - Block by hash
+  - [x] Create separate `SubstrateBlock` type
+  - [x] Update components to handle both EVM and Substrate blocks
+  - [x] **FIXED: Backend timestamp format issue (EVM=seconds, Substrate=milliseconds)**
+  - [x] **FIXED: Substrate timestamp conversion to ISO string for proper date display**
 
 ### 9. Substrate Extrinsic Integration
 
-- [ ] **Update Substrate extrinsic endpoints**
-  - [ ] `GET /api/substrate/extrinsics` - Paginated extrinsics list
-  - [ ] `GET /api/substrate/extrinsics/block/{block_number}` - Extrinsics by block
-  - [ ] `GET /api/substrate/extrinsics/signer/{signer}` - Extrinsics by signer
-  - [ ] `GET /api/substrate/extrinsics/module` - Extrinsics by module/function
-  - [ ] Update `Extrinsics.tsx` component
-  - [ ] Update `ExtrinsicDetails.tsx` component
-  - [ ] Create proper `Extrinsic` type based on backend response
+- [x] **Update Substrate extrinsic endpoints**
+  - [x] `GET /api/substrate/extrinsics` - Paginated extrinsics list
+  - [x] `GET /api/substrate/extrinsics/block/{block_number}` - Extrinsics by block
+  - [x] `GET /api/substrate/extrinsics/signer/{signer}` - Extrinsics by signer
+  - [x] `GET /api/substrate/extrinsics/module` - Extrinsics by module/function
+  - [x] Update `Extrinsics.tsx` component
+  - [x] Update `ExtrinsicDetails.tsx` component
+  - [x] Create proper `Extrinsic` type based on backend response
 
 ### 10. Substrate Event Integration
 
-- [ ] **Update Substrate event endpoints**
-  - [ ] `GET /api/substrate/events` - Paginated events list
-  - [ ] `GET /api/substrate/events/block/{block_number}` - Events by block
-  - [ ] `GET /api/substrate/events/module` - Events by module/event name
-  - [ ] `GET /api/substrate/events/name/{event_name}` - Events by name
-  - [ ] `GET /api/substrate/events/recent` - Recent events
-  - [ ] Create `Events.tsx` component (if not exists)
-  - [ ] Create `EventDetails.tsx` component
+- [x] **Update Substrate event endpoints**
+  - [x] `GET /api/substrate/events` - Paginated events list
+  - [x] `GET /api/substrate/events/block/{block_number}` - Events by block
+  - [x] `GET /api/substrate/events/module` - Events by module/event name
+  - [x] `GET /api/substrate/events/name/{event_name}` - Events by name
+  - [x] `GET /api/substrate/events/recent` - Recent events
+  - [x] Create `Events.tsx` component (if not exists)
+  - [x] Create `EventDetails.tsx` component
 
 ## 🔄 Address Conversion Integration
 
 ### 11. Address Conversion Features
 
-- [ ] **Implement address conversion endpoints**
+- [ ] **Implement address conversion endpoints** (⚠️ **BLOCKED: Backend endpoints not yet implemented**)
   - [ ] `GET /api/convert/ss58_to_evm_address/{address}` - SS58 to EVM conversion
   - [ ] `GET /api/convert/evm_to_ss58_address/{address}` - EVM to SS58 conversion
   - [ ] Add address conversion utility functions
@@ -125,15 +137,16 @@ This document outlines all the tasks needed to integrate the backend API with th
 
 ### 12. Enhanced Search Implementation
 
-- [ ] **Update search to work with backend data**
-  - [ ] Remove mock search implementation
-  - [ ] Implement search for blocks (by number/hash)
-  - [ ] Implement search for transactions (by hash)
-  - [ ] Implement search for accounts/addresses
-  - [ ] Implement search for contracts
-  - [ ] Add search for extrinsics and events
-  - [ ] Update `Search.tsx` component
-  - [ ] Add search suggestions/autocomplete
+- [x] **Update search to work with backend data**
+  - [x] Remove mock search implementation
+  - [x] Implement search for blocks (by number/hash) - Both EVM and Substrate
+  - [x] Implement search for transactions (by hash) - EVM only
+  - [x] Implement search for accounts/addresses - Both EVM addresses and contract addresses
+  - [x] Implement search for contracts - EVM contracts
+  - [x] Add search for extrinsics - Substrate extrinsics by block-index format
+  - [x] Update `Search.tsx` component with proper routing and network type handling
+  - [x] Update SearchResult type to include all supported types
+  - [ ] Add search suggestions/autocomplete (future enhancement)
 
 ## 📊 Data Display Components
 
@@ -307,6 +320,8 @@ All backend responses follow this format:
 
 - [ ] **Update frontend types to match these exact field names and formats**
 - [ ] **Handle timestamp differences (ms vs s) between EVM and Substrate**
+  - [x] **DISCOVERED: Backend has timestamp formats reversed from documentation**
+  - [x] **FIXED: EVM timestamps are in seconds (should be ms), Substrate timestamps are in milliseconds (should be s)**
 - [ ] **Handle snake_case vs camelCase conversion**
 
 ## 🚀 Implementation Priority
@@ -330,11 +345,11 @@ All backend responses follow this format:
 9. Substrate Block Integration (#8)
 10. Substrate Extrinsic Integration (#9)
 11. Substrate Event Integration (#10)
-12. Address Conversion Integration (#11)
 
 ### Phase 4 (Enhancement)
 
-13. Enhanced Search (#12)
+12. Enhanced Search (#12)
+13. Address Conversion Integration (#11) - BLOCKED (backend not implemented)
 14. Data Display Components (#13)
 15. Network Type Handling (#14)
 16. Enhanced Data Visualization (#15)
@@ -353,7 +368,9 @@ All backend responses follow this format:
 - **Pagination**: Backend uses `limit` and `offset` parameters
 - **Network Types**: Backend distinguishes between EVM and Substrate data
 - **Address Formats**: Support both SS58 (Substrate) and H160 (EVM) addresses
-- **Timestamp Formats**: EVM uses milliseconds, Substrate uses seconds
+- **Timestamp Formats**:
+  - **ACTUAL BACKEND FORMAT (REVERSED FROM DOCS)**: EVM uses seconds, Substrate uses milliseconds
+  - **DOCUMENTED FORMAT**: EVM uses milliseconds, Substrate uses seconds
 - **Field Naming**: Backend uses snake_case, frontend uses camelCase
 
 ## 🎯 Success Criteria
@@ -370,3 +387,14 @@ The integration is complete when:
 - [ ] All TypeScript types are accurate and safe
 
 This comprehensive TODO list should guide the complete integration of the backend API with the frontend application, transforming it from a mock-based explorer to a fully functional blockchain explorer.
+
+## 🎯 Recent Fixes and Updates
+
+### TypeScript Error Resolution (December 2024)
+
+- **Fixed Account type issues**: Removed references to non-existent `lastActivity` and `creator` properties
+- **Fixed Validator type issues**: Updated property references to use correct `totalStake` instead of `staked`, fixed `uptime` type usage, removed `lastActive` reference
+- **Fixed AddressDisplay component**: Added missing `networkType` prop in Validators page
+- **Fixed API service unused variables**: Removed unused parameters and interfaces, cleaned up function signatures
+- **Fixed unused variable**: Removed unused `transformedTransactions` in BlockDetails.tsx
+- **Updated ApiContext hooks**: Fixed parameter mismatches after API service method signature changes
