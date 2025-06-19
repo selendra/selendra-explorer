@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { handleChainImageError } from '../../utils/imageUtils';
 
 interface WalletOption {
   id: string;
@@ -201,10 +202,7 @@ export default function WalletModal({ isOpen, onClose, onConnect }: WalletModalP
                       src={network.icon} 
                       alt={network.name} 
                       className="h-8 w-8"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = '/chains/default.png';
-                      }}
+                      onError={handleChainImageError}
                     />
                   </div>
                   <p className="font-medium text-white text-sm">{network.name}</p>
@@ -271,4 +269,4 @@ export default function WalletModal({ isOpen, onClose, onConnect }: WalletModalP
       </div>
     </div>
   );
-} 
+}

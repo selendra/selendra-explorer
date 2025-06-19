@@ -21,8 +21,7 @@ import {
   DocumentDuplicateIcon,
   InformationCircleIcon
 } from '@heroicons/react/24/outline';
-import { mockBlocks } from '../mocks/blocks';
-import { mockTransactions } from '../mocks/transactions';
+import { useBlock, useTransactionsByBlock } from '../contexts/ApiContext';
 
 // Helper function to copy to clipboard with visual feedback
 const copyToClipboard = (text: string, event: React.MouseEvent) => {
@@ -45,18 +44,24 @@ const copyToClipboard = (text: string, event: React.MouseEvent) => {
 const BlockDetails: React.FC = () => {
   const { blockId } = useParams<{ blockId: string }>();
   
-  // Find block from mock data
-  const block = mockBlocks.find(b => b.number.toString() === blockId);
-  const transactions = mockTransactions
-    .slice(0, 10 + Math.floor(Math.random() * 20))
-    .map(tx => ({
-      ...tx,
-      blockNumber: block?.number || 0,
-    }));
-  
-  const isLoadingBlock = false;
-  const isLoadingTransactions = false;
-  const error = !block;
+  // Use real API hooks
+  const { data: block, isLoading: isLoadingBlock, error } = useBlock(blockId || '');
+  const { data: transactions = [], isLoading: isLoadingTransactions } = useTransactionsByBlock(
+    block?.number || 0
+  );
+
+  // Transform transactions for table display
+  const transformedTransactions = transactions.map(tx => ({
+    hash: tx.hash,
+    transactionType: tx.transactionType || 'Transfer',
+    from: tx.from,
+    to: tx.to,
+    value: tx.value,
+    status: tx.status,
+    timestamp: tx.timestamp,
+    fee: tx.fee,
+    blockNumber: tx.blockNumber,
+  }));
   
   if (isLoadingBlock) {
     return (
@@ -99,9 +104,8 @@ const BlockDetails: React.FC = () => {
     );
   }
   
-  // Find next and previous blocks
-  const prevBlock = mockBlocks.find(b => b.number === block.number + 1);
-  const nextBlock = mockBlocks.find(b => b.number === block.number - 1);
+  // Find next and previous blocks (TODO: implement proper navigation)
+  // Navigation is now handled directly in the JSX using block.number +/- 1
   const session = 110;
   
   // Calculate gas usage percentage
@@ -152,24 +156,22 @@ const BlockDetails: React.FC = () => {
               <ArrowPathIcon className="h-4 w-4 mr-1" />
               Refresh
             </button>
-            {prevBlock && (
+            {block.number > 1 && (
               <Link
-                to={`/blocks/${prevBlock.number}`}
+                to={`/blocks/${block.number - 1}`}
                 className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-sm leading-5 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 <ChevronLeftIcon className="h-4 w-4 mr-1" />
                 Previous
               </Link>
             )}
-            {nextBlock && (
-              <Link
-                to={`/blocks/${nextBlock.number}`}
-                className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-sm leading-5 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                Next
-                <ChevronRightIcon className="h-4 w-4 ml-1" />
-              </Link>
-            )}
+            <Link
+              to={`/blocks/${block.number + 1}`}
+              className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-sm leading-5 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Next
+              <ChevronRightIcon className="h-4 w-4 ml-1" />
+            </Link>
           </div>
         </div>
         

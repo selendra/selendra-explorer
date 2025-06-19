@@ -31,6 +31,10 @@ const queryClient = new QueryClient({
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes
       refetchOnWindowFocus: false,
+      refetchOnMount: false, // Don't refetch on mount
+      refetchOnReconnect: false, // Don't refetch on reconnect
+      retry: 2, // Only retry 2 times on failure
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
     },
   },
 });
@@ -68,6 +72,9 @@ export const useBlocks = (page: number = 1, pageSize: number = 10) => {
   return useQuery({
     queryKey: ["blocks", page, pageSize],
     queryFn: () => apiService.getBlocks(page, pageSize),
+    staleTime: 30000, // Consider data stale after 30 seconds
+    retry: 2, // Only retry 2 times
+    retryDelay: 1000, // Wait 1 second between retries
   });
 };
 
@@ -88,6 +95,9 @@ export const useTransactions = (
   return useQuery({
     queryKey: ["transactions", page, pageSize, address],
     queryFn: () => apiService.getTransactions(page, pageSize, address),
+    staleTime: 30000, // Consider data stale after 30 seconds
+    retry: 2, // Only retry 2 times
+    retryDelay: 1000, // Wait 1 second between retries
   });
 };
 
@@ -192,7 +202,10 @@ export const useNetworkStats = () => {
   return useQuery({
     queryKey: ["networkStats"],
     queryFn: () => apiService.getNetworkStats(),
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 60000, // Refetch every 60 seconds instead of 30
+    staleTime: 30000, // Consider data stale after 30 seconds
+    retry: 2, // Only retry 2 times
+    retryDelay: 2000, // Wait 2 seconds between retries
   });
 };
 

@@ -120,6 +120,21 @@ const apiRequest = async <T>(
       throw new Error(result.error || "API request failed");
     }
 
+    // Handle null data from backend - this is normal for some endpoints when no data exists
+    if (result.data === null) {
+      // For array endpoints, return empty array instead of null
+      if (
+        endpoint.includes("blocks") ||
+        endpoint.includes("transactions") ||
+        endpoint.includes("accounts") ||
+        endpoint.includes("contracts")
+      ) {
+        return [] as unknown as T;
+      }
+      // For single item endpoints, return null
+      return null as unknown as T;
+    }
+
     return result.data as T;
   });
 };
@@ -349,18 +364,40 @@ export class ApiService {
     page: number = 1,
     pageSize: number = 10
   ): Promise<PaginatedResponse<Block>> {
-    const offset = (page - 1) * pageSize;
-    const blocks = await apiRequest<BackendEvmBlock[]>(
-      `${API_ENDPOINTS.EVM_BLOCKS}?limit=${pageSize}&offset=${offset}`
-    );
+    try {
+      const offset = (page - 1) * pageSize;
+      const blocks = await apiRequest<BackendEvmBlock[]>(
+        `${API_ENDPOINTS.EVM_BLOCKS}?limit=${pageSize}&offset=${offset}`
+      );
 
-    return {
-      items: blocks.map(transformBackendBlockToFrontend),
-      totalCount: blocks.length, // Backend doesn't provide total count, using array length
-      page,
-      pageSize,
-      hasMore: blocks.length === pageSize,
-    };
+      // Handle null or empty response
+      if (!blocks || !Array.isArray(blocks)) {
+        return {
+          items: [],
+          totalCount: 0,
+          page,
+          pageSize,
+          hasMore: false,
+        };
+      }
+
+      return {
+        items: blocks.map(transformBackendBlockToFrontend),
+        totalCount: blocks.length,
+        page,
+        pageSize,
+        hasMore: blocks.length === pageSize,
+      };
+    } catch (error) {
+      console.warn("Error fetching blocks, returning empty result:", error);
+      return {
+        items: [],
+        totalCount: 0,
+        page,
+        pageSize,
+        hasMore: false,
+      };
+    }
   }
 
   async getBlock(numberOrHash: string | number): Promise<Block | null> {
@@ -405,24 +442,49 @@ export class ApiService {
     pageSize: number = 10,
     address?: string
   ): Promise<PaginatedResponse<Transaction>> {
-    const offset = (page - 1) * pageSize;
-    let endpoint = `${API_ENDPOINTS.EVM_TRANSACTIONS}?limit=${pageSize}&offset=${offset}`;
+    try {
+      const offset = (page - 1) * pageSize;
+      let endpoint = `${API_ENDPOINTS.EVM_TRANSACTIONS}?limit=${pageSize}&offset=${offset}`;
 
-    // Backend doesn't support filtering by address in the main endpoint
-    // This would need to be implemented differently
-    if (address) {
-      console.warn("Address filtering not yet implemented in backend");
+      // Backend doesn't support filtering by address in the main endpoint
+      // This would need to be implemented differently
+      if (address) {
+        console.warn("Address filtering not yet implemented in backend");
+      }
+
+      const transactions = await apiRequest<BackendEvmTransaction[]>(endpoint);
+
+      // Handle null or empty response
+      if (!transactions || !Array.isArray(transactions)) {
+        return {
+          items: [],
+          totalCount: 0,
+          page,
+          pageSize,
+          hasMore: false,
+        };
+      }
+
+      return {
+        items: transactions.map(transformBackendTransactionToFrontend),
+        totalCount: transactions.length,
+        page,
+        pageSize,
+        hasMore: transactions.length === pageSize,
+      };
+    } catch (error) {
+      console.warn(
+        "Error fetching transactions, returning empty result:",
+        error
+      );
+      return {
+        items: [],
+        totalCount: 0,
+        page,
+        pageSize,
+        hasMore: false,
+      };
     }
-
-    const transactions = await apiRequest<BackendEvmTransaction[]>(endpoint);
-
-    return {
-      items: transactions.map(transformBackendTransactionToFrontend),
-      totalCount: transactions.length,
-      page,
-      pageSize,
-      hasMore: transactions.length === pageSize,
-    };
   }
 
   async getTransaction(hash: string): Promise<Transaction | null> {

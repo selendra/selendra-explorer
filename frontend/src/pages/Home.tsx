@@ -10,9 +10,7 @@ import {
   CircleStackIcon,
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
-import { mockBlocks } from "../mocks/blocks";
-import { mockTransactions } from "../mocks/transactions";
-import { mockNetworkStats } from "../mocks/networkStats";
+import { useBlocks, useTransactions, useNetworkStats } from "../contexts/ApiContext";
 
 /**
  * Generates chart data for homepage activity chart
@@ -54,23 +52,24 @@ const generateChartData = () => {
 };
 
 const Home: React.FC = () => {
-  const blocksData = React.useMemo(
-    () => ({
-      items: mockBlocks.slice(0, 15),
-      totalCount: mockBlocks.length,
-    }),
-    []
-  );
-  const transactionsData = React.useMemo(
-    () => ({
-      items: mockTransactions.slice(0, 15),
-      totalCount: mockTransactions.length,
-    }),
-    []
-  );
-  const isLoadingBlocks = false;
-  const isLoadingTransactions = false;
-  const networkStats = mockNetworkStats;
+  // Use real API hooks with conservative settings to prevent loops
+  const { data: blocksData, isLoading: isLoadingBlocks } = useBlocks(1, 15);
+  const { data: transactionsData, isLoading: isLoadingTransactions } = useTransactions(1, 15);
+  const { data: networkStats } = useNetworkStats();
+
+  // Fallback data while loading
+  const safeBLocksData = blocksData || { items: [], totalCount: 0 };
+  const safeTransactionsData = transactionsData || { items: [], totalCount: 0 };
+  const safeNetworkStats = networkStats || {
+    latestBlock: 0,
+    averageBlockTime: 12,
+    totalTransactions: 0,
+    activeAccounts: 0,
+    totalAccounts: 0,
+    gasPrice: "0",
+    totalValueLocked: "0",
+    validators: { total: 0, active: 0 }
+  };
 
   // Mocked total supply since it's not in the NetworkStats type
   const totalSupply = "601,091,728.63";
@@ -171,7 +170,7 @@ const Home: React.FC = () => {
                   Block Height
                 </p>
                 <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {networkStats.latestBlock.toLocaleString()}
+                  {safeNetworkStats.latestBlock.toLocaleString()}
                 </p>
               </div>
               <div className="flex justify-between">
@@ -336,7 +335,7 @@ const Home: React.FC = () => {
                             </td>
                           </tr>
                         ))
-                    : blocksData.items.map((block) => (
+                    : safeBLocksData.items.map((block) => (
                         <tr
                           key={block.hash}
                           className="hover:bg-gray-50 dark:hover:bg-gray-750 h-10"
@@ -447,7 +446,7 @@ const Home: React.FC = () => {
                             </td>
                           </tr>
                         ))
-                    : transactionsData.items.map((tx) => (
+                    : safeTransactionsData.items.map((tx) => (
                         <tr
                           key={tx.hash}
                           className="hover:bg-gray-50 dark:hover:bg-gray-750 h-10"
