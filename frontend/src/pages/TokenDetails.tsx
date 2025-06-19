@@ -5,28 +5,18 @@ import TimeAgo from "../components/ui/TimeAgo";
 import AddressDisplay from "../components/ui/AddressDisplay";
 import NetworkBadge from "../components/ui/NetworkBadge";
 import TokenIcon from "../components/ui/TokenIcon";
-import LineChart from "../components/charts/LineChart";
+import { ModernAreaChart } from "../components/charts/ModernCharts";
 
 // Mock data for the chart
 const generateTokenPriceData = () => {
-  const labels = Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`);
-  const priceData = Array.from({ length: 30 }, (_, i) => {
+  return Array.from({ length: 30 }, (_, i) => {
     const basePrice = 1 + Math.random() * 2;
-    return basePrice + Math.sin(i / 3) * 0.5;
+    const price = basePrice + Math.sin(i / 3) * 0.5;
+    return {
+      name: `Day ${i + 1}`,
+      value: price,
+    };
   });
-
-  return {
-    labels,
-    datasets: [
-      {
-        label: "Token Price (USD)",
-        data: priceData,
-        borderColor: "rgb(59, 130, 246)",
-        backgroundColor: "rgba(59, 130, 246, 0.5)",
-        tension: 0.3,
-      },
-    ],
-  };
 };
 
 const TokenDetails: React.FC = () => {
@@ -191,7 +181,12 @@ const TokenDetails: React.FC = () => {
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             Price History
           </h2>
-          <LineChart data={chartData} height={300} />
+          <ModernAreaChart 
+            data={chartData} 
+            height={300}
+            color="#3B82F6"
+            dataKey="value"
+          />
           <div className="mt-2 text-center text-sm text-gray-500 dark:text-gray-400">
             Note: This is simulated data for demonstration methods.
           </div>
