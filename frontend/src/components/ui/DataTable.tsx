@@ -229,7 +229,9 @@ function DataTable<T extends object>({
                       key={`${String(row[keyField])}-${colIndex}`}
                       className={`px-4 py-3 text-sm text-gray-800 dark:text-gray-200 ${column.cellClassName || ''}`}
                     >
-                      {cellValue}
+                      {typeof cellValue === "object" && cellValue !== null && !React.isValidElement(cellValue)
+  ? JSON.stringify(cellValue)
+  : cellValue as React.ReactNode}
                     </td>
                   );
                 })}
@@ -350,4 +352,4 @@ function calculatePageButtons(
   }
 }
 
-export default DataTable; 
+export default DataTable;

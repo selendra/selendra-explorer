@@ -171,7 +171,7 @@ const StakingForm: React.FC<StakingFormProps> = ({ onClose }) => {
 const Staking: React.FC = () => {
   const [showStakingForm, setShowStakingForm] = useState(false);
   const pageSize = 10;
-  const { data, isLoading } = useValidators(1, pageSize, 'active');
+  const { data, isLoading } = useValidators(1, pageSize);
   
   // Mock user staking data
   const userStaking = {
@@ -471,7 +471,7 @@ const Staking: React.FC = () => {
                         </div>
                         <AddressDisplay 
                           address={validator.address}
-                          networkType="evm"
+                          networkType="substrate"
                           truncate={true}
                           className="text-sm"
                         />
@@ -625,4 +625,4 @@ const Staking: React.FC = () => {
 // Clean export without trailing whitespace or extra characters
 const StakingPage = Staking;
 export { StakingPage as Staking };
-export default StakingPage; 
+export default StakingPage;

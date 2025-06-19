@@ -1,5 +1,5 @@
 // Common Types
-export type NetworkType = "evm" | "wasm"; // TODO: Consolidate with NetworkType enum in common.ts
+export type NetworkType = "evm" | "wasm" | "substrate"; // TODO: Consolidate with NetworkType enum in common.ts
 
 // Block Types
 export interface Block {

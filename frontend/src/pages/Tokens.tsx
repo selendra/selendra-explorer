@@ -91,7 +91,7 @@ const Tokens: React.FC = () => {
     undefined
   );
   const pageSize = 20;
-  const { data, isLoading } = useTokens(page, pageSize, tokenType, networkType);
+  const { data, isLoading } = useTokens(page, pageSize, tokenType);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);

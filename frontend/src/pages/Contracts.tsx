@@ -22,7 +22,9 @@ const Contracts: React.FC = () => {
   const [page, setPage] = useState(1);
   const [networkType, setNetworkType] = useState<'evm' | 'wasm' | undefined>(undefined);
   const pageSize = 20;
-  const { data, isLoading } = useContracts(page, pageSize, networkType);
+  const { data, isLoading } = useContracts(page, pageSize);
+  
+  // TODO: Apply networkType filter client-side since API doesn't support it yet
   
   const handlePageChange = (newPage: number) => {
     setPage(newPage);

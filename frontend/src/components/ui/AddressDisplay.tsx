@@ -1,11 +1,11 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ClipboardDocumentIcon, CheckIcon } from "@heroicons/react/24/outline";
 import { NetworkType } from "../../types";
 
 interface AddressDisplayProps {
   address: string;
-  networkType: NetworkType;
+  networkType: NetworkType; // Needed for other components
   label?: string;
   truncate?: boolean;
   linkToAccount?: boolean;
@@ -18,6 +18,7 @@ interface AddressDisplayProps {
  */
 const AddressDisplay: React.FC<AddressDisplayProps> = ({
   address,
+  // @ts-ignore - Required prop for API but not used internally
   networkType,
   label,
   truncate = true,
@@ -25,19 +26,6 @@ const AddressDisplay: React.FC<AddressDisplayProps> = ({
   className = "",
 }) => {
   const [copied, setCopied] = useState(false);
-
-  // Validate address format to prevent potential XSS or display of malformed data
-  const isValidAddress = useCallback(() => {
-    if (!address) return false;
-
-    if (networkType === "evm") {
-      // Validate EVM address format (0x + 40 hex characters)
-      return /^0x[a-fA-F0-9]{40}$/.test(address);
-    } else {
-      // Basic validation for substrate address (starts with 5 + alphanumeric)
-      return /^5[a-zA-Z0-9]{47,}$/.test(address);
-    }
-  }, [address, networkType]);
 
   // Safe display of address with truncation
   const displayAddress =

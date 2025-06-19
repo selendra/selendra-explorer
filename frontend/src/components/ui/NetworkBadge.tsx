@@ -12,11 +12,12 @@ const NetworkBadge: React.FC<NetworkBadgeProps> = ({ type, className = '' }) => 
   const typeClasses = {
     evm: 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100',
     wasm: 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100',
+    substrate: 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100',
   };
   
   return (
     <span className={`${baseClasses} ${typeClasses[type]} ${className}`}>
-      {type === 'evm' ? 'EVM' : 'Wasm'}
+      {type === 'evm' ? 'EVM' : type === 'wasm' ? 'Wasm' : 'Substrate'}
     </span>
   );
 };

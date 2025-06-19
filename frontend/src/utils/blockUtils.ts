@@ -51,12 +51,12 @@ export const formatBlockTimestamp = (
 };
 
 /**
- * Gets the appropriate transaction/extrinsic count label based on network type
+ * Get the appropriate label for transaction counts based on network type
  */
 export const getTransactionCountLabel = (
-  networkType: "evm" | "wasm"
+  networkType: "evm" | "wasm" | "substrate"
 ): string => {
-  return networkType === "wasm" ? "Extrinsics" : "Transactions";
+  return networkType === "evm" ? "Transactions" : "Extrinsics";
 };
 
 /**
