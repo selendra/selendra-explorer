@@ -32,7 +32,6 @@ interface ModernPieChartProps {
   data: ChartData[];
   colors?: string[];
   height?: number;
-  showLegend?: boolean;
 }
 
 interface ModernAreaChartProps {
@@ -129,7 +128,6 @@ export const ModernPieChart: React.FC<ModernPieChartProps> = ({
   data,
   colors = ["#8C30F5", "#0CCBD6", "#FF6B6B", "#4CAF50", "#FFA726"],
   height = 300,
-  showLegend = true,
 }) => {
   const RADIAN = Math.PI / 180;
   const renderCustomizedLabel = ({
@@ -167,7 +165,7 @@ export const ModernPieChart: React.FC<ModernPieChartProps> = ({
           fill="#8884d8"
           dataKey="value"
         >
-          {data.map((entry, index) => (
+          {data.map((_, index) => (
             <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
           ))}
         </Pie>
