@@ -202,7 +202,7 @@ interface BackendEvmContract {
     creator_address: string;
     transaction_hash: string;
     block_number: number;
-    timestamp: number;
+    timestamp: string | number; // Can be string or number from backend
     creation_bytecode: string;
   };
 }
@@ -286,10 +286,12 @@ const transformBackendContractToFrontend = (
   creator: backendContract.creator_info?.creator_address || "",
   creationTransaction: backendContract.creator_info?.transaction_hash || "",
   createdAt: backendContract.creator_info
-    ? new Date(backendContract.creator_info.timestamp).toISOString()
+    ? new Date(
+        parseInt(backendContract.creator_info.timestamp.toString()) * 1000
+      ).toISOString()
     : "",
   networkType: "evm" as NetworkType,
-  name: backendContract.name,
+  name: backendContract.name || "Unnamed Contract",
   verified: backendContract.is_verified,
   contractType: backendContract.contract_type,
 });
@@ -523,12 +525,19 @@ export class ApiService {
       `${API_ENDPOINTS.EVM_CONTRACTS}?limit=${pageSize}&offset=${offset}`
     );
 
+    // Since the backend doesn't provide total count, we estimate it
+    // If we get a full page, assume there are more items
+    const hasMore = contracts.length === pageSize;
+    const estimatedTotal = hasMore
+      ? page * pageSize + 1
+      : (page - 1) * pageSize + contracts.length;
+
     return {
       items: contracts.map(transformBackendContractToFrontend),
-      totalCount: contracts.length,
+      totalCount: estimatedTotal,
       page,
       pageSize,
-      hasMore: contracts.length === pageSize,
+      hasMore,
     };
   }
 

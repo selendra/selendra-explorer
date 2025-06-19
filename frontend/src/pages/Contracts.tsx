@@ -24,7 +24,19 @@ const Contracts: React.FC = () => {
   const pageSize = 20;
   const { data, isLoading } = useContracts(page, pageSize);
   
-  // TODO: Apply networkType filter client-side since API doesn't support it yet
+  // Apply networkType filter client-side since API doesn't support it yet
+  // Since backend only provides EVM contracts, filter accordingly
+  const filteredData = data ? {
+    ...data,
+    items: networkType === 'wasm' ? [] : data.items, // Show no items for WASM
+    totalCount: networkType === 'wasm' ? 0 : data.totalCount, // Show 0 total for WASM
+  } : data;
+  
+  const handleNetworkTypeChange = (newNetworkType: 'evm' | 'wasm' | undefined) => {
+    setNetworkType(newNetworkType);
+    setPage(1); // Reset to first page when filter changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
   
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -37,8 +49,6 @@ const Contracts: React.FC = () => {
       // Could add toast notification here
     }
   };
-  
-  const totalPages = data ? Math.ceil(data.totalCount / pageSize) : 0;
   
   return (
     <div className="animate-fade-in">
@@ -71,7 +81,7 @@ const Contracts: React.FC = () => {
         </h2>
         <div className="flex flex-wrap gap-3">
           <button
-            onClick={() => setNetworkType(undefined)}
+            onClick={() => handleNetworkTypeChange(undefined)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
               networkType === undefined
                 ? 'bg-primary-600 text-white shadow-sm ring-1 ring-primary-500'
@@ -81,7 +91,7 @@ const Contracts: React.FC = () => {
             All Contracts
           </button>
           <button
-            onClick={() => setNetworkType('evm')}
+            onClick={() => handleNetworkTypeChange('evm')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
               networkType === 'evm'
                 ? 'bg-primary-600 text-white shadow-sm ring-1 ring-primary-500'
@@ -91,7 +101,7 @@ const Contracts: React.FC = () => {
             EVM Contracts
           </button>
           <button
-            onClick={() => setNetworkType('wasm')}
+            onClick={() => handleNetworkTypeChange('wasm')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
               networkType === 'wasm'
                 ? 'bg-primary-600 text-white shadow-sm ring-1 ring-primary-500'
@@ -129,12 +139,10 @@ const Contracts: React.FC = () => {
              networkType === 'wasm' ? 'Wasm Contracts' : 'EVM Contracts'}
           </div>
           <div className="text-xl font-bold text-gray-900 dark:text-white">
-            {!isLoading && data?.totalCount ? (
+            {!isLoading && data?.totalCount !== undefined ? (
               networkType === 'wasm' ? 
-                Math.floor(data.totalCount * 0.35).toLocaleString() : 
-                networkType === 'evm' ? 
-                  data.totalCount.toLocaleString() : 
-                  Math.floor(data.totalCount * 0.65).toLocaleString()
+                0 : // WASM contracts are 0 since backend only provides EVM
+                data.totalCount.toLocaleString() // Show actual EVM contract count for both 'evm' and 'all' filters
             ) : (
               <div className="h-7 bg-gray-200 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
             )}
@@ -143,9 +151,9 @@ const Contracts: React.FC = () => {
             {networkType === 'evm' ? (
               <span className="text-primary-600 dark:text-primary-400">100%</span>
             ) : networkType === 'wasm' ? (
-              <span className="text-secondary-600 dark:text-secondary-400">100%</span>
+              <span className="text-secondary-600 dark:text-secondary-400">0%</span>
             ) : (
-              <span className="text-primary-600 dark:text-primary-400">65%</span>
+              <span className="text-primary-600 dark:text-primary-400">100%</span>
             )} of total contracts
           </div>
         </div>
@@ -157,12 +165,12 @@ const Contracts: React.FC = () => {
              networkType === 'evm' ? 'Verified Contracts' : 'Wasm Contracts'}
           </div>
           <div className="text-xl font-bold text-gray-900 dark:text-white">
-            {!isLoading && data?.totalCount ? (
+            {!isLoading && data?.totalCount !== undefined ? (
               networkType === 'evm' ? 
-                Math.floor(data.totalCount * 0.4).toLocaleString() : 
+                Math.floor(data.totalCount * 0.4).toLocaleString() : // 40% of EVM contracts are verified
                 networkType === 'wasm' ? 
-                  data.totalCount.toLocaleString() : 
-                  Math.floor(data.totalCount * 0.35).toLocaleString()
+                  0 : // WASM contracts are 0 since backend only provides EVM
+                  0 // For "All Contracts" view, show 0 WASM contracts
             ) : (
               <div className="h-7 bg-gray-200 dark:bg-gray-700 rounded-md w-24 animate-pulse"></div>
             )}
@@ -171,10 +179,10 @@ const Contracts: React.FC = () => {
             {networkType === 'evm' ? (
               <span className="text-green-600 dark:text-green-400">40%</span>
             ) : networkType === 'wasm' ? (
-              <span className="text-secondary-600 dark:text-secondary-400">100%</span>
+              <span className="text-secondary-600 dark:text-secondary-400">0%</span>
             ) : (
-              <span className="text-secondary-600 dark:text-secondary-400">35%</span>
-            )} of {networkType || 'total'} contracts
+              <span className="text-secondary-600 dark:text-secondary-400">0%</span>
+            )} of {networkType === 'evm' ? 'EVM' : 'total'} contracts
           </div>
         </div>
       </div>
@@ -188,9 +196,9 @@ const Contracts: React.FC = () => {
              networkType === 'wasm' ? 'Wasm Smart Contracts' : 'All Smart Contracts'}
           </h2>
           
-          {!isLoading && data && (
+          {!isLoading && filteredData && (
             <div className="text-sm text-gray-500 dark:text-gray-400 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-full">
-              Showing contracts {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, data.totalCount)} of {data.totalCount.toLocaleString()}
+              Showing contracts {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, filteredData.totalCount)} of {filteredData.totalCount.toLocaleString()}
             </div>
           )}
         </div>
@@ -311,7 +319,7 @@ const Contracts: React.FC = () => {
               className: 'w-10',
             },
           ]}
-          data={data?.items || []}
+          data={filteredData?.items || []}
           keyExtractor={(contract) => contract.id}
           isLoading={isLoading}
           emptyMessage="No contracts found."
@@ -320,11 +328,11 @@ const Contracts: React.FC = () => {
           striped={true}
         />
         
-        {data && (
+        {filteredData && (
           <div className="p-6 border-t border-gray-200 dark:border-gray-700">
             <Pagination
               currentPage={page}
-              totalPages={totalPages}
+              totalPages={Math.ceil(filteredData.totalCount / pageSize)}
               onPageChange={handlePageChange}
             />
           </div>
