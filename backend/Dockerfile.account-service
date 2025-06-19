@@ -4,10 +4,10 @@ FROM debian:bullseye-slim
 # Install required libraries for Rust binaries and wget
 RUN apt-get update && apt-get install -y \
     ca-certificates \
-    libssl3 \
     wget \
+    libssl1.1 \
     && rm -rf /var/lib/apt/lists/*
-
+    
 WORKDIR /app
 
 # Download the account-service binary from GitHub releases
