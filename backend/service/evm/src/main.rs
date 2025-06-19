@@ -32,8 +32,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     //1619130  869240
     let config = ProcessingConfig {
-        start_block: Some(1619130),
-        end_block: Some(1619366),
+        start_block: None,
+        end_block: None,
         batch_size: 5,
         delay_between_batches: Duration::from_millis(200),
         max_retries: 3,
@@ -46,11 +46,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Err(e) => println!("❌ Processing failed: {}", e),
     }
 
-    // // start continue block sync
-    // match processor.start_continuous_sync().await {
-    //     Ok(_) => println!("✅ Continuous sync started successfully"),
-    //     Err(e) => println!("❌ Continuous sync failed: {}", e),
-    // }
+    // start continue block sync
+    match processor.start_continuous_sync().await {
+        Ok(_) => println!("✅ Continuous sync started successfully"),
+        Err(e) => println!("❌ Continuous sync failed: {}", e),
+    }
 
     Ok(())
 }
