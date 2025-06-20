@@ -79,6 +79,7 @@ export interface SubstrateBlock {
 export interface SubstrateExtrinsic {
   block_number: number;
   extrinsic_index: number;
+  hash: string;
   is_signed: boolean;
   signer: string;
   call_module: string;

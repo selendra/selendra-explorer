@@ -104,6 +104,7 @@ export const SAMPLE_DATA: SampleData = {
   substrateExtrinsic: {
     block_number: 1962278,
     extrinsic_index: 1,
+    hash: "0xa1b2c3d4e5f6789012345678901234567890123456789012345678901234567890",
     is_signed: true,
     signer: "5DM7PJEFPbcYViEzFXu5GjF96JgoSJ3rb6jfXLsmXqrPVG2o",
     call_module: "Balances",

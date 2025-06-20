@@ -102,8 +102,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
           title: `Substrate Block #${searchResult.data.number.toLocaleString()}`,
           subtitle: `${searchResult.data.extrinscs_len} extrinsics, ${searchResult.data.event_len} events`,
           value: truncateHash(searchResult.data.hash)
-        };
-      
+      };
+  
       case 'evm_transaction':
         return {
           type: 'transaction',
