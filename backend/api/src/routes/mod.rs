@@ -87,6 +87,10 @@ pub fn create_api_routes() -> Router<Arc<AppState>> {
             get(get_substrate_extrinsics_by_block_number),
         )
         .route(
+            "/api/substrate/extrinsics/hash/{hash}",
+            get(get_substrate_extrinsic_by_hash),
+        )
+        .route(
             "/api/substrate/extrinsics/signer/{signer}",
             get(get_substrate_extrinsics_by_signer),
         )

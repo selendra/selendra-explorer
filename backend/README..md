@@ -619,6 +619,7 @@ Retrieve a list of Substrate extrinsics with pagination support.
     {
       "block_number": 1962278,
       "extrinsic_index": 1,
+      "hash": "0xd8878b915294da185df77e98e9a564197c1f977fc44ffd4eb60d113cbf3aacac",
       "is_signed": true,
       "signer": "5DM7PJEFPbcYViEzFXu5GjF96JgoSJ3rb6jfXLsmXqrPVG2o",
       "call_module": "Balances",
@@ -649,6 +650,11 @@ Retrieve Substrate extrinsics filtered by signer address.
 
 **Query Parameters:**
 - `limit` (integer, optional): Number of extrinsics to return (default: 20)
+
+### Get Substrate Extrinsics by Hash
+Retrieve Substrate extrinsics by hash.
+
+**Endpoint:** `GET /substrate/extrinsics/hash/0xd8878b915294da185df77e98e9a564197c1f977fc44ffd4eb60d113cbf3aacac`
 
 ### Get Substrate Extrinsics by Module
 Retrieve Substrate extrinsics filtered by module and optionally by function.

@@ -246,4 +246,28 @@ impl<'a> SubstrateExtrinsicService<'a> {
 
         Ok(extrinsic)
     }
+
+    pub async fn get_by_hash(
+        &self,
+        hash: &str,
+    ) -> Result<Option<SubstrateExtrinsic>, ServiceError> {
+        let query = format!(
+            "SELECT * FROM {} WHERE hash = $hash LIMIT 1",
+            SUBSTRATE_EXTRINSICS_TABLE
+        );
+        let mut result = self
+            .db
+            .query(query)
+            .bind(("hash", hash.to_string()))
+            .await
+            .map_err(|e| {
+                ServiceError::DatabaseError(format!("Extrinsic by hash query failed: {}", e))
+            })?;
+    
+        let extrinsics: Vec<SubstrateExtrinsic> = result.take(0).map_err(|e| {
+            ServiceError::DatabaseError(format!("Extrinsic by hash extraction failed: {}", e))
+        })?;
+    
+        Ok(extrinsics.into_iter().next())
+    }
 }

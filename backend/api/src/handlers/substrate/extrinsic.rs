@@ -44,6 +44,21 @@ pub async fn get_all_substrate_extrinsics(
     }
 }
 
+pub async fn get_substrate_extrinsic_by_hash(
+    State(state): State<Arc<AppState>>,
+    Path(hash): Path<String>,
+) -> Result<Json<ApiResponse<Option<SubstrateExtrinsic>>>, StatusCode> {
+    let extrinsic_service = state.db.substrate_extrinsics();
+
+    match extrinsic_service.get_by_hash(&hash).await {
+        Ok(extrinsic) => Ok(Json(ApiResponse::success(extrinsic))),
+        Err(e) => {
+            eprintln!("Error fetching substrate extrinsic by hash: {:?}", e);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
+}
+
 pub async fn get_substrate_extrinsics_by_block_number(
     State(state): State<Arc<AppState>>,
     Path(block_number): Path<u32>,
