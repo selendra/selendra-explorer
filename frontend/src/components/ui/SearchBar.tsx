@@ -27,10 +27,11 @@ interface SearchResultItem {
  * - Keyboard navigation with '/' shortcut
  * - Dropdown with search results
  * - Improved accessibility
+ * - Support for Substrate extrinsics
  */
 const SearchBar: React.FC<SearchBarProps> = ({ 
   className = "",
-  placeholder = "Search by Block / TX / Account / Contract...",
+  placeholder = "Search by Block / TX / Extrinsic / Account / Contract...",
   showHotkey = true,
   autoFocus = false
 }) => {
@@ -90,26 +91,36 @@ const SearchBar: React.FC<SearchBarProps> = ({
         return {
           type: 'block',
           id: searchResult.data.number.toString(),
-          title: `Block #${searchResult.data.number.toLocaleString()}`,
+          title: `EVM Block #${searchResult.data.number.toLocaleString()}`,
           subtitle: `${searchResult.data.transaction_count} transactions`,
           value: truncateHash(searchResult.data.hash)
         };
       
       case 'substrate_block':
         return {
-          type: 'block',
+          type: 'substrate_block',
           id: searchResult.data.number.toString(),
           title: `Substrate Block #${searchResult.data.number.toLocaleString()}`,
           subtitle: `${searchResult.data.extrinscs_len} extrinsics, ${searchResult.data.event_len} events`,
           value: truncateHash(searchResult.data.hash)
-      };
+        };
   
       case 'evm_transaction':
         return {
           type: 'transaction',
           id: searchResult.data.hash,
-          title: `Transaction`,
+          title: `EVM Transaction`,
           subtitle: `Block ${searchResult.data.block_number} • ${searchResult.data.status}`,
+          value: truncateHash(searchResult.data.hash)
+        };
+      
+      // NEW: Add support for substrate extrinsic
+      case 'substrate_extrinsic':
+        return {
+          type: 'extrinsic',
+          id: searchResult.data.hash,
+          title: `Substrate Extrinsic`,
+          subtitle: `Block ${searchResult.data.block_number} • ${searchResult.data.call_module}.${searchResult.data.call_function}`,
           value: truncateHash(searchResult.data.hash)
         };
       
@@ -117,7 +128,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         return {
           type: 'account',
           id: searchResult.data.address,
-          title: searchResult.data.is_contract ? 'Contract Account' : 'Account',
+          title: searchResult.data.is_contract ? 'Contract Account' : 'EVM Account',
           subtitle: `Balance: ${formatTokenAmount(searchResult.data.balance_token, 18, 'SEL')}`,
           value: truncateAddress(searchResult.data.address)
         };
@@ -135,7 +146,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         return {
           type: 'account',
           id: searchResult.data.address,
-          title: 'ss58 Account',
+          title: 'SS58 Account',
           subtitle: `Balance: ${formatTokenAmount(searchResult.data.balance_token, 18, 'SEL')}`,
           value: truncateAddress(searchResult.data.address)
         };
@@ -265,10 +276,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
     // Basic validation for different types
     switch (type) {
       case "block":
+      case "substrate_block":
         // Block number or hash
         return sanitizedId;
       case "transaction":
-        // Transaction hash
+      case "extrinsic":
+        // Transaction/extrinsic hash
         return sanitizedId;
       case "account":
       case "contract":
@@ -300,6 +313,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
         case "evm_transaction":
           navigate(`/evm/transaction/${result.data.hash}`);
           break;
+        // NEW: Add navigation for substrate extrinsic
+        case "substrate_extrinsic":
+          navigate(`/substrate/extrinsic/${result.data.hash}`);
+          break;
         case "evm_account":
           navigate(`/evm/account/${result.data.address}`);
           break;
@@ -307,7 +324,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           navigate(`/evm/contract/${result.data.address}`);
           break;
         case "ss58_address":
-            navigate(`/evm/account/${result.data.address}`);
+          navigate(`/evm/account/${result.data.address}`);
           break;
         default:
           navigate(`/search?q=${encodeURIComponent(inputValue)}`);
@@ -318,8 +335,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
         case "block":
           navigate(`/evm/block/${safeId}`);
           break;
+        case "substrate_block":
+          navigate(`/substrate/block/${safeId}`);
+          break;
         case "transaction":
           navigate(`/evm/transaction/${safeId}`);
+          break;
+        case "extrinsic":
+          navigate(`/substrate/extrinsic/${safeId}`);
           break;
         case "account":
           navigate(`/evm/account/${safeId}`);
@@ -344,10 +367,27 @@ const SearchBar: React.FC<SearchBarProps> = ({
             </svg>
           </div>
         );
+      case "substrate_block":
+        return (
+          <div className="rounded-full bg-indigo-100 dark:bg-indigo-900/30 p-1 flex-shrink-0">
+            <svg className="w-3 h-3 text-indigo-600 dark:text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15.211 6.276a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4.447 8.342A1 1 0 003 9.236V15a1 1 0 00.553.894l4 2A1 1 0 009 17v-5.764a1 1 0 00-.553-.894l-4-2z" />
+            </svg>
+          </div>
+        );
       case "transaction":
         return (
           <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-1 flex-shrink-0">
             <svg className="w-3 h-3 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M8 5a1 1 0 100 2h5.586l-1.293 1.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L13.586 5H8zM12 15a1 1 0 100-2H6.414l1.293-1.293a1 1 0 10-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L6.414 15H12z" />
+            </svg>
+          </div>
+        );
+      // NEW: Add icon for substrate extrinsic
+      case "extrinsic":
+        return (
+          <div className="rounded-full bg-teal-100 dark:bg-teal-900/30 p-1 flex-shrink-0">
+            <svg className="w-3 h-3 text-teal-600 dark:text-teal-400" fill="currentColor" viewBox="0 0 20 20">
               <path d="M8 5a1 1 0 100 2h5.586l-1.293 1.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L13.586 5H8zM12 15a1 1 0 100-2H6.414l1.293-1.293a1 1 0 10-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L6.414 15H12z" />
             </svg>
           </div>
@@ -531,7 +571,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             <div className="px-4 py-4 text-gray-500 dark:text-gray-400 text-center">
               No results found for "{inputValue}"
               <div className="text-xs mt-1">
-                Try searching by block number, transaction hash, address, or contract address
+                Try searching by block number, transaction hash, extrinsic hash, address, or contract address
               </div>
             </div>
           ) : null}

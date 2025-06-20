@@ -53,6 +53,25 @@ export const useSubstrateExtrinsics = (params: PaginationParams = {}) => {
   );
 };
 
+// NEW: Add the hook for getting extrinsic by hash
+export const useSubstrateExtrinsic = (
+  identifier: string | number,
+  type: "hash" | "block" = "hash"
+) => {
+  return useApi<SubstrateExtrinsic | SubstrateExtrinsic[]>(
+    () => {
+      if (type === "hash") {
+        return apiService.getSubstrateExtrinsicByHash(identifier as string);
+      }
+      return apiService.getSubstrateExtrinsicsByBlock(identifier as number);
+    },
+    {},
+    {
+      immediate: !!identifier,
+    }
+  );
+};
+
 export const useSubstrateEvents = (params: PaginationParams = {}) => {
   return useApi<SubstrateEvent[]>(
     (p) => apiService.getSubstrateEvents(p),

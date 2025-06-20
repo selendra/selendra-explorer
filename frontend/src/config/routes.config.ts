@@ -76,6 +76,7 @@ export const API_ENDPOINTS: ApiEndpoints = {
     extrinsicsByBlock: '/substrate/extrinsics/block',
     extrinsicsBySigner: '/substrate/extrinsics/signer',
     extrinsicsByModule: '/substrate/extrinsics/module',
+    extrinsicsByHash: '/substrate/extrinsics/hash', // NEW: Added this line
     events: '/substrate/events',
     eventsByBlock: '/substrate/events/block',
     eventsByModule: '/substrate/events/module',

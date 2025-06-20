@@ -51,6 +51,7 @@ export interface SubstrateEndpoints {
   extrinsicsByBlock: string;
   extrinsicsBySigner: string;
   extrinsicsByModule: string;
+  extrinsicsByHash: string; // NEW: Added this line
   events: string;
   eventsByBlock: string;
   eventsByModule: string;

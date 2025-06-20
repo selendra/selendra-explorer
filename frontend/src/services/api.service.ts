@@ -209,6 +209,11 @@ class ApiService {
     return this.request<SubstrateExtrinsic[]>(`${API_ENDPOINTS.substrate.extrinsicsByModule}${queryString ? `?${queryString}` : ''}`);
   }
 
+  // NEW: Add the getSubstrateExtrinsicByHash method
+  public async getSubstrateExtrinsicByHash(extrinsicHash: string): Promise<SubstrateExtrinsic> {
+    return this.request<SubstrateExtrinsic>(`${API_ENDPOINTS.substrate.extrinsicsByHash}/${extrinsicHash}`);
+  }
+
   // Substrate Event endpoints
   public async getSubstrateEvents(params: PaginationParams = {}): Promise<SubstrateEvent[]> {
     const queryString = buildQueryString(params);
