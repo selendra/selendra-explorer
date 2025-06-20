@@ -1,6 +1,7 @@
 use blockscan_model::extrinsic::{CallInfo, ExtrinsicDetails, SignatureInfo};
 use codec::Encode;
 use custom_error::ServiceError;
+use sp_core::blake2_256;
 use substrate_api_client::ac_primitives::{BlakeTwo256, Block, Header, OpaqueExtrinsic};
 
 // Constants for better maintainability
@@ -72,6 +73,10 @@ impl ExtrinsicInfo {
             )));
         }
 
+        // Calculate extrinsic hash
+        let hash = blake2_256(raw_data);
+        let hash_hex = format!("0x{}", hex::encode(hash));
+
         let version_byte = raw_data
             .get(length_bytes)
             .copied()
@@ -92,6 +97,7 @@ impl ExtrinsicInfo {
 
         Ok(ExtrinsicDetails {
             index,
+            hash: hash_hex, 
             is_signed,
             signature_info,
             call_info,

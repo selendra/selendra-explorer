@@ -1,6 +1,7 @@
 #[derive(Debug)]
 pub struct ExtrinsicDetails {
     pub index: usize,
+    pub hash: String,
     pub is_signed: bool,
     pub signature_info: Option<SignatureInfo>,
     pub call_info: CallInfo,
