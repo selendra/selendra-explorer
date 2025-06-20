@@ -5,3 +5,4 @@ export * from './useSubstrateData';
 export { useAddressConversion } from './useAddressConversion';
 export { useWebSocket } from './useWebSocket';
 export { usePagination } from './usePagination';
+export * from './useSearch'
