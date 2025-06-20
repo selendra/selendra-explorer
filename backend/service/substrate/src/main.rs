@@ -3,7 +3,7 @@ pub mod processing_config;
 
 use block_process::BlockProcessingService;
 use config::{
-    DATABASE_NAMESPACE, DATABASE_PASSWORD, DATABASE_TABLE, DATABASE_URL, DATABASE_USERNAME,
+    DATABASE_NAMESPACE, DATABASE_PASSWORD, DATABASE_TABLE, DATABASE_URL, DATABASE_USERNAME, SUBSTRATE_URL,
 };
 use dotenv::dotenv;
 use processing_config::{ContinuousProcessor, ProcessingConfig};
@@ -24,15 +24,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     )
     .await?;
 
-    let endpoint = "wss://rpcx.selendra.org";
-    let client = JsonrpseeClient::new(endpoint).await.map_err(|e| {
+    let client = JsonrpseeClient::new(&SUBSTRATE_URL).await.map_err(|e| {
         Box::<dyn std::error::Error>::from(format!("Failed to connect to endpoint: {:?}", e))
     })?;
 
     //1619130  869240 1619366
     let config = ProcessingConfig {
-        start_block: None,
-        end_block: None,
+        start_block: Some(3022310),
+        end_block: Some(3022320),
         batch_size: 5,
         delay_between_batches: Duration::from_millis(200),
         max_retries: 3,

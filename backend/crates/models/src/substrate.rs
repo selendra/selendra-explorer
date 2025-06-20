@@ -24,6 +24,7 @@ pub struct SubstrateBlock {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SubstrateExtrinsic {
     pub block_number: u32,
+    pub hash: String,
     pub extrinsic_index: u32,
     pub is_signed: bool,
     pub signer: Option<String>,

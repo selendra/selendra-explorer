@@ -77,6 +77,7 @@ impl BlockProcessingService {
 
                 for (_, extrinsic_details) in extrinsics.iter().enumerate() {
                     let substrate_extrinsic = SubstrateExtrinsic {
+                        hash: extrinsic_details.hash.clone(),
                         block_number,
                         extrinsic_index: extrinsic_details.index as u32,
                         is_signed: extrinsic_details.is_signed,
