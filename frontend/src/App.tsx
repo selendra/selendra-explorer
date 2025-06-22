@@ -1,9 +1,11 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider, Route, createRoutesFromElements } from "react-router-dom";
+
 import { Layout, ErrorBoundary } from './components';
-import { About } from './pages';
-import './App.css';
 import { ThemeProvider, WalletProvider } from './content';
+import { Home, Search } from './pages';
+import './App.css';
+
 
 // Loading component
 const PageLoader = () => (
@@ -15,7 +17,8 @@ const PageLoader = () => (
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
-      <Route index element={<About />} />
+      <Route index element={<Home />} />
+      <Route path="search" element={<Search />} />
     </Route>
   )
 );
