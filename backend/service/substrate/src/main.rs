@@ -3,7 +3,7 @@ pub mod processing_config;
 
 use block_process::BlockProcessingService;
 use config::{
-    DATABASE_NAMESPACE, DATABASE_PASSWORD, DATABASE_TABLE, DATABASE_URL, DATABASE_USERNAME, SUBSTRATE_URL,
+    BATCH_SIZE, DATABASE_NAMESPACE, DATABASE_PASSWORD, DATABASE_TABLE, DATABASE_URL, DATABASE_USERNAME, DELAY_BATCH, END_AT, MAX_RETRIES, START_AT, SUBSTRATE_URL
 };
 use dotenv::dotenv;
 use processing_config::{ContinuousProcessor, ProcessingConfig};
@@ -28,13 +28,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Box::<dyn std::error::Error>::from(format!("Failed to connect to endpoint: {:?}", e))
     })?;
 
-    //1619130  869240 1619366
     let config = ProcessingConfig {
-        start_block: Some(3022310),
-        end_block: Some(3022320),
-        batch_size: 5,
-        delay_between_batches: Duration::from_millis(200),
-        max_retries: 3,
+        start_block: START_AT,
+        end_block: END_AT,
+        batch_size: BATCH_SIZE,
+        delay_between_batches: Duration::from_millis(DELAY_BATCH),
+        max_retries: MAX_RETRIES,
     };
 
     // Initialize block processing service

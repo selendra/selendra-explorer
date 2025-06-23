@@ -1,18 +1,16 @@
 [package]
-name = "blockscan"
+name = "evm-blockscan"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 subxt = { workspace = true }
+ethers = { workspace = true }
 hex = { workspace = true }
 serde = { workspace = true }
 tokio = { workspace = true }
 futures = { workspace = true }
 serde_json = { workspace = true }
-sp-core = { workspace = true }
-sp-runtime = { workspace = true }
-selendra-runtime = { workspace = true }
 
 blockscan-model = { workspace = true }
 custom-error = { workspace = true }

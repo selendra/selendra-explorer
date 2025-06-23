@@ -5,9 +5,9 @@ use crate::block_process::BlockProcessingService;
 
 #[derive(Debug, Clone)]
 pub struct ProcessingConfig {
-    pub start_block: Option<u32>,
-    pub end_block: Option<u32>, // None means process to latest
-    pub batch_size: u32,
+    pub start_block: Option<u64>,
+    pub end_block: Option<u64>, // None means process to latest
+    pub batch_size: u64,
     pub delay_between_batches: Duration,
     pub max_retries: u32,
 }
@@ -40,7 +40,7 @@ impl ContinuousProcessor {
     pub async fn start_processing(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         let latest_block = self.block_processor.lastest_block().await?;
         let start_block = self.config.start_block.unwrap_or_default();
-        let end_block = self.config.end_block.unwrap_or(latest_block);
+        let end_block = self.config.end_block.unwrap_or(latest_block.into());
 
         println!("📊 Processing Configuration:");
         println!("   Start Block: {}", start_block);
@@ -64,7 +64,7 @@ impl ContinuousProcessor {
                 current_block, batch_end
             );
 
-            match self.process_block_batch(current_block, batch_end).await {
+            match self.process_block_batch(current_block as u32, batch_end as u32).await {
                 Ok(batch_processed) => {
                     processed_count += batch_processed;
                     let progress = (processed_count as f64 / total_blocks as f64) * 100.0;
@@ -158,12 +158,12 @@ impl ContinuousProcessor {
 
         loop {
             let latest_block = self.block_processor.lastest_block().await?;
-            let start_block = self.config.start_block.unwrap_or(latest_block);
+            let start_block = self.config.start_block.unwrap_or(latest_block.into());
 
-            if start_block <= latest_block {
+            if start_block <= latest_block.into() {
                 let mut temp_config = self.config.clone();
                 temp_config.start_block = Some(start_block);
-                temp_config.end_block = Some(latest_block);
+                temp_config.end_block = Some(latest_block.into());
 
                 let temp_processor =
                     ContinuousProcessor::new(self.block_processor.clone(), temp_config);

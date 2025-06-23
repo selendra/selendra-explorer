@@ -9,7 +9,7 @@ ethers = { workspace = true }
 tokio = { workspace = true }
 surrealdb = { workspace = true }
 
-blockscan = { workspace = true }
+blockscan = { path = "./blockscan", package = "evm-blockscan" }
 models = { workspace = true }
 config = { workspace = true }
 database = { workspace = true }

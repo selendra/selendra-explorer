@@ -1035,19 +1035,13 @@ dependencies = [
  "blockscan-model",
  "config",
  "custom-error",
- "ethers",
- "frame-system 4.0.0-dev",
  "futures",
  "hex",
- "pallet-balances 4.0.0-dev",
- "pallet-staking",
- "parity-scale-codec",
  "selendra-runtime",
  "serde",
  "serde_json",
  "sp-core 21.0.0",
  "sp-runtime 24.0.0",
- "substrate-api-client",
  "subxt",
  "tokio",
 ]
@@ -2856,6 +2850,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "evm-blockscan"
+version = "0.1.0"
+dependencies = [
+ "blockscan-model",
+ "config",
+ "custom-error",
+ "ethers",
+ "futures",
+ "hex",
+ "serde",
+ "serde_json",
+ "subxt",
+ "tokio",
+]
+
+[[package]]
 name = "evm-core"
 version = "0.42.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2896,12 +2906,12 @@ dependencies = [
 name = "evm-service"
 version = "0.1.0"
 dependencies = [
- "blockscan",
  "config",
  "custom-error",
  "database",
  "dotenv",
  "ethers",
+ "evm-blockscan",
  "models",
  "surrealdb",
  "tokio",
@@ -9913,21 +9923,6 @@ dependencies = [
  "schnorrkel",
  "sha2 0.10.9",
  "zeroize",
-]
-
-[[package]]
-name = "substrate-service"
-version = "0.1.0"
-dependencies = [
- "blockscan",
- "config",
- "custom-error",
- "database",
- "dotenv",
- "models",
- "serde_json",
- "substrate-api-client",
- "tokio",
 ]
 
 [[package]]

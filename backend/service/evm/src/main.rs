@@ -3,8 +3,7 @@ pub mod processing_config;
 
 use block_process::BlockProcessingService;
 use config::{
-    DATABASE_NAMESPACE, DATABASE_PASSWORD, DATABASE_TABLE, DATABASE_URL, DATABASE_USERNAME,
-    EVM_RPC_URL,
+    BATCH_SIZE, DATABASE_NAMESPACE, DATABASE_PASSWORD, DATABASE_TABLE, DATABASE_URL, DATABASE_USERNAME, DELAY_BATCH, END_AT, EVM_RPC_URL, MAX_RETRIES, START_AT
 };
 use dotenv::dotenv;
 use ethers::providers::{Http, Provider};
@@ -30,13 +29,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Initialize block processing service
     let block_processor = BlockProcessingService::new(Arc::clone(&provider), database);
 
-    //1619130  869240
     let config = ProcessingConfig {
-        start_block: None,
-        end_block: None,
-        batch_size: 5,
-        delay_between_batches: Duration::from_millis(200),
-        max_retries: 3,
+        start_block: START_AT,
+        end_block: END_AT,
+        batch_size: BATCH_SIZE,
+        delay_between_batches: Duration::from_millis(DELAY_BATCH),
+        max_retries: MAX_RETRIES,
     };
 
     let processor = ContinuousProcessor::new(block_processor, config);

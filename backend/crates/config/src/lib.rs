@@ -43,3 +43,10 @@ pub const GENESIS_TIMESTAMP: u128 = 1_745_282_623_000;
 // Constants for better maintainability
 pub const DECIMALS: u128 = 1_000_000_000_000_000_000; // 10^18
 pub const DECIMALS_F64: f64 = 1_000_000_000_000_000_000.0;
+
+// contanst for service
+pub const START_AT: Option<u64> = Some(0);  //1619130  869240 1619366   //1619130  869240
+pub const END_AT: Option<u64> = Some(0);
+pub const BATCH_SIZE: u64 = 20;
+pub const MAX_RETRIES: u32 = 3;
+pub const DELAY_BATCH: u64 = 200;

@@ -9,7 +9,7 @@ members = [
     "crates/models",
     "crates/config",
     "service/evm",
-    "service/substrate",
+    # "service/substrate",
     "service/account",
     "api",
 ]
