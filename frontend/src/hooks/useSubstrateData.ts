@@ -27,20 +27,17 @@ export const useLatestSubstrateBlock = () => {
   );
 };
 
-export const useSubstrateBlock = (
-  identifier: string | number,
-  type: "number" | "hash" = "number"
-) => {
+export const useSubstrateBlock = (identifier: string | number, type: 'number' | 'hash' = 'number', options: { enabled?: boolean } = {}) => {
   return useApi<SubstrateBlock>(
     () => {
-      if (type === "hash") {
+      if (type === 'hash') {
         return apiService.getSubstrateBlockByHash(identifier as string);
       }
       return apiService.getSubstrateBlockByNumber(identifier as number);
     },
     {},
-    {
-      immediate: !!identifier,
+    { 
+      immediate: options.enabled !== false && !!identifier
     }
   );
 };
@@ -90,6 +87,16 @@ export const useRecentSubstrateEvents = (params: PaginationParams = {}) => {
     {
       immediate: true,
       refreshInterval: APP_CONFIG.refreshIntervals.events,
+    }
+  );
+};
+
+export const useSubstrateExtrinsicsByBlock = (blockNumber: number | undefined, options: { enabled?: boolean } = {}) => {
+  return useApi<SubstrateExtrinsic[]>(
+    () => apiService.getSubstrateExtrinsicsByBlock(blockNumber!),
+    {},
+    { 
+      immediate: options.enabled !== false && !!blockNumber
     }
   );
 };

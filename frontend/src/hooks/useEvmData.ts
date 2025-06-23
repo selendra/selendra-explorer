@@ -22,7 +22,7 @@ export const useLatestEvmBlock = () => {
   );
 };
 
-export const useEvmBlock = (identifier: string | number, type: 'number' | 'hash' = 'number') => {
+export const useEvmBlock = (identifier: string | number, type: 'number' | 'hash' = 'number', options: { enabled?: boolean } = {}) => {
   return useApi<EvmBlock>(
     () => {
       if (type === 'hash') {
@@ -32,7 +32,7 @@ export const useEvmBlock = (identifier: string | number, type: 'number' | 'hash'
     },
     {},
     { 
-      immediate: !!identifier
+      immediate: options.enabled !== false && !!identifier
     }
   );
 };
@@ -94,3 +94,14 @@ export const useEvmContract = (address: string) => {
     }
   );
 };
+
+export const useEvmTransactionsByBlock = (blockNumber: number | undefined, options: { enabled?: boolean } = {}) => {
+  return useApi<EvmTransaction[]>(
+    () => apiService.getEvmTransactionsByBlock(blockNumber!),
+    {},
+    { 
+      immediate: options.enabled !== false && !!blockNumber
+    }
+  );
+};
+
