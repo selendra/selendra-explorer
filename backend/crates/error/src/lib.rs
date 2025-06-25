@@ -18,4 +18,8 @@ pub enum ServiceError {
     SubstrateError(String),
     #[error("Surrealdb error: {0}")]
     DatabaseError(String),
+    #[error("Substrate error: {0}")]
+    InsufficientData(String),
+    #[error("Substrate error: {0}")]
+    InvalidData(String),
 }

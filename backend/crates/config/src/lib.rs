@@ -45,8 +45,15 @@ pub const DECIMALS: u128 = 1_000_000_000_000_000_000; // 10^18
 pub const DECIMALS_F64: f64 = 1_000_000_000_000_000_000.0;
 
 // contanst for service
-pub const START_AT: Option<u64> = Some(0);  //1619130  869240 1619366   //1619130  869240
+pub const START_AT: Option<u64> = Some(0); //1619130  869240 1619366   //1619130  869240
 pub const END_AT: Option<u64> = Some(0);
 pub const BATCH_SIZE: u64 = 20;
 pub const MAX_RETRIES: u32 = 3;
 pub const DELAY_BATCH: u64 = 200;
+
+pub const SIGNER_BYTES: usize = 32;
+pub const SIGNATURE_BYTES: usize = 64;
+pub const EVM_ADDRESS_BYTES: usize = 20;
+pub const VALUE_BYTES: usize = 32;
+pub const GAS_LIMIT_BYTES: usize = 8;
+pub const MIN_SEARCH_OFFSET: usize = 50;

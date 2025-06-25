@@ -1032,11 +1032,13 @@ dependencies = [
 name = "blockscan"
 version = "0.1.0"
 dependencies = [
- "blockscan-model",
  "config",
  "custom-error",
+ "database",
+ "dotenv",
  "futures",
  "hex",
+ "parity-scale-codec",
  "selendra-runtime",
  "serde",
  "serde_json",

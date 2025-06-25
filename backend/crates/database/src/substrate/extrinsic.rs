@@ -263,11 +263,11 @@ impl<'a> SubstrateExtrinsicService<'a> {
             .map_err(|e| {
                 ServiceError::DatabaseError(format!("Extrinsic by hash query failed: {}", e))
             })?;
-    
+
         let extrinsics: Vec<SubstrateExtrinsic> = result.take(0).map_err(|e| {
             ServiceError::DatabaseError(format!("Extrinsic by hash extraction failed: {}", e))
         })?;
-    
+
         Ok(extrinsics.into_iter().next())
     }
 }
