@@ -1,5 +1,5 @@
 #[derive(Debug, Clone)]
-pub struct ExtrinsicDetails {
+pub struct DataExtrinsic {
     pub index: u32,
     pub hash: String,
     pub is_signed: bool,
@@ -49,16 +49,14 @@ impl CallInfo {
     }
 }
 
-
 #[derive(Debug, Clone)]
-pub struct EventDetails {
+pub struct DataEvent {
     pub extrinsic_index: u32,
     pub event_index: u32,
     pub pallet: String,
     pub event: String,
     pub phase: EventPhase,
     pub topics: Vec<String>,
-    pub data: Vec<u8>,
     pub decoded_data: Vec<(String, String)>,
 }
 

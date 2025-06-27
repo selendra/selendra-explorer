@@ -4,7 +4,7 @@ use config::{
 };
 use custom_error::ServiceError;
 
-use crate::data_types::{CallInfo, Era, ExtrinsicDetails, SignatureInfo};
+use crate::data_types::{CallInfo, Era, DataExtrinsic, SignatureInfo};
 
 mod index_pallet {
     pub const SYSTEM: u8 = 0;
@@ -144,7 +144,7 @@ impl ExtrinsicDecoder {
         &self,
         extrinsic_bytes: &[u8],
         index: u32,
-    ) -> Result<ExtrinsicDetails, ServiceError> {
+    ) -> Result<DataExtrinsic, ServiceError> {
         if extrinsic_bytes.is_empty() {
             return Err(ServiceError::InsufficientData(
                 "Empty extrinsic data".to_string(),
@@ -183,7 +183,7 @@ impl ExtrinsicDecoder {
             .decode_call_info(extrinsic_bytes, is_signed, length_bytes)
             .await?;
 
-        Ok(ExtrinsicDetails {
+        Ok(DataExtrinsic {
             index,
             is_signed,
             signature_info,

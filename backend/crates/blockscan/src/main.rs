@@ -1,14 +1,14 @@
+pub mod data_types;
+mod processing;
+mod scan;
+mod substrate;
+
 use crate::processing::BlockProcessingService;
 use config::{
     DATABASE_NAMESPACE, DATABASE_PASSWORD, DATABASE_TABLE, DATABASE_URL, DATABASE_USERNAME,
 };
 use dotenv::dotenv;
-
-pub mod data_types;
-mod extrinsic;
-mod event;
-mod processing;
-mod scan;
+use substrate::{event, extrinsic};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -24,7 +24,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let processor = BlockProcessingService::new("wss://rpc.selendra.org".to_string(), database)?;
     println!("laste block {:?}", processor.lastest_block().await?);
-    // processor.process_block(Some(3_455_947)).await?;
+    processor.process_chain_data(Some(3606538)).await?;
     processor.process_chain_data(Some(3_456_091)).await?;
     Ok(())
 }

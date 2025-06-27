@@ -4,7 +4,7 @@ use subxt::{
 };
 
 use crate::{
-    data_types::{CallInfo, EventDetails, EventPhase, ExtrinsicDetails}, event::EventDecoder, extrinsic::ExtrinsicDecoder
+    data_types::{CallInfo, DataEvent, EventPhase, DataExtrinsic}, event::EventDecoder, extrinsic::ExtrinsicDecoder
 };
 
 #[derive(Clone)]
@@ -84,7 +84,7 @@ impl SubstrateBlockQuery {
     pub async fn get_extrinsics_with_events(
         &self,
         block: Block<SubstrateConfig, OnlineClient<SubstrateConfig>>,
-    ) -> Result<(Vec<ExtrinsicDetails>, Vec<Vec<EventDetails>>), ServiceError> {
+    ) -> Result<(Vec<DataExtrinsic>, Vec<Vec<DataEvent>>), ServiceError> {
         let extrinsics = block
             .extrinsics()
             .await
@@ -120,7 +120,7 @@ impl SubstrateBlockQuery {
                     detail.hash = hash;
                     detail
                 }
-                Err(e) => ExtrinsicDetails {
+                Err(e) => DataExtrinsic {
                     index: idx,
                     hash: "0xErr".to_string(),
                     is_signed: false,
@@ -144,7 +144,7 @@ impl SubstrateBlockQuery {
         &self,
         events: ExtrinsicEvents<SubstrateConfig>,
         extrinsic_index: u32,
-    ) -> Result<Vec<EventDetails>, ServiceError> {
+    ) -> Result<Vec<DataEvent>, ServiceError> {
         let event_decoder = EventDecoder::new();
         let mut event_details = Vec::new();
 
@@ -165,23 +165,19 @@ impl SubstrateBlockQuery {
             // Get event name
             let (pallet_name, event_name) = event_decoder.get_event_name(pallet_index, event_variant);
             
-            // Get raw event data
-            let raw_data = event.field_bytes();
-            
             // Decode event data
-            let decoded_data = event_decoder.decode_event_data(pallet_index, event_variant, raw_data);
+            let decoded_data = event_decoder.decode_event_data(pallet_index, event_variant, event.clone());
             
             // Get topics (if any)
             let topics = event.topics().iter().map(|t| format!("{:?}", t)).collect();
 
-            let event_detail = EventDetails {
+            let event_detail = DataEvent {
                 extrinsic_index,
                 event_index: event_index as u32,
                 pallet: pallet_name,
                 event: event_name,
                 phase,
                 topics,
-                data: raw_data.to_vec(),
                 decoded_data,
             };
 
