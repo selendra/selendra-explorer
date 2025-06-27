@@ -25,8 +25,35 @@ impl BlockProcessingService {
         let client = SubstrateBlockQuery::new(&self.url, block_number).await?;
 
         let block = client.get_block().await?;
-        let (extrinsic, _event) = client.get_extrinsics_with_events(block).await?;
-        println!("Extrinsic: {:?}", extrinsic);
+        let (extrinsics, events) = client.get_extrinsics_with_events(block).await?;
+        
+        println!("Extrinsics: {:?}", extrinsics);
+        println!("Events: {:?}", events);
+        
+        // Process each extrinsic with its events
+        for (extrinsic, extrinsic_events) in extrinsics.iter().zip(events.iter()) {
+            println!("Extrinsic {}: {} - {}", 
+                extrinsic.index, 
+                extrinsic.call_info.pallet, 
+                extrinsic.call_info.call
+            );
+            
+            for event in extrinsic_events {
+                println!("  Event {}: {} - {} (Phase: {})", 
+                    event.event_index,
+                    event.pallet,
+                    event.event,
+                    event.phase
+                );
+                
+                if !event.decoded_data.is_empty() {
+                    for (key, value) in &event.decoded_data {
+                        println!("    {}: {}", key, value);
+                    }
+                }
+            }
+        }
+        
         Ok(())
     }
 }

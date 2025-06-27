@@ -1,14 +1,10 @@
 use custom_error::ServiceError;
 use subxt::{
-    OnlineClient, SubstrateConfig,
-    backend::{legacy::LegacyRpcMethods, rpc::RpcClient},
-    blocks::{Block, ExtrinsicEvents},
-    utils::H256,
+    backend::rpc::RpcClient, blocks::{Block, ExtrinsicEvents}, ext::subxt_rpcs::LegacyRpcMethods, utils::H256, OnlineClient, SubstrateConfig
 };
 
 use crate::{
-    data_types::{CallInfo, ExtrinsicDetails},
-    extrinsic::ExtrinsicDecoder,
+    data_types::{CallInfo, EventDetails, EventPhase, ExtrinsicDetails}, event::EventDecoder, extrinsic::ExtrinsicDecoder
 };
 
 #[derive(Clone)]
@@ -88,7 +84,7 @@ impl SubstrateBlockQuery {
     pub async fn get_extrinsics_with_events(
         &self,
         block: Block<SubstrateConfig, OnlineClient<SubstrateConfig>>,
-    ) -> Result<(Vec<ExtrinsicDetails>, Vec<ExtrinsicEvents<SubstrateConfig>>), ServiceError> {
+    ) -> Result<(Vec<ExtrinsicDetails>, Vec<Vec<EventDetails>>), ServiceError> {
         let extrinsics = block
             .extrinsics()
             .await
@@ -96,7 +92,7 @@ impl SubstrateBlockQuery {
 
         let decoder = ExtrinsicDecoder::new();
         let mut extrinsic_details = Vec::new();
-        let mut events = Vec::new();
+        let mut all_events = Vec::new();
 
         for ext in extrinsics.iter() {
             let idx = ext.index();
@@ -107,11 +103,13 @@ impl SubstrateBlockQuery {
             }
 
             // Process events for this extrinsic
-            let event = ext
+            let extrinsic_events = ext
                 .events()
                 .await
                 .map_err(|e| ServiceError::SubstrateError(e.to_string()))?;
-            events.push(event);
+            
+            let event_details = self.event_info(extrinsic_events, idx).await?;
+            all_events.push(event_details);
 
             // Process extrinsic details
             let raw_bytes = ext.bytes();
@@ -139,14 +137,57 @@ impl SubstrateBlockQuery {
             extrinsic_details.push(extrinsic_detail);
         }
 
-        Ok((extrinsic_details, events))
+        Ok((extrinsic_details, all_events))
     }
 
-    pub async fn _event_info(
+    pub async fn event_info(
         &self,
-        _event: ExtrinsicEvents<SubstrateConfig>,
-    ) -> Result<(), ServiceError> {
-        todo!();
-        // Process event information here
+        events: ExtrinsicEvents<SubstrateConfig>,
+        extrinsic_index: u32,
+    ) -> Result<Vec<EventDetails>, ServiceError> {
+        let event_decoder = EventDecoder::new();
+        let mut event_details = Vec::new();
+
+        for (event_index, event) in events.iter().enumerate() {
+            let event = event.map_err(|e| ServiceError::SubstrateError(e.to_string()))?;
+            
+            // Get the phase
+            let phase = match event.phase() {
+                subxt::events::Phase::ApplyExtrinsic(idx) => EventPhase::ApplyExtrinsic(idx),
+                subxt::events::Phase::Finalization => EventPhase::Finalization,
+                subxt::events::Phase::Initialization => EventPhase::Initialization,
+            };
+
+            // Get pallet and event indices
+            let pallet_index = event.pallet_index();
+            let event_variant = event.variant_index();
+            
+            // Get event name
+            let (pallet_name, event_name) = event_decoder.get_event_name(pallet_index, event_variant);
+            
+            // Get raw event data
+            let raw_data = event.field_bytes();
+            
+            // Decode event data
+            let decoded_data = event_decoder.decode_event_data(pallet_index, event_variant, raw_data);
+            
+            // Get topics (if any)
+            let topics = event.topics().iter().map(|t| format!("{:?}", t)).collect();
+
+            let event_detail = EventDetails {
+                extrinsic_index,
+                event_index: event_index as u32,
+                pallet: pallet_name,
+                event: event_name,
+                phase,
+                topics,
+                data: raw_data.to_vec(),
+                decoded_data,
+            };
+
+            event_details.push(event_detail);
+        }
+
+        Ok(event_details)
     }
 }

@@ -6,6 +6,7 @@ use dotenv::dotenv;
 
 pub mod data_types;
 mod extrinsic;
+mod event;
 mod processing;
 mod scan;
 
