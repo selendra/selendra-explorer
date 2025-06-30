@@ -4,13 +4,15 @@ use subxt::{
 };
 
 use crate::{
-    data_types::{CallInfo, DataEvent, EventPhase, DataExtrinsic}, event::EventDecoder, extrinsic::ExtrinsicDecoder
+    data_types::{CallInfo, DataEvent, DataExtrinsic, EventPhase}, event::EventDecoder, extrinsic::ExtrinsicDecoder, substrate::validator::ValidatorQuery
 };
 
 #[derive(Clone)]
 pub struct SubstrateBlockQuery {
+    pub rpc: LegacyRpcMethods<SubstrateConfig>,
     pub client: OnlineClient<SubstrateConfig>,
     pub block_hash: H256,
+    pub block_number: u32
 }
 
 impl SubstrateBlockQuery {
@@ -27,7 +29,7 @@ impl SubstrateBlockQuery {
 
         let rpc = LegacyRpcMethods::<SubstrateConfig>::new(rpc_client);
 
-        let block_hash = match block_number {
+        let (block_hash, actual_block_number) = match block_number {
             Some(num) => {
                 // Specific block number provided
                 let hash = rpc
@@ -39,26 +41,34 @@ impl SubstrateBlockQuery {
                     .ok_or_else(|| {
                         ServiceError::SubstrateError("Block hash not found".to_string())
                     })?;
-                hash
+                (hash, num)
             }
             None => {
-                let latest_hash = client
+                // Get the latest block
+                let latest_block = client
                     .blocks()
                     .at_latest()
                     .await
                     .map_err(|e| {
                         ServiceError::SubstrateError(format!(
-                            "Error getting lastest block: {:?}",
+                            "Error getting latest block: {:?}",
                             e
                         ))
-                    })?
-                    .hash();
+                    })?;
 
-                latest_hash
+                let latest_hash = latest_block.hash();
+                let latest_number = latest_block.number();
+
+                (latest_hash, latest_number)
             }
         };
 
-        Ok(Self { client, block_hash })
+        Ok(Self {
+            rpc,
+            client,
+            block_hash,
+            block_number: actual_block_number,
+        })
     }
 
     pub async fn latest_block(&self) -> Result<u32, ServiceError> {
@@ -66,6 +76,25 @@ impl SubstrateBlockQuery {
             ServiceError::SubstrateError(format!("Error getting lastest block: {:?}", e))
         })?;
         Ok(latest_block.number())
+    }
+
+    pub async fn is_block_finalized(&self) -> Result<bool, ServiceError> {
+        let finalized_hash = self.rpc
+            .chain_get_finalized_head()
+            .await
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!("Error getting finalized head: {:?}", e))
+            })?;
+
+        let finalized_block = self
+            .client
+            .blocks()
+            .at(finalized_hash)
+            .await
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!("Error getting finalized block: {:?}", e))
+            })?;
+        Ok(self.block_number <= finalized_block.number())
     }
 
     pub async fn get_block(
@@ -185,5 +214,151 @@ impl SubstrateBlockQuery {
         }
 
         Ok(event_details)
+    }
+
+    pub async fn get_validator(&self) -> Result<(), ServiceError> {
+        let validate = ValidatorQuery::new(self.rpc.clone(), self.client.clone()).await?;
+        validate.get_validators_in_era().await?;
+        Ok(())
+    }
+
+    pub async fn get_current_era(&self) -> Result<u32, ServiceError> {
+        let active_era = self
+            .client
+            .storage()
+            .at_latest()
+            .await
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!("Error getting lastest block: {:?}", e))
+            })?
+            .fetch(&config::selendra::storage().staking().active_era())
+            .await
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!("Error getting active era: {:?}", e))
+            })?;
+
+        match active_era {
+            Some(era) => Ok(era.index),
+            None => Err(ServiceError::SubstrateError(
+                "No active era found".to_string(),
+            )),
+        }
+    }
+
+    pub async fn get_current_session(&self) -> Result<u32, ServiceError> {
+        let session = self
+            .client
+            .storage()
+            .at_latest()
+            .await
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!("Error getting lastest block: {:?}", e))
+            })?
+            .fetch(&config::selendra::storage().session().current_index())
+            .await
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!("Error getting active era: {:?}", e))
+            })?;
+
+        Ok(session.unwrap_or(0))
+    }
+
+    pub async fn get_total_issuance(&self) -> Result<u128, ServiceError> {
+        let total_issuance = self
+            .client
+            .storage()
+            .at_latest()
+            .await
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!("Error getting lastest block: {:?}", e))
+            })?
+            .fetch(&config::selendra::storage().balances().total_issuance())
+            .await
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!("Error getting total issuance: {:?}", e))
+            })?;
+
+        Ok(total_issuance.unwrap_or(0))
+    }
+
+
+    pub async fn check_account_balance(&self, account_address: &str) -> Result<u128, ServiceError> {
+        use subxt::utils::AccountId32;
+
+        // Parse the account address
+        let account_id = if account_address.starts_with("0x") {
+            // Handle hex-encoded account ID
+            let hex_bytes = hex::decode(&account_address[2..]).map_err(|e| {
+                ServiceError::SubstrateError(format!("Error decoding hex account id: {:?}", e))
+            })?;
+            let account_array: [u8; 32] = hex_bytes.try_into().map_err(|_| {
+                ServiceError::SubstrateError(
+                    "Invalid hex account id length, expected 32 bytes".to_string(),
+                )
+            })?;
+            AccountId32::from(account_array)
+        } else {
+            // Handle SS58 address
+            account_address.parse::<AccountId32>().map_err(|e| {
+                ServiceError::SubstrateError(format!(
+                    "Error parsing SS58 address '{}': {:?}",
+                    account_address, e
+                ))
+            })?
+        };
+
+        let account_info = self
+            .client
+            .storage()
+            .at_latest()
+            .await
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!("Error getting latest block: {:?}", e))
+            })?
+            .fetch(&config::selendra::storage().system().account(account_id))
+            .await
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!("Error getting account info: {:?}", e))
+            })?;
+
+        match account_info {
+            Some(info) => Ok(info.data.free + info.data.reserved),
+            None => Ok(0), // Account doesn't exist, balance is 0
+        }
+    }
+
+    pub async fn get_total_staking(&self) -> Result<u128, ServiceError> {
+        let active_era = match self
+            .client
+            .storage()
+            .at_latest()
+            .await
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!("Error getting lastest block: {:?}", e))
+            })?
+            .fetch(&config::selendra::storage().staking().active_era())
+            .await
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!("Error getting active era: {:?}", e))
+            })? {
+            Some(era) => era.index,
+            None => 0,
+        };
+
+        let total_stake = self
+            .client
+            .storage()
+            .at_latest()
+            .await
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!("Error getting lastest block: {:?}", e))
+            })?
+            .fetch(&config::selendra::storage().staking().eras_total_stake(active_era))
+            .await
+            .map_err(|e| {
+                ServiceError::SubstrateError(format!("Error getting total stake: {:?}", e))
+            })?;
+
+        Ok(total_stake.unwrap_or(0))
     }
 }

@@ -11,7 +11,7 @@ members = [
     "service/evm",
     # "service/substrate",
     "service/account",
-    "api",
+    # "api",
 ]
 
 [profile.release]

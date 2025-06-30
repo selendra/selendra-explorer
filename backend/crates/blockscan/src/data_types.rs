@@ -1,3 +1,5 @@
+use subxt::utils::AccountId32;
+
 #[derive(Debug, Clone)]
 pub struct DataExtrinsic {
     pub index: u32,
@@ -75,4 +77,11 @@ impl std::fmt::Display for EventPhase {
             EventPhase::Initialization => write!(f, "Initialization"),
         }
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct EraValidator {
+    pub reserve: usize,
+    pub non_reserve: usize,
+    pub account: AccountId32
 }

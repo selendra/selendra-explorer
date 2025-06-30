@@ -22,10 +22,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     )
     .await?;
 
-    let processor = BlockProcessingService::new("wss://rpc.selendra.org".to_string(), database)?;
+    let processor = BlockProcessingService::new("wss://rpc.selendra.org".to_string(), Some(3_456_091), database).await?;
     println!("laste block {:?}", processor.lastest_block().await?);
-    processor.process_chain_data(Some(3606538)).await?;
-    processor.process_chain_data(Some(3_456_091)).await?;
+    // processor.process_chain_data(Some(3606538)).await?;
+    // processor.process_chain_data().await?;
+    processor.validator_info().await?;
     Ok(())
 }
 
